@@ -8,85 +8,102 @@ WHITE    = ( 255, 255, 255)
 RED      = ( 255,   0,   0)
 GRAYDARK = ( 167, 167, 167)
 GRAYLIGHT= ( 205, 205, 205)
+BLOCKSIZE= 20 #tamanho do lado de cada block
+MATRIXSIZE=21 #tamanho do lado da matrix, se for igual BLOCKSIZE nao da pra ver grade, diferente aparece grade no fundo
+COLUMNS  = 10
+ROWS     = 10
+BOMBS    = 10
 
-class Mina(pygame.sprite.Sprite):
-    """
-    This class represents the ball
-    It derives from the "Sprite" class in Pygame
-    """
-    def __init__(self, img,posX, posY):
-
-        super(Mina,self).__init__()
-        self.image = pygame.image.load(img).convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.x = 20 * posX
-        self.rect.y = 20 * posY
 class Block(pygame.sprite.Sprite):
 
-    def __init__(self, color, posX, posY):
+    def __init__(self, posX, posY):
         super(Block,self).__init__()
-        self.image = pygame.Surface([20, 20])
-        self.image.fill(color)
+        self.image = pygame.Surface([BLOCKSIZE, BLOCKSIZE])
+        self.image.fill(GRAYLIGHT)
         self.rect = self.image.get_rect()
-        self.rect.x = 20 * posX
-        self.rect.y = 20 * posY
+        self.rect.x = MATRIXSIZE * posX
+        self.rect.y = MATRIXSIZE * posY
+        self.neighbors = 0
+        self.changed=False
+    def reveal(self):
+        if not self.changed:
+            for block in mines:
+                if block.rect.collidepoint((self.rect.x + MATRIXSIZE, self.rect.y)):
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x + MATRIXSIZE, self.rect.y):  # tem alguem a direita
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x - MATRIXSIZE, self.rect.y):  # esqueda
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x, self.rect.y + MATRIXSIZE):  # baixo
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x, self.rect.y - MATRIXSIZE):  # cima
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x + MATRIXSIZE, self.rect.y - MATRIXSIZE):  # direta superior
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x - MATRIXSIZE, self.rect.y - MATRIXSIZE):  # esquerda superior
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x - MATRIXSIZE, self.rect.y + MATRIXSIZE):  # esquerda inferior
+                    self.neighbors += 1
+                elif block.rect.collidepoint(self.rect.x + MATRIXSIZE, self.rect.y + MATRIXSIZE):  # direita inferior
+                    self.neighbors += 1
+            if self.neighbors>0:
+                self.image = pygame.image.load("number"+str(self.neighbors)+".png").convert_alpha()
+            else:
+                self.image.fill(GRAYDARK)
+            self.changed=True
 
-    def update(self):
-        """ Called each frame. """
 
-        # Move block down one pixel
-        self.rect.y += 1
+class Mina(Block):
 
-        # If block is too far down, reset to top of screen.
-        if self.rect.y > 400:
-            self.reset_pos()
-
-
-class Player(Block):
-    """ The player class derives from Block, but overrides the 'update'
-    functionality with new a movement function that will move the block
-    with the mouse. """
-    def update(self):
-        # Get the current mouse position. This returns the position
-        # as a list of two numbers.
-        pos = pygame.mouse.get_pos()
-
-        # Fetch the x and y out of the list,
-        # just like we'd fetch letters out of a string.
-        # Set the player object to the mouse location
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+    def reveal(self):
+        self.image=pygame.image.load("mina.png").convert_alpha()
 
 # Initialize Pygame
 pygame.init()
 
 # Set the height and width of the screen
-screen_width = 200
-screen_height = 200
+screen_width = COLUMNS*MATRIXSIZE
+screen_height = ROWS*MATRIXSIZE
 screen = pygame.display.set_mode([screen_width, screen_height])
 
 #criando matriz 10 por 10
 matrix = [[0 for x in range(10)] for y in range(10)]
 #gupo dos elementos no campo
-field = pygame.sprite.Group()
+mines = pygame.sprite.Group()
+all_sprites_list = pygame.sprite.Group()
 
 # This is a list of every sprite. All blocks and the player block as well.
 all_sprites_list = pygame.sprite.Group()
 
-for i in range(50):
+for i in range(BOMBS):
     # This represents a block
-    posX=random.randrange(10)
-    posY=random.randrange(10)
-    mina = Mina("mina.png",posX,posY)
+    empty=True
+    posX=random.randrange(COLUMNS)
+    posY=random.randrange(ROWS)
+    for block in all_sprites_list:
+        if block.rect.collidepoint(posX*MATRIXSIZE, posY*MATRIXSIZE):
+            empty=False
+    if empty:
+        mina = Mina(posX,posY)
     # Add the block to the list of objects
-    field.add(mina)
-    all_sprites_list.add(mina)
+        mines.add(mina)
+        all_sprites_list.add(mina)
+
+for posX in range(COLUMNS):
+    for posY in range(ROWS):
+        empty=True
+        for block in all_sprites_list:
+            if block.rect.collidepoint(posX * MATRIXSIZE, posY * MATRIXSIZE):
+                empty = False
+        if empty:
+            bloco = Block(posX,posY)
+            all_sprites_list.add(bloco)
 
 
 
 # Create a red player block
-player = Player(RED, 20, 20)
-all_sprites_list.add(player)
+#player = Player(RED, 20, 20)
+#all_sprites_list.add(player)
 
 #Loop until the user clicks the close button.
 done = False
@@ -107,17 +124,15 @@ while not done:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             x, y = event.pos
-            for block in field:
+            for block in all_sprites_list:
                 if block.rect.collidepoint(x, y):
-                    score += 1
-                    print score
+                    block.reveal()
 
         # Clear the screen
     screen.fill(GRAYDARK)
 
-    # Draw all the spites
-    field.draw(screen)
-
+    for block in all_sprites_list: block.reveal()
+    all_sprites_list.draw(screen)
     # Limit to 20 frames per second
     clock.tick(20)
 

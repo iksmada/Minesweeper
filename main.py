@@ -9,10 +9,10 @@ RED      = ( 255,   0,   0)
 GRAYDARK = ( 167, 167, 167)
 GRAYLIGHT= ( 205, 205, 205)
 BLOCKSIZE= 20 #tamanho do lado de cada block
-MATRIXSIZE=21 #tamanho do lado da matrix, se for igual BLOCKSIZE nao da pra ver grade, diferente aparece grade no fundo
+MATRIXSIZE=25 #tamanho do lado da matrix, se for igual BLOCKSIZE nao da pra ver grade, diferente aparece grade no fundo
 COLUMNS  = 10
 ROWS     = 10
-BOMBS    = 10
+BOMBS    = 50
 
 class Block(pygame.sprite.Sprite):
 
@@ -20,37 +20,42 @@ class Block(pygame.sprite.Sprite):
         super(Block,self).__init__()
         self.image = pygame.Surface([BLOCKSIZE, BLOCKSIZE])
         self.image.fill(GRAYLIGHT)
+        self.posX=posX
+        self.posY=posY
         self.rect = self.image.get_rect()
         self.rect.x = MATRIXSIZE * posX
         self.rect.y = MATRIXSIZE * posY
         self.neighbors = 0
-        self.changed=False
+
     def reveal(self):
-        if not self.changed:
-            for block in mines:
-                if block.rect.collidepoint((self.rect.x + MATRIXSIZE, self.rect.y)):
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x + MATRIXSIZE, self.rect.y):  # tem alguem a direita
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x - MATRIXSIZE, self.rect.y):  # esqueda
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x, self.rect.y + MATRIXSIZE):  # baixo
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x, self.rect.y - MATRIXSIZE):  # cima
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x + MATRIXSIZE, self.rect.y - MATRIXSIZE):  # direta superior
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x - MATRIXSIZE, self.rect.y - MATRIXSIZE):  # esquerda superior
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x - MATRIXSIZE, self.rect.y + MATRIXSIZE):  # esquerda inferior
-                    self.neighbors += 1
-                elif block.rect.collidepoint(self.rect.x + MATRIXSIZE, self.rect.y + MATRIXSIZE):  # direita inferior
-                    self.neighbors += 1
-            if self.neighbors>0:
-                self.image = pygame.image.load("number"+str(self.neighbors)+".png").convert_alpha()
-            else:
-                self.image.fill(GRAYDARK)
-            self.changed=True
+        print "matrix[" + str(self.posX+1) + "][" + str(self.posY) + "] = " + str(matrix[self.posX+1][self.posY])
+        if   type(matrix[self.posX + 1][self.posY    ]) is Mina:
+            self.neighbors += 1
+        if type(matrix[self.posX    ][self.posY + 1]) is Mina:
+            self.neighbors += 1
+        if type(matrix[self.posX - 1][self.posY    ]) is Mina:
+            self.neighbors += 1
+        if type(matrix[self.posX    ][self.posY - 1] ) is Mina:
+            self.neighbors += 1
+        if type(matrix[self.posX + 1][self.posY + 1] ) is Mina:
+            self.neighbors += 1
+        if type(matrix[self.posX - 1][self.posY + 1] ) is Mina:
+            self.neighbors += 1
+        if type(matrix[self.posX + 1][self.posY - 1] ) is Mina:
+            self.neighbors += 1
+        if type(matrix[self.posX - 1][self.posY - 1] ) is Mina:
+            self.neighbors += 1
+
+        if self.neighbors>0:
+            self.image = pygame.image.load("number"+str(self.neighbors)+".png").convert_alpha()
+        else:
+            self.image.fill(GRAYDARK)
+
+        self.neighbors = 0
+
+
+    def __str__(self):
+        return "bloco"
 
 
 class Mina(Block):
@@ -58,48 +63,48 @@ class Mina(Block):
     def reveal(self):
         self.image=pygame.image.load("mina.png").convert_alpha()
 
+    def __str__(self):
+        return "mina"
+
 # Initialize Pygame
 pygame.init()
 
-# Set the height and width of the screen
+#tamanho da janela depende do numero de columas linhas e do tamanho de cada celula da matrix
 screen_width = COLUMNS*MATRIXSIZE
 screen_height = ROWS*MATRIXSIZE
 screen = pygame.display.set_mode([screen_width, screen_height])
 
 #criando matriz 10 por 10
-matrix = [[0 for x in range(10)] for y in range(10)]
-#gupo dos elementos no campo
+matrix = [[0 for x in range(COLUMNS+1)] for y in range(ROWS+1)] #+1 para poder verificar do lado
+#grupo dos elementos de minas e total
 mines = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
 # This is a list of every sprite. All blocks and the player block as well.
 all_sprites_list = pygame.sprite.Group()
 
+#cria bombas
 for i in range(BOMBS):
-    # This represents a block
+
     empty=True
     posX=random.randrange(COLUMNS)
     posY=random.randrange(ROWS)
-    for block in all_sprites_list:
-        if block.rect.collidepoint(posX*MATRIXSIZE, posY*MATRIXSIZE):
-            empty=False
-    if empty:
+    print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+    if matrix[posX][posY]==0:
         mina = Mina(posX,posY)
+        matrix[posX][posY]=mina
     # Add the block to the list of objects
         mines.add(mina)
         all_sprites_list.add(mina)
+        print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
 for posX in range(COLUMNS):
     for posY in range(ROWS):
-        empty=True
-        for block in all_sprites_list:
-            if block.rect.collidepoint(posX * MATRIXSIZE, posY * MATRIXSIZE):
-                empty = False
-        if empty:
+        print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+        if matrix[posX][posY] == 0:
             bloco = Block(posX,posY)
             all_sprites_list.add(bloco)
-
-
+            print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
 # Create a red player block
 #player = Player(RED, 20, 20)
@@ -131,7 +136,7 @@ while not done:
         # Clear the screen
     screen.fill(GRAYDARK)
 
-    for block in all_sprites_list: block.reveal()
+    #for block in all_sprites_list: block.reveal()
     all_sprites_list.draw(screen)
     # Limit to 20 frames per second
     clock.tick(20)

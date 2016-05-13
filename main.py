@@ -1,7 +1,9 @@
 import pygame
 import random
 from constants import *
-#colocar que tem q erelevar todos blocos, revelar envolta dos gray
+
+#TODO colocar que tem q erelevar todos blocos, revelar envolta dos gray
+
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 24 # tamanho de um bloco que contem uma mina
 COLUMNS     = 10
@@ -11,106 +13,132 @@ BOMBS       = 2
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 
 # Criando matriz ROWS+1 por COLUMNS+1
+# Neste caso, nao sera gerado IndexError quando elemento esta fora da matriz
 matrix = [[0 for x in range(COLUMNS + 1)] for y in range(ROWS + 1)]
-animations_to_update = []
+# Fila de elementos que precisam ser atualizados a cada clique
+blocks_to_reveal = []
 
 class Block(pygame.sprite.Sprite):
+    """
+        Classe Bloco:
+            representa uma caixa que contem os elementos do jogo:
+            minas (subclasse), avisos de minas ou vazio
+    """
 
     def __init__(self, posX, posY, neighbors=10):
-        # type: (int, int, int) -> Block
+        # Chama o construtor do Pai
         super(Block,self).__init__()
+        # image representa o elemento interno da caixa
         self.image = pygame.Surface([MINA_SIZE, MINA_SIZE])
-        self.image.fill(GRAYLIGHT)
+        self.image.fill(COLOR_UNCLICKED_BLOCK)
+        # next_image representa o image depois que uma atualizacao acontece
         self.next_image = None
+        # posX e posY sao as posicoes do elemento na matriz. Utilizados para encontrar os vizinhos
         self.posX=posX
         self.posY=posY
+        # objeto retangulo que contem o bloco
         self.rect = self.image.get_rect()
         self.rect.x = BLOCK_SIZE * posX + PADDING
         self.rect.y = BLOCK_SIZE * posY + PADDING
+        # neighbors e o numero de minas vizinhas desse bloco
         self.neighbors = neighbors
+        # revealed representa se este bloco ja foi revelado pelo/ao usuario
         self.revealed=False
+        # marked representa se o usuario marcou este bloco com uma bandeira
         self.marked = False
 
     def __repr__(self):
-        return str(self.posX) + ' ' + str(self.posY) + ' ' + str(self.neighbors) + ' ' + str(self.revealed)
+        """
+            Cria uma string com posicao, vizinhos, se ja foi revelado ou marcado
+            :return: string com informacao
+        """
+
+        posicao = '(%d,%d)' % (self.posX, self.posY)
+        vizinhos = 'N:' + str(neighbors)
+        revelado = 'REVELADO' if self.revealed else 'NAO_REVELADO'
+        marcado = 'MARCADO' if self.marked else 'NAO_MARCADO'
+
+        return posicao + ' ' + vizinhos + ' ' + revelado + ' ' + marcado
 
     def reveal(self, first=False):
+        """
+            Revela um bloco e adiciona seus vizinhos na lista de blocos para serem revelados
+            :param first: indica se este e o primeiro elemento da chamada dessa funcao
+            :return: nada
+        """
 
         if self.revealed:
             return
 
         if first:
-            animations_to_update.append(self)
+            blocks_to_reveal.append(self)
 
         self.revealed = True
-        #pygame.time.wait(10)
+        pygame.time.wait(1)
         all_sprites_list.draw(screen)
         pygame.display.flip()
 
         if self.neighbors>0:
             # Atualiza numero de bombas no tabuleiro
             self.next_image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
-            #self.image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
         else:
-            self.next_image = FILL_DARK_GRAY
-            #self.image.fill(GRAYDARK)
-            # Acorda os vizinhos sem bombas pertos
+            # Adiciona vizinhos na lista de blocos para serem revelados
+            self.next_image = ACTION_FILL_CLICKED
 
             bloco = matrix[self.posX + 1][self.posY]
             if type(bloco) is Block and bloco.revealed==False:
-                animations_to_update.append(bloco)
-                #bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
-                animations_to_update.append(bloco)
-                # bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX - 1][self.posY]
             if type(bloco) is Block and bloco.revealed == False:
-                animations_to_update.append(bloco)
-                # bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
-                animations_to_update.append(bloco)
-                # bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX + 1][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
-                animations_to_update.append(bloco)
-                # bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX - 1][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
-                animations_to_update.append(bloco)
-                # bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX + 1][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
-                animations_to_update.append(bloco)
-                # bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX - 1][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
-                animations_to_update.append(bloco)
-                # bloco.reveal()
+                blocks_to_reveal.append(bloco)
 
     def update_image(self):
+        """
+            Atualiza image para a imagem previamente carregada em next_image
+            :return: nada
+        """
+
         if self.next_image is not None:
-            if self.next_image == FILL_DARK_GRAY:
+            if self.next_image == ACTION_FILL_CLICKED:
                 self.image.fill(GRAYDARK)
             else:
                 self.image = self.next_image
 
         self.next_image = None
 
-    def __str__(self):
-        return "bloco"
-
     def mark(self):
-        self.image = pygame.image.load("images/mark1.png").convert_alpha()
-        self.marked=True
+        """
+            Marca um bloco se ele nao foi revelado ou marcado
+            :return: nada
+        """
+        if not self.revealed and not self.marked:
+            self.image = pygame.image.load("images/mark1.png").convert_alpha()
+            self.marked=True
 
 
 class Mina(Block):
@@ -121,7 +149,7 @@ class Mina(Block):
             self.next_image = pygame.image.load("images/mina.png").convert_alpha()
 
         if first:
-            animations_to_update.append(self)
+            blocks_to_reveal.append(self)
 
         self.revealed = True
 
@@ -215,9 +243,9 @@ while not done:
                 if block.rect.collidepoint(x, y):
                     if button1:
                         block.reveal(True)
-                        while len(animations_to_update) > 0:
+                        while len(blocks_to_reveal) > 0:
                             block.update_image()
-                            block = animations_to_update.pop(0)
+                            block = blocks_to_reveal.pop(0)
                             block.reveal()
                 # usa colisao:
                 # vantagem -> ignora se clicar entre dois quadrados
@@ -242,7 +270,6 @@ while not done:
             if bombMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
                         #GANHOU
                 done=True;
-                pygame.time.wait(2000)
 
         # Clear the screen
     screen.fill(GRAYDARK)

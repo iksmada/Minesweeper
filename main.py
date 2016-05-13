@@ -12,11 +12,12 @@ BLOCKSIZE= 20 #tamanho do lado de cada block
 MATRIXSIZE=25 #tamanho do lado da matrix, se for igual BLOCKSIZE nao da pra ver grade, diferente aparece grade no fundo
 COLUMNS  = 10
 ROWS     = 10
-BOMBS    = 50
+BOMBS    = 10
 
 class Block(pygame.sprite.Sprite):
 
-    def __init__(self, posX, posY):
+    def __init__(self, posX, posY,neighbors=10):
+        # type: (int, int, int) -> Block
         super(Block,self).__init__()
         self.image = pygame.Surface([BLOCKSIZE, BLOCKSIZE])
         self.image.fill(GRAYLIGHT)
@@ -25,32 +26,42 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = MATRIXSIZE * posX
         self.rect.y = MATRIXSIZE * posY
-        self.neighbors = 0
+        self.neighbors = neighbors
+        self.revealed=False
 
     def reveal(self):
-        if   type(matrix[self.posX + 1][self.posY    ]) is Mina:
-            self.neighbors += 1
-        if type(matrix[self.posX    ][self.posY + 1]) is Mina:
-            self.neighbors += 1
-        if type(matrix[self.posX - 1][self.posY    ]) is Mina:
-            self.neighbors += 1
-        if type(matrix[self.posX    ][self.posY - 1] ) is Mina:
-            self.neighbors += 1
-        if type(matrix[self.posX + 1][self.posY + 1] ) is Mina:
-            self.neighbors += 1
-        if type(matrix[self.posX - 1][self.posY + 1] ) is Mina:
-            self.neighbors += 1
-        if type(matrix[self.posX + 1][self.posY - 1] ) is Mina:
-            self.neighbors += 1
-        if type(matrix[self.posX - 1][self.posY - 1] ) is Mina:
-            self.neighbors += 1
 
         if self.neighbors>0:
             self.image = pygame.image.load("number"+str(self.neighbors)+".png").convert_alpha()
         else:
             self.image.fill(GRAYDARK)
-
-        self.neighbors = 0
+            self.revealed = True
+            #pygame.time.wait(50)
+            #acorda os vizinhos sem bombas pertos
+            bloco = matrix[self.posX + 1][self.posY]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed==False:
+                bloco.reveal()
+            bloco = matrix[self.posX][self.posY + 1]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+            bloco = matrix[self.posX - 1][self.posY]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+            bloco = matrix[self.posX][self.posY - 1]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+            bloco = matrix[self.posX + 1][self.posY + 1]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+            bloco = matrix[self.posX - 1][self.posY + 1]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+            bloco = matrix[self.posX + 1][self.posY - 1]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+            bloco = matrix[self.posX - 1][self.posY - 1]
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
 
 
     def __str__(self):
@@ -81,11 +92,10 @@ matrix = [[0 for x in range(COLUMNS+1)] for y in range(ROWS+1)] #+1 para poder v
 #grupo dos elementos de minas e total
 all_sprites_list = pygame.sprite.Group()
 
-# This is a list of every sprite. All blocks and the player block as well.
-all_sprites_list = pygame.sprite.Group()
 
 #cria bombas
-for i in range(BOMBS):
+i=0
+while i < BOMBS:
 
     empty=True
     posX=random.randrange(COLUMNS)
@@ -96,13 +106,31 @@ for i in range(BOMBS):
         matrix[posX][posY]=mina
     # Add the block to the list of objects
         all_sprites_list.add(mina)
+        i+=1
        # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
 for posX in range(COLUMNS):
     for posY in range(ROWS):
         #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
         if matrix[posX][posY] == 0:
-            block = Block(posX,posY)
+            neighbors = 0
+            if type(matrix[posX + 1][posY]) is Mina:
+                neighbors += 1
+            if type(matrix[posX][posY + 1]) is Mina:
+                neighbors += 1
+            if type(matrix[posX - 1][posY]) is Mina:
+                neighbors += 1
+            if type(matrix[posX][posY - 1]) is Mina:
+                neighbors += 1
+            if type(matrix[posX + 1][posY + 1]) is Mina:
+                neighbors += 1
+            if type(matrix[posX - 1][posY + 1]) is Mina:
+                neighbors += 1
+            if type(matrix[posX + 1][posY - 1]) is Mina:
+                neighbors += 1
+            if type(matrix[posX - 1][posY - 1]) is Mina:
+                neighbors += 1
+            block = Block(posX,posY,neighbors)
             matrix[posX][posY] = block
             all_sprites_list.add(block)
             #print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
@@ -129,10 +157,10 @@ while not done:
                 done=True
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            [button1, button2, button3]=pygame.mouse.get_pressed()
+            button1, button2, button3=pygame.mouse.get_pressed()
             x, y = event.pos
             if button1:
-                # usa colisão:
+                # usa colisao:
                 # vantagem -> ignora se clicar entre dois quadrados
                 for block in all_sprites_list:
                     if block.rect.collidepoint(x, y):

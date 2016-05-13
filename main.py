@@ -10,7 +10,7 @@ BOMBS       = 2
 
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 
-#criando matriz ROWS+1 por COLUMNS+1
+# Criando matriz ROWS+1 por COLUMNS+1
 matrix = [[0 for x in range(COLUMNS + 1)] for y in range(ROWS + 1)]
 animations_to_update = []
 
@@ -30,6 +30,9 @@ class Block(pygame.sprite.Sprite):
         self.neighbors = neighbors
         self.revealed=False
         self.marked = False
+
+    def __repr__(self):
+        return str(self.posX) + ' ' + str(self.posY) + ' ' + str(self.neighbors) + ' ' + str(self.revealed)
 
     def reveal(self, first=False):
 
@@ -115,8 +118,12 @@ class Mina(Block):
     def reveal(self, first=False):
 
         if not self.revealed:
-            self.image=pygame.image.load("images/mina.png").convert_alpha()
-            self.revealed = True
+            self.next_image = pygame.image.load("images/mina.png").convert_alpha()
+
+        if first:
+            animations_to_update.append(self)
+
+        self.revealed = True
 
     def __str__(self):
         return "mina"
@@ -209,8 +216,8 @@ while not done:
                     if button1:
                         block.reveal(True)
                         while len(animations_to_update) > 0:
-                            block = animations_to_update.pop(0)
                             block.update_image()
+                            block = animations_to_update.pop(0)
                             block.reveal()
                 # usa colisao:
                 # vantagem -> ignora se clicar entre dois quadrados

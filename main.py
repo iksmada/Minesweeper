@@ -2,24 +2,26 @@ import pygame
 import random
 from constants import *
 
-BLOCKSIZE= 20 #tamanho do lado de cada block
-MATRIXSIZE=25 #tamanho do lado da matrix, se for igual BLOCKSIZE nao da pra ver grade, diferente aparece grade no fundo
-COLUMNS  = 10
-ROWS     = 10
-BOMBS    = 10
+MINA_SIZE   = 20 # tamanho de uma mina
+BLOCK_SIZE  = 24 # tamanho de um bloco que contem uma mina
+COLUMNS     = 10
+ROWS        = 10
+BOMBS       = 10
+
+PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 
 class Block(pygame.sprite.Sprite):
 
     def __init__(self, pos_x, pos_y, neighborhood=10):
         # type: (int, int, int) -> Block
         super(Block,self).__init__()
-        self.image = pygame.Surface([BLOCKSIZE, BLOCKSIZE])
+        self.image = pygame.Surface([MINA_SIZE, MINA_SIZE])
         self.image.fill(GRAYLIGHT)
         self.posX=pos_x
         self.posY=pos_y
         self.rect = self.image.get_rect()
-        self.rect.x = MATRIXSIZE * pos_x
-        self.rect.y = MATRIXSIZE * pos_y
+        self.rect.x = BLOCK_SIZE * pos_x + PADDING
+        self.rect.y = BLOCK_SIZE * pos_y + PADDING
         self.neighbors = neighborhood
         self.revealed=False
 
@@ -77,11 +79,11 @@ class Mina(Block):
 pygame.init()
 
 #tamanho da janela depende do numero de columas linhas e do tamanho de cada celula da matrix
-screen_width = COLUMNS*MATRIXSIZE
-screen_height = ROWS*MATRIXSIZE
+screen_width = COLUMNS * BLOCK_SIZE + PADDING
+screen_height = ROWS * BLOCK_SIZE + PADDING
 screen = pygame.display.set_mode([screen_width, screen_height])
 
-#criando matriz 10 por 10
+#criando matriz ROWS+1 por COLUMNS+1
 matrix = [[0 for x in range(COLUMNS+1)] for y in range(ROWS+1)] #+1 para poder verificar do lado
 #grupo dos elementos de minas e total
 all_sprites_list = pygame.sprite.Group()
@@ -160,7 +162,7 @@ while not done:
                     if block.rect.collidepoint(x, y):
                         block.reveal()
             elif button3:
-                block = matrix[x / MATRIXSIZE][y / MATRIXSIZE]
+                block = matrix[x / BLOCK_SIZE][y / BLOCK_SIZE]
                 #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
                 block.mark()
 

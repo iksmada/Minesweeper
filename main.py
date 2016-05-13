@@ -32,15 +32,18 @@ class Block(pygame.sprite.Sprite):
         self.marked = False
 
     def reveal(self, first=False):
+
+        if self.revealed:
+            return
+
+        if first:
+            animations_to_update.append(self)
+
         self.revealed = True
         #pygame.time.wait(10)
         all_sprites_list.draw(screen)
         pygame.display.flip()
 
-        if first:
-            animations_to_update.append(self)
-
-        image = None
         if self.neighbors>0:
             # Atualiza numero de bombas no tabuleiro
             self.next_image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
@@ -109,9 +112,11 @@ class Block(pygame.sprite.Sprite):
 
 class Mina(Block):
 
-    def reveal(self):
-        self.image=pygame.image.load("images/mina.png").convert_alpha()
-        self.revealed = True
+    def reveal(self, first=False):
+
+        if not self.revealed:
+            self.image=pygame.image.load("images/mina.png").convert_alpha()
+            self.revealed = True
 
     def __str__(self):
         return "mina"

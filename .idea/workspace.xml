@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f919b9ef-661a-4ceb-ac93-9696bc445e44" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bin/MyApplication-0.1-debug.apk" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.buildozer/android/app/main.py" afterPath="$PROJECT_DIR$/.buildozer/android/app/main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.buildozer/state.db" afterPath="$PROJECT_DIR$/.buildozer/state.db" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
-    </list>
+    <list default="true" id="f919b9ef-661a-4ceb-ac93-9696bc445e44" name="Default" comment="" />
     <ignored path="Minesweeper.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />

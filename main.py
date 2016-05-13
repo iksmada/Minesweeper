@@ -32,7 +32,7 @@ class Block(pygame.sprite.Sprite):
     def reveal(self):
 
         if self.neighbors>0:
-            self.image = pygame.image.load("number"+str(self.neighbors)+".png").convert_alpha()
+            self.image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
         else:
             self.image.fill(GRAYDARK)
             self.revealed = True
@@ -68,13 +68,13 @@ class Block(pygame.sprite.Sprite):
         return "bloco"
 
     def mark(self):
-        self.image = pygame.image.load("mark1.png").convert_alpha()
+        self.image = pygame.image.load("images/mark1.png").convert_alpha()
 
 
 class Mina(Block):
 
     def reveal(self):
-        self.image=pygame.image.load("mina.png").convert_alpha()
+        self.image=pygame.image.load("images/mina.png").convert_alpha()
 
     def __str__(self):
         return "mina"

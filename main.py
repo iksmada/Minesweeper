@@ -1,13 +1,7 @@
-
 import pygame
 import random
+from constants import *
 
-# Define some colors
-BLACK    = (   0,   0,   0)
-WHITE    = ( 255, 255, 255)
-RED      = ( 255,   0,   0)
-GRAYDARK = ( 167, 167, 167)
-GRAYLIGHT= ( 205, 205, 205)
 BLOCKSIZE= 20 #tamanho do lado de cada block
 MATRIXSIZE=25 #tamanho do lado da matrix, se for igual BLOCKSIZE nao da pra ver grade, diferente aparece grade no fundo
 COLUMNS  = 10
@@ -16,17 +10,17 @@ BOMBS    = 10
 
 class Block(pygame.sprite.Sprite):
 
-    def __init__(self, posX, posY,neighbors=10):
+    def __init__(self, pos_x, pos_y, neighborhood=10):
         # type: (int, int, int) -> Block
         super(Block,self).__init__()
         self.image = pygame.Surface([BLOCKSIZE, BLOCKSIZE])
         self.image.fill(GRAYLIGHT)
-        self.posX=posX
-        self.posY=posY
+        self.posX=pos_x
+        self.posY=pos_y
         self.rect = self.image.get_rect()
-        self.rect.x = MATRIXSIZE * posX
-        self.rect.y = MATRIXSIZE * posY
-        self.neighbors = neighbors
+        self.rect.x = MATRIXSIZE * pos_x
+        self.rect.y = MATRIXSIZE * pos_y
+        self.neighbors = neighborhood
         self.revealed=False
 
     def reveal(self):
@@ -153,7 +147,7 @@ while not done:
         if event.type == pygame.QUIT: # If user clicked close
             done = True # Flag that we are done so we exit this loop
         if event.type == pygame.KEYDOWN:
-            if event.key == K_ESCAPE:
+            if event.key == pygame.K_ESCAPE:
                 done=True
 
         if event.type == pygame.MOUSEBUTTONDOWN:

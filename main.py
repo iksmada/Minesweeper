@@ -12,6 +12,7 @@ PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 
 #criando matriz ROWS+1 por COLUMNS+1
 matrix = [[0 for x in range(COLUMNS + 1)] for y in range(ROWS + 1)]
+animations_to_update = []
 
 class Block(pygame.sprite.Sprite):
 
@@ -20,6 +21,7 @@ class Block(pygame.sprite.Sprite):
         super(Block,self).__init__()
         self.image = pygame.Surface([MINA_SIZE, MINA_SIZE])
         self.image.fill(GRAYLIGHT)
+        self.next_image = None
         self.posX=posX
         self.posY=posY
         self.rect = self.image.get_rect()
@@ -29,50 +31,73 @@ class Block(pygame.sprite.Sprite):
         self.revealed=False
         self.marked = False
 
-    def reveal(self):
+    def reveal(self, first=False):
         self.revealed = True
-        pygame.time.wait(10)
+        #pygame.time.wait(10)
         all_sprites_list.draw(screen)
         pygame.display.flip()
 
+        if first:
+            animations_to_update.append(self)
+
+        image = None
         if self.neighbors>0:
             # Atualiza numero de bombas no tabuleiro
-            self.image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
+            self.next_image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
+            #self.image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
         else:
-            self.image.fill(GRAYDARK)
+            self.next_image = FILL_DARK_GRAY
+            #self.image.fill(GRAYDARK)
             # Acorda os vizinhos sem bombas pertos
 
             bloco = matrix[self.posX + 1][self.posY]
             if type(bloco) is Block and bloco.revealed==False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                #bloco.reveal()
 
             bloco = matrix[self.posX][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                # bloco.reveal()
 
             bloco = matrix[self.posX - 1][self.posY]
             if type(bloco) is Block and bloco.revealed == False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                # bloco.reveal()
 
             bloco = matrix[self.posX][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                # bloco.reveal()
 
             bloco = matrix[self.posX + 1][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                # bloco.reveal()
 
             bloco = matrix[self.posX - 1][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                # bloco.reveal()
 
             bloco = matrix[self.posX + 1][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                # bloco.reveal()
 
             bloco = matrix[self.posX - 1][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
-                bloco.reveal()
+                animations_to_update.append(bloco)
+                # bloco.reveal()
+
+    def update_image(self):
+        if self.next_image is not None:
+            if self.next_image == FILL_DARK_GRAY:
+                self.image.fill(GRAYDARK)
+            else:
+                self.image = self.next_image
+
+        self.next_image = None
 
     def __str__(self):
         return "bloco"
@@ -177,7 +202,11 @@ while not done:
             for block in all_sprites_list:
                 if block.rect.collidepoint(x, y):
                     if button1:
-                        block.reveal()
+                        block.reveal(True)
+                        while len(animations_to_update) > 0:
+                            block = animations_to_update.pop(0)
+                            block.update_image()
+                            block.reveal()
                 # usa colisao:
                 # vantagem -> ignora se clicar entre dois quadrados
 

@@ -28,7 +28,6 @@ class Block(pygame.sprite.Sprite):
         self.neighbors = 0
 
     def reveal(self):
-        print "matrix[" + str(self.posX+1) + "][" + str(self.posY) + "] = " + str(matrix[self.posX+1][self.posY])
         if   type(matrix[self.posX + 1][self.posY    ]) is Mina:
             self.neighbors += 1
         if type(matrix[self.posX    ][self.posY + 1]) is Mina:
@@ -57,6 +56,9 @@ class Block(pygame.sprite.Sprite):
     def __str__(self):
         return "bloco"
 
+    def mark(self):
+        self.image = pygame.image.load("mark1.png").convert_alpha()
+
 
 class Mina(Block):
 
@@ -77,7 +79,6 @@ screen = pygame.display.set_mode([screen_width, screen_height])
 #criando matriz 10 por 10
 matrix = [[0 for x in range(COLUMNS+1)] for y in range(ROWS+1)] #+1 para poder verificar do lado
 #grupo dos elementos de minas e total
-mines = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
 # This is a list of every sprite. All blocks and the player block as well.
@@ -89,22 +90,22 @@ for i in range(BOMBS):
     empty=True
     posX=random.randrange(COLUMNS)
     posY=random.randrange(ROWS)
-    print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+   # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
     if matrix[posX][posY]==0:
         mina = Mina(posX,posY)
         matrix[posX][posY]=mina
     # Add the block to the list of objects
-        mines.add(mina)
         all_sprites_list.add(mina)
-        print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+       # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
 for posX in range(COLUMNS):
     for posY in range(ROWS):
-        print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+        #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
         if matrix[posX][posY] == 0:
-            bloco = Block(posX,posY)
-            all_sprites_list.add(bloco)
-            print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+            block = Block(posX,posY)
+            matrix[posX][posY] = block
+            all_sprites_list.add(block)
+            #print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
 # Create a red player block
 #player = Player(RED, 20, 20)
@@ -128,10 +129,19 @@ while not done:
                 done=True
 
         if event.type == pygame.MOUSEBUTTONDOWN:
+            [button1, button2, button3]=pygame.mouse.get_pressed()
             x, y = event.pos
-            for block in all_sprites_list:
-                if block.rect.collidepoint(x, y):
-                    block.reveal()
+            if button1:
+                # usa colisão:
+                # vantagem -> ignora se clicar entre dois quadrados
+                for block in all_sprites_list:
+                    if block.rect.collidepoint(x, y):
+                        block.reveal()
+            elif button3:
+                block = matrix[x / MATRIXSIZE][y / MATRIXSIZE]
+                #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
+                block.mark()
+
 
         # Clear the screen
     screen.fill(GRAYDARK)

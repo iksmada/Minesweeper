@@ -11,7 +11,7 @@ BOMBS       = 2
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 
 #criando matriz ROWS+1 por COLUMNS+1
-matrix = [[0 for x in range(COLUMNS)] for y in range(ROWS)] #+1 para poder verificar do lado
+matrix = [[0 for x in range(COLUMNS + 1)] for y in range(ROWS + 1)]
 
 class Block(pygame.sprite.Sprite):
 
@@ -29,61 +29,48 @@ class Block(pygame.sprite.Sprite):
         self.revealed=False
         self.marked = False
 
-    @staticmethod
-    def check_interval(a,b):
-        if 0 <= a < ROWS and 0 <= b < COLUMNS:
-            return True
-        else:
-            return False
-
     def reveal(self):
         self.revealed = True
         pygame.time.wait(10)
         all_sprites_list.draw(screen)
         pygame.display.flip()
+
         if self.neighbors>0:
+            # Atualiza numero de bombas no tabuleiro
             self.image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
         else:
             self.image.fill(GRAYDARK)
-            #acorda os vizinhos sem bombas pertos
+            # Acorda os vizinhos sem bombas pertos
 
-            bloco = matrix[self.posX + 1][self.posY] \
-                if self.check_interval(self.posX + 1,self.posY) else None
+            bloco = matrix[self.posX + 1][self.posY]
             if type(bloco) is Block and bloco.revealed==False:
                 bloco.reveal()
 
-            bloco = matrix[self.posX][self.posY + 1] \
-                if self.check_interval(self.posX,self.posY + 1) else None
+            bloco = matrix[self.posX][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
-            bloco = matrix[self.posX - 1][self.posY] \
-                if self.check_interval(self.posX - 1,self.posY) else None
+            bloco = matrix[self.posX - 1][self.posY]
             if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
-            bloco = matrix[self.posX][self.posY - 1] \
-                if self.check_interval(self.posX,self.posY - 1) else None
+            bloco = matrix[self.posX][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
-            bloco = matrix[self.posX + 1][self.posY + 1] \
-                if self.check_interval(self.posX + 1,self.posY + 1) else None
+            bloco = matrix[self.posX + 1][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
-            bloco = matrix[self.posX - 1][self.posY + 1] \
-                if self.check_interval(self.posX - 1,self.posY + 1) else None
+            bloco = matrix[self.posX - 1][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
-            bloco = matrix[self.posX + 1][self.posY - 1] \
-                if self.check_interval(self.posX + 1,self.posY - 1) else None
+            bloco = matrix[self.posX + 1][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
-            bloco = matrix[self.posX - 1][self.posY - 1] \
-                if self.check_interval(self.posX - 1,self.posY -1) else None
+            bloco = matrix[self.posX - 1][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
@@ -139,22 +126,23 @@ for posX in range(COLUMNS):
         #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
         if matrix[posX][posY] == 0:
             neighbors = 0
-            if Block.check_interval(posX + 1,posY) and type(matrix[posX + 1][posY]) is Mina:
+            if type(matrix[posX + 1][posY]) is Mina:
                 neighbors += 1
-            if Block.check_interval(posX,posY + 1) and type(matrix[posX][posY + 1]) is Mina:
+            if type(matrix[posX][posY + 1]) is Mina:
                 neighbors += 1
-            if Block.check_interval(posX - 1,posY) and type(matrix[posX - 1][posY]) is Mina:
+            if type(matrix[posX - 1][posY]) is Mina:
                 neighbors += 1
-            if Block.check_interval(posX,posY - 1) and type(matrix[posX][posY - 1]) is Mina:
+            if type(matrix[posX][posY - 1]) is Mina:
                 neighbors += 1
-            if Block.check_interval(posX + 1,posY + 1) and type(matrix[posX + 1][posY + 1]) is Mina:
+            if type(matrix[posX + 1][posY + 1]) is Mina:
                 neighbors += 1
-            if Block.check_interval(posX - 1,posY + 1) and type(matrix[posX - 1][posY + 1]) is Mina:
+            if type(matrix[posX - 1][posY + 1]) is Mina:
                 neighbors += 1
-            if Block.check_interval(posX + 1,posY - 1) and type(matrix[posX + 1][posY - 1]) is Mina:
+            if type(matrix[posX + 1][posY - 1]) is Mina:
                 neighbors += 1
-            if Block.check_interval(posX - 1,posY - 1) and type(matrix[posX - 1][posY - 1]) is Mina:
+            if type(matrix[posX - 1][posY - 1]) is Mina:
                 neighbors += 1
+
             block = Block(posX,posY,neighbors)
             matrix[posX][posY] = block
             all_sprites_list.add(block)
@@ -182,7 +170,7 @@ while not done:
                 done=True
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            button1, button2, button3 =pygame.mouse.get_pressed()
+            button1, button2, button3 = pygame.mouse.get_pressed()
             x, y = event.pos
             bombMarked=0
             blocksRevealed=0
@@ -209,7 +197,7 @@ while not done:
                 elif block.revealed == True:
                         blocksRevealed+=1
                     #se marcou todas as bombas e revelou todos os blocos
-                print "bombas marcadas:"+str(bombMarked)+" e blocos revelados:"+ str(blocksRevealed)
+                #print "bombas marcadas:"+str(bombMarked)+" e blocos revelados:"+ str(blocksRevealed)
             if bombMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
                         #GANHOU
                 done=True;

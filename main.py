@@ -1,12 +1,12 @@
 import pygame
 import random
 from constants import *
-
+#colocar que tem q erelevar todos blocos, revelar envolta dos gray
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 24 # tamanho de um bloco que contem uma mina
 COLUMNS     = 10
 ROWS        = 10
-BOMBS       = 10
+BOMBS       = 2
 
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 
@@ -27,6 +27,7 @@ class Block(pygame.sprite.Sprite):
         self.rect.y = BLOCK_SIZE * posY + PADDING
         self.neighbors = neighbors
         self.revealed=False
+        self.marked = False
 
     @staticmethod
     def check_interval(a,b):
@@ -36,53 +37,54 @@ class Block(pygame.sprite.Sprite):
             return False
 
     def reveal(self):
-
+        self.revealed = True
+        pygame.time.wait(10)
+        all_sprites_list.draw(screen)
+        pygame.display.flip()
         if self.neighbors>0:
             self.image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
         else:
             self.image.fill(GRAYDARK)
-            self.revealed = True
-            #pygame.time.wait(50)
             #acorda os vizinhos sem bombas pertos
 
             bloco = matrix[self.posX + 1][self.posY] \
                 if self.check_interval(self.posX + 1,self.posY) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed==False:
+            if type(bloco) is Block and bloco.revealed==False:
                 bloco.reveal()
 
             bloco = matrix[self.posX][self.posY + 1] \
                 if self.check_interval(self.posX,self.posY + 1) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
             bloco = matrix[self.posX - 1][self.posY] \
                 if self.check_interval(self.posX - 1,self.posY) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
             bloco = matrix[self.posX][self.posY - 1] \
                 if self.check_interval(self.posX,self.posY - 1) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
             bloco = matrix[self.posX + 1][self.posY + 1] \
                 if self.check_interval(self.posX + 1,self.posY + 1) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
             bloco = matrix[self.posX - 1][self.posY + 1] \
                 if self.check_interval(self.posX - 1,self.posY + 1) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
             bloco = matrix[self.posX + 1][self.posY - 1] \
                 if self.check_interval(self.posX + 1,self.posY - 1) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
             bloco = matrix[self.posX - 1][self.posY - 1] \
                 if self.check_interval(self.posX - 1,self.posY -1) else None
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False:
                 bloco.reveal()
 
     def __str__(self):
@@ -90,12 +92,14 @@ class Block(pygame.sprite.Sprite):
 
     def mark(self):
         self.image = pygame.image.load("images/mark1.png").convert_alpha()
+        self.marked=True
 
 
 class Mina(Block):
 
     def reveal(self):
         self.image=pygame.image.load("images/mina.png").convert_alpha()
+        self.revealed = True
 
     def __str__(self):
         return "mina"
@@ -104,11 +108,12 @@ class Mina(Block):
 pygame.init()
 
 #tamanho da janela depende do numero de columas linhas e do tamanho de cada celula da matrix
-screen_width = COLUMNS * BLOCK_SIZE + PADDING
-screen_height = ROWS * BLOCK_SIZE + PADDING
+screen_width  = COLUMNS * BLOCK_SIZE + PADDING
+screen_height =    ROWS * BLOCK_SIZE + PADDING
 screen = pygame.display.set_mode([screen_width, screen_height])
 
 #grupo dos elementos de minas e total
+mines = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
 
@@ -124,6 +129,7 @@ while i < BOMBS:
         mina = Mina(posX,posY)
         matrix[posX][posY]=mina
     # Add the block to the list of objects
+        mines.add(mina)
         all_sprites_list.add(mina)
         i+=1
        # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
@@ -176,19 +182,38 @@ while not done:
                 done=True
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            button1, button2, button3=pygame.mouse.get_pressed()
+            button1, button2, button3 =pygame.mouse.get_pressed()
             x, y = event.pos
-            if button1:
+            bombMarked=0
+            blocksRevealed=0
+            for block in all_sprites_list:
+                if block.rect.collidepoint(x, y):
+                    if button1:
+                        block.reveal()
                 # usa colisao:
                 # vantagem -> ignora se clicar entre dois quadrados
-                for block in all_sprites_list:
-                    if block.rect.collidepoint(x, y):
-                        block.reveal()
-            elif button3:
-                block = matrix[x / BLOCK_SIZE][y / BLOCK_SIZE]
-                #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
-                block.mark()
 
+                    elif button3:
+                #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
+                        block.mark()
+                    #se for Mina
+                if type(block)==Mina:
+                        #revelou uma mina
+                    if block.revealed == True:
+                        #PERDEU
+                        done=True
+                        #marcou uma mina
+                    if block.marked == True:
+                        bombMarked+=1
+                    #se for bloco normal ese revelou o bloco
+                elif block.revealed == True:
+                        blocksRevealed+=1
+                    #se marcou todas as bombas e revelou todos os blocos
+                print "bombas marcadas:"+str(bombMarked)+" e blocos revelados:"+ str(blocksRevealed)
+            if bombMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
+                        #GANHOU
+                done=True;
+                pygame.time.wait(2000)
 
         # Clear the screen
     screen.fill(GRAYDARK)

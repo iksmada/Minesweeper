@@ -10,20 +10,30 @@ BOMBS       = 10
 
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 
+#criando matriz ROWS+1 por COLUMNS+1
+matrix = [[0 for x in range(COLUMNS)] for y in range(ROWS)] #+1 para poder verificar do lado
+
 class Block(pygame.sprite.Sprite):
 
-    def __init__(self, pos_x, pos_y, neighborhood=10):
+    def __init__(self, posX, posY, neighbors=10):
         # type: (int, int, int) -> Block
         super(Block,self).__init__()
         self.image = pygame.Surface([MINA_SIZE, MINA_SIZE])
         self.image.fill(GRAYLIGHT)
-        self.posX=pos_x
-        self.posY=pos_y
+        self.posX=posX
+        self.posY=posY
         self.rect = self.image.get_rect()
-        self.rect.x = BLOCK_SIZE * pos_x + PADDING
-        self.rect.y = BLOCK_SIZE * pos_y + PADDING
-        self.neighbors = neighborhood
+        self.rect.x = BLOCK_SIZE * posX + PADDING
+        self.rect.y = BLOCK_SIZE * posY + PADDING
+        self.neighbors = neighbors
         self.revealed=False
+
+    @staticmethod
+    def check_interval(a,b):
+        if 0 <= a < ROWS and 0 <= b < COLUMNS:
+            return True
+        else:
+            return False
 
     def reveal(self):
 
@@ -34,31 +44,46 @@ class Block(pygame.sprite.Sprite):
             self.revealed = True
             #pygame.time.wait(50)
             #acorda os vizinhos sem bombas pertos
-            bloco = matrix[self.posX + 1][self.posY]
+
+            bloco = matrix[self.posX + 1][self.posY] \
+                if self.check_interval(self.posX + 1,self.posY) else None
             if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed==False:
                 bloco.reveal()
-            bloco = matrix[self.posX][self.posY + 1]
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
-                bloco.reveal()
-            bloco = matrix[self.posX - 1][self.posY]
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
-                bloco.reveal()
-            bloco = matrix[self.posX][self.posY - 1]
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
-                bloco.reveal()
-            bloco = matrix[self.posX + 1][self.posY + 1]
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
-                bloco.reveal()
-            bloco = matrix[self.posX - 1][self.posY + 1]
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
-                bloco.reveal()
-            bloco = matrix[self.posX + 1][self.posY - 1]
-            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
-                bloco.reveal()
-            bloco = matrix[self.posX - 1][self.posY - 1]
+
+            bloco = matrix[self.posX][self.posY + 1] \
+                if self.check_interval(self.posX,self.posY + 1) else None
             if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
                 bloco.reveal()
 
+            bloco = matrix[self.posX - 1][self.posY] \
+                if self.check_interval(self.posX - 1,self.posY) else None
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+
+            bloco = matrix[self.posX][self.posY - 1] \
+                if self.check_interval(self.posX,self.posY - 1) else None
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+
+            bloco = matrix[self.posX + 1][self.posY + 1] \
+                if self.check_interval(self.posX + 1,self.posY + 1) else None
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+
+            bloco = matrix[self.posX - 1][self.posY + 1] \
+                if self.check_interval(self.posX - 1,self.posY + 1) else None
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+
+            bloco = matrix[self.posX + 1][self.posY - 1] \
+                if self.check_interval(self.posX + 1,self.posY - 1) else None
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
+
+            bloco = matrix[self.posX - 1][self.posY - 1] \
+                if self.check_interval(self.posX - 1,self.posY -1) else None
+            if type(bloco) is Block and bloco.neighbors == 0 and bloco.revealed == False:
+                bloco.reveal()
 
     def __str__(self):
         return "bloco"
@@ -83,8 +108,6 @@ screen_width = COLUMNS * BLOCK_SIZE + PADDING
 screen_height = ROWS * BLOCK_SIZE + PADDING
 screen = pygame.display.set_mode([screen_width, screen_height])
 
-#criando matriz ROWS+1 por COLUMNS+1
-matrix = [[0 for x in range(COLUMNS+1)] for y in range(ROWS+1)] #+1 para poder verificar do lado
 #grupo dos elementos de minas e total
 all_sprites_list = pygame.sprite.Group()
 
@@ -110,21 +133,21 @@ for posX in range(COLUMNS):
         #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
         if matrix[posX][posY] == 0:
             neighbors = 0
-            if type(matrix[posX + 1][posY]) is Mina:
+            if Block.check_interval(posX + 1,posY) and type(matrix[posX + 1][posY]) is Mina:
                 neighbors += 1
-            if type(matrix[posX][posY + 1]) is Mina:
+            if Block.check_interval(posX,posY + 1) and type(matrix[posX][posY + 1]) is Mina:
                 neighbors += 1
-            if type(matrix[posX - 1][posY]) is Mina:
+            if Block.check_interval(posX - 1,posY) and type(matrix[posX - 1][posY]) is Mina:
                 neighbors += 1
-            if type(matrix[posX][posY - 1]) is Mina:
+            if Block.check_interval(posX,posY - 1) and type(matrix[posX][posY - 1]) is Mina:
                 neighbors += 1
-            if type(matrix[posX + 1][posY + 1]) is Mina:
+            if Block.check_interval(posX + 1,posY + 1) and type(matrix[posX + 1][posY + 1]) is Mina:
                 neighbors += 1
-            if type(matrix[posX - 1][posY + 1]) is Mina:
+            if Block.check_interval(posX - 1,posY + 1) and type(matrix[posX - 1][posY + 1]) is Mina:
                 neighbors += 1
-            if type(matrix[posX + 1][posY - 1]) is Mina:
+            if Block.check_interval(posX + 1,posY - 1) and type(matrix[posX + 1][posY - 1]) is Mina:
                 neighbors += 1
-            if type(matrix[posX - 1][posY - 1]) is Mina:
+            if Block.check_interval(posX - 1,posY - 1) and type(matrix[posX - 1][posY - 1]) is Mina:
                 neighbors += 1
             block = Block(posX,posY,neighbors)
             matrix[posX][posY] = block

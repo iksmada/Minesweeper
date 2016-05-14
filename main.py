@@ -59,7 +59,7 @@ class Block(pygame.sprite.Sprite):
 
         return posicao + ' ' + vizinhos + ' ' + revelado + ' ' + marcado
 
-    def reveal(self, first=False):
+    def reveal(self):
         """
             Revela um bloco e adiciona seus vizinhos na lista de blocos para serem revelados
             :param first: indica se este e o primeiro elemento da chamada dessa funcao
@@ -69,13 +69,7 @@ class Block(pygame.sprite.Sprite):
         if self.revealed:
             return
 
-        if first:
-            blocks_to_reveal.append(self)
-
         self.revealed = True
-        pygame.time.wait(1)
-        all_sprites_list.draw(screen)
-        pygame.display.flip()
 
         if self.neighbors>0:
             # Atualiza numero de bombas no tabuleiro
@@ -116,6 +110,11 @@ class Block(pygame.sprite.Sprite):
             if type(bloco) is Block and bloco.revealed == False:
                 blocks_to_reveal.append(bloco)
 
+        self.update_image()
+        all_sprites_list.draw(screen)
+        pygame.display.flip()
+        pygame.time.wait(1)
+
     def update_image(self):
         """
             Atualiza image para a imagem previamente carregada em next_image
@@ -143,15 +142,16 @@ class Block(pygame.sprite.Sprite):
 
 class Mina(Block):
 
-    def reveal(self, first=False):
+    def reveal(self):
 
         if not self.revealed:
             self.next_image = pygame.image.load("images/mina.png").convert_alpha()
 
-        if first:
-            blocks_to_reveal.append(self)
-
         self.revealed = True
+
+        self.update_image()
+        all_sprites_list.draw(screen)
+        pygame.display.flip()
 
     def __repr__(self):
         return "Mina" + super(Mina,self).__repr__()
@@ -253,9 +253,8 @@ while not done:
                 for block in all_sprites_list:
                     if block.rect.collidepoint(x, y):
                         if button1:
-                            block.reveal(True)
+                            block.reveal()
                             while len(blocks_to_reveal) > 0:
-                                block.update_image()
                                 block = blocks_to_reveal.pop(0)
                                 block.reveal()
                                 title_score.score+=block.neighbors

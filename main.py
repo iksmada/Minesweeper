@@ -4,8 +4,8 @@ from constants import *
 
 #TODO colocar que tem q erelevar todos blocos, revelar envolta dos gray
 
-MINA_SIZE   = 20 # tamanho de uma mina
-BLOCK_SIZE  = 24 # tamanho de um bloco que contem uma mina
+MINA_SIZE   = 25 # tamanho de uma mina
+BLOCK_SIZE  = 30 # tamanho de um bloco que contem uma mina
 COLUMNS     = 10
 ROWS        = 10
 BOMBS       = 2
@@ -127,7 +127,7 @@ class Block(pygame.sprite.Sprite):
             if self.next_image == ACTION_FILL_CLICKED:
                 self.image.fill(GRAYDARK)
             else:
-                self.image = self.next_image
+                self.image = pygame.transform.scale(self.next_image,[MINA_SIZE,MINA_SIZE])
 
         self.next_image = None
 
@@ -137,8 +137,9 @@ class Block(pygame.sprite.Sprite):
             :return: nada
         """
         if not self.revealed and not self.marked:
-            self.image = pygame.image.load("images/mark1.png").convert_alpha()
+            self.next_image = pygame.image.load("images/mark1.png").convert_alpha()
             self.marked=True
+            self.update_image()
 
 
 class Mina(Block):

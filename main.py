@@ -3,7 +3,7 @@ import random
 from constants import *
 
 #TODO Placa e wait avisando se ganho uo perdeu e quantos pontos
-#TODO arruamr vetor blocks_to_reaveal, pois tenta revelar bloco ja revelado, erro ligado ao parametro first da funcao reveal ou a ordem de adição ao vetor dentro da recursao de revelar vizinhos
+#TODO arruamr vetor blocks_to_reaveal, pois tenta revelar bloco ja revelado, erro ligado ao parametro first da funcao reveal ou a ordem de adicao ao vetor dentro da recursao de revelar vizinhos
 
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 30 # tamanho de um bloco que contem uma mina
@@ -140,9 +140,6 @@ class Block(pygame.sprite.Sprite):
             self.marked=True
             self.update_image()
 
-    def __str__(self):
-        return "bloco"
-
 
 class Mina(Block):
 
@@ -157,7 +154,7 @@ class Mina(Block):
         self.revealed = True
 
     def __repr__(self):
-        return "mina"
+        return "Mina" + super(Mina,self).__repr__()
 
 class Title_and_Score:
 

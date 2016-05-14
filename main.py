@@ -267,21 +267,20 @@ while not done:
                         #se for Mina
                     if type(block)==Mina:
                             #revelou uma mina
-                        if block.revealed == True:
+                        if block.revealed:
                             #PERDEU
                             round_is_finished=True
                             #marcou uma mina
-                        if block.marked == True:
+                        if block.marked:
                             bombMarked+=1
                         #se for bloco normal ese revelou o bloco
-                    elif block.revealed == True:
+                    elif block.revealed:
                             blocksRevealed+=1
                         #se marcou todas as bombas e revelou todos os blocos
                     #print "bombas marcadas:"+str(bombMarked)+" e blocos revelados:"+ str(blocksRevealed)
                 if bombMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
                             #GANHOU
                     round_is_finished=True;
-
 
             if event.type == pygame.QUIT:  # If user clicked close
                 round_is_finished = True  # Flag that we are round so we exit this loop
@@ -290,15 +289,15 @@ while not done:
                 if event.key == pygame.K_ESCAPE:
                     round_is_finished = True
                     done = True
+
         # Clear the screen
-        screen.fill(GRAYDARK)
+        screen.fill(COLOR_CLEAR_SCREEN)
 
         #for block in all_sprites_list: block.reveal()
         all_sprites_list.draw(screen)
         title_score.draw()
         # Limit to 20 frames per second
         clock.tick(20)
-
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()

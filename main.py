@@ -4,11 +4,11 @@ from constants import *
 
 #TODO colocar que tem q erelevar todos blocos, revelar envolta dos gray
 
-MINA_SIZE   = 25 # tamanho de uma mina
-BLOCK_SIZE  = 35 # tamanho de um bloco que contem uma mina
-COLUMNS     = 10
-ROWS        = 10
-BOMBS       = 2
+MINA_SIZE   = 20 # tamanho de uma mina
+BLOCK_SIZE  = 30 # tamanho de um bloco que contem uma mina
+COLUMNS     = 30
+ROWS        = 20
+BOMBS       = 50
 
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 TITLE_AND_SCORE_SIZE = BLOCK_SIZE
@@ -18,7 +18,7 @@ SCREEN_HEIGHT = ROWS * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
 
 # Criando matriz ROWS+1 por COLUMNS+1
 # Neste caso, nao sera gerado IndexError quando elemento esta fora da matriz
-matrix = [[0 for x in range(COLUMNS + 1)] for y in range(ROWS + 1)]
+matrix = [[0 for x in range(ROWS + 1)] for y in range(COLUMNS + 1)]
 # Fila de elementos que precisam ser atualizados a cada clique
 blocks_to_reveal = []
 
@@ -105,15 +105,15 @@ class Block(pygame.sprite.Sprite):
             if type(bloco) is Block and bloco.revealed == False:
                 blocks_to_reveal.append(bloco)
 
+            bloco = matrix[self.posX + 1][self.posY - 1]
+            if type(bloco) is Block and bloco.revealed == False:
+                blocks_to_reveal.append(bloco)
+
             bloco = matrix[self.posX + 1][self.posY + 1]
             if type(bloco) is Block and bloco.revealed == False:
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX - 1][self.posY + 1]
-            if type(bloco) is Block and bloco.revealed == False:
-                blocks_to_reveal.append(bloco)
-
-            bloco = matrix[self.posX + 1][self.posY - 1]
             if type(bloco) is Block and bloco.revealed == False:
                 blocks_to_reveal.append(bloco)
 

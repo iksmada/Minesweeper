@@ -5,12 +5,16 @@ from constants import *
 #TODO colocar que tem q erelevar todos blocos, revelar envolta dos gray
 
 MINA_SIZE   = 25 # tamanho de uma mina
-BLOCK_SIZE  = 30 # tamanho de um bloco que contem uma mina
+BLOCK_SIZE  = 35 # tamanho de um bloco que contem uma mina
 COLUMNS     = 10
 ROWS        = 10
 BOMBS       = 2
 
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
+TITLE_AND_SCORE_SIZE = BLOCK_SIZE
+# tamanho da janela depende do numero de columas linhas e do tamanho de cada celula da matrix
+SCREEN_WIDTH  = COLUMNS * BLOCK_SIZE + PADDING
+SCREEN_HEIGHT = ROWS * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
 
 # Criando matriz ROWS+1 por COLUMNS+1
 # Neste caso, nao sera gerado IndexError quando elemento esta fora da matriz
@@ -39,7 +43,7 @@ class Block(pygame.sprite.Sprite):
         # objeto retangulo que contem o bloco
         self.rect = self.image.get_rect()
         self.rect.x = BLOCK_SIZE * posX + PADDING
-        self.rect.y = BLOCK_SIZE * posY + PADDING
+        self.rect.y = BLOCK_SIZE * posY + PADDING + TITLE_AND_SCORE_SIZE
         # neighbors e o numero de minas vizinhas desse bloco
         self.neighbors = neighbors
         # revealed representa se este bloco ja foi revelado pelo/ao usuario
@@ -141,6 +145,9 @@ class Block(pygame.sprite.Sprite):
             self.marked=True
             self.update_image()
 
+    def __str__(self):
+        return "bloco"
+
 
 class Mina(Block):
 
@@ -157,18 +164,28 @@ class Mina(Block):
     def __str__(self):
         return "mina"
 
+class Title_and_Score:
+
+    def __init__(self,score=0):
+        #super(Title,self).__init__()
+        self.score = score
+        self.font = pygame.font.Font(None, BLOCK_SIZE)
+
+    def draw(self):
+        title = self.font.render("MINESWEEPER", 1, COLOR_TITLE)
+        screen.blit(title, (PADDING,PADDING))
+        score = self.font.render("SCORE: %4d" % self.score, 1, COLOR_SCORE)
+        screen.blit(score, (SCREEN_WIDTH - (PADDING + score.get_size()[0]), PADDING))
+
 # Initialize Pygame
 pygame.init()
 
-#tamanho da janela depende do numero de columas linhas e do tamanho de cada celula da matrix
-screen_width  = COLUMNS * BLOCK_SIZE + PADDING
-screen_height =    ROWS * BLOCK_SIZE + PADDING
-screen = pygame.display.set_mode([screen_width, screen_height])
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
+title_score = Title_and_Score()
 #grupo dos elementos de minas e total
 mines = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
-
 
 #cria bombas
 i=0
@@ -272,13 +289,15 @@ while not done:
                         #GANHOU
                 done=True;
 
-        # Clear the screen
+    # Clear the screen
     screen.fill(GRAYDARK)
 
     #for block in all_sprites_list: block.reveal()
     all_sprites_list.draw(screen)
+    title_score.draw()
     # Limit to 20 frames per second
     clock.tick(20)
+
 
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()

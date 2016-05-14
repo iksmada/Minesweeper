@@ -1,14 +1,17 @@
 import pygame
 import random
+from threading import Thread
+
+from multiplayer import *
 from constants import *
 
 #TODO colocar que tem q erelevar todos blocos, revelar envolta dos gray
 
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 30 # tamanho de um bloco que contem uma mina
-COLUMNS     = 30
-ROWS        = 20
-BOMBS       = 50
+COLUMNS     = 10
+ROWS        = 10
+BOMBS       = 10
 
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 TITLE_AND_SCORE_SIZE = BLOCK_SIZE
@@ -21,6 +24,8 @@ SCREEN_HEIGHT = ROWS * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
 matrix = [[0 for x in range(ROWS + 1)] for y in range(COLUMNS + 1)]
 # Fila de elementos que precisam ser atualizados a cada clique
 blocks_to_reveal = []
+
+PLAYER_ID = raw_input('ID:')
 
 class Block(pygame.sprite.Sprite):
     """
@@ -74,13 +79,7 @@ class Block(pygame.sprite.Sprite):
         if self.revealed:
             return
 
-        if first:
-            blocks_to_reveal.append(self)
-
         self.revealed = True
-        pygame.time.wait(1)
-        all_sprites_list.draw(screen)
-        pygame.display.flip()
 
         if self.neighbors>0:
             # Atualiza numero de bombas no tabuleiro
@@ -121,6 +120,11 @@ class Block(pygame.sprite.Sprite):
             if type(bloco) is Block and bloco.revealed == False:
                 blocks_to_reveal.append(bloco)
 
+        self.update_image()
+        all_sprites_list.draw(screen)
+        pygame.display.flip()
+        pygame.time.wait(1)
+
     def update_image(self):
         """
             Atualiza image para a imagem previamente carregada em next_image
@@ -145,9 +149,6 @@ class Block(pygame.sprite.Sprite):
             self.marked=True
             self.update_image()
 
-    def __str__(self):
-        return "bloco"
-
 
 class Mina(Block):
 
@@ -160,9 +161,10 @@ class Mina(Block):
             blocks_to_reveal.append(self)
 
         self.revealed = True
+        self.update_image()
+        all_sprites_list.draw(screen)
+        pygame.display.flip()
 
-    def __str__(self):
-        return "mina"
 
 class Title_and_Score:
 
@@ -177,6 +179,10 @@ class Title_and_Score:
         score = self.font.render("SCORE: %4d" % self.score, 1, COLOR_SCORE)
         screen.blit(score, (SCREEN_WIDTH - (PADDING + score.get_size()[0]), PADDING))
 
+PARTIDA_ID = 'test'
+shared_click_list = []
+thread_get_data = Thread(target=get_data, args=(PLAYER_ID, PARTIDA_ID, shared_click_list))
+thread_get_data.start()
 # Initialize Pygame
 pygame.init()
 
@@ -245,6 +251,16 @@ score = 0
 
 # -------- Main Program Loop -----------
 while not done:
+    if len(shared_click_list) > 0:
+        click = shared_click_list.pop(0)
+        bloco = matrix[click[0]][click[1]]
+        if type(bloco) is Block and bloco.revealed == False:
+            pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN,{'button': 2, 'pos': (-1, -1)}))
+            bloco.reveal(True)
+            while len(blocks_to_reveal) > 0:
+                block = blocks_to_reveal.pop(0)
+                block.reveal()
+
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
             done = True # Flag that we are done so we exit this loop
@@ -258,18 +274,27 @@ while not done:
             bombMarked=0
             blocksRevealed=0
             for block in all_sprites_list:
-                if block.rect.collidepoint(x, y):
+                if block.rect.collidepoint(x, y) and not block.revealed:
+                    x = block.posX
+                    y = block.posY
+                    print x,y
                     if button1:
+                        thread_get_data = Thread(target=send_data,
+                                                 args=(x, y, PLAYER_ID, PARTIDA_ID, ACTION_REGISTER_CLICK))
+                        thread_get_data.start()
+                        time.sleep(0.3)
                         block.reveal(True)
                         while len(blocks_to_reveal) > 0:
-                            block.update_image()
                             block = blocks_to_reveal.pop(0)
                             block.reveal()
-                # usa colisao:
-                # vantagem -> ignora se clicar entre dois quadrados
+                    # usa colisao:
+                    # vantagem -> ignora se clicar entre dois quadrados
 
                     elif button3:
-                #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
+                    #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
+                        thread_get_data = Thread(target=send_data,
+                                                 args=(x, y, PLAYER_ID, PARTIDA_ID, ACTION_REGISTER_MARK))
+                        thread_get_data.start()
                         block.mark()
                     #se for Mina
                 if type(block)==Mina:
@@ -298,8 +323,11 @@ while not done:
     # Limit to 20 frames per second
     clock.tick(20)
 
-
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
 
 pygame.quit()
+
+# Thread acaba quando o primeiro elemento da lista eh True ou False
+shared_click_list.insert(0,True)
+quit()

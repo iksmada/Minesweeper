@@ -235,18 +235,14 @@ while not done:
                 all_sprites_list.add(block)
                 #print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
-    # Create a red player block
-    #player = Player(RED, 20, 20)
-    #all_sprites_list.add(player)
-
     #Loop until the user clicks the close button.
-    round = False
+    round_is_finished = False
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
 
     # -------- Main Program Loop -----------
-    while not round:
+    while not round_is_finished:
         for event in pygame.event.get(): # User did something
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -274,7 +270,7 @@ while not done:
                             #revelou uma mina
                         if block.revealed == True:
                             #PERDEU
-                            round=True
+                            round_is_finished=True
                             #marcou uma mina
                         if block.marked == True:
                             bombMarked+=1
@@ -285,15 +281,15 @@ while not done:
                     #print "bombas marcadas:"+str(bombMarked)+" e blocos revelados:"+ str(blocksRevealed)
                 if bombMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
                             #GANHOU
-                    round=True;
+                    round_is_finished=True;
 
 
             if event.type == pygame.QUIT:  # If user clicked close
-                round = True  # Flag that we are round so we exit this loop
+                round_is_finished = True  # Flag that we are round so we exit this loop
                 done = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    round = True
+                    round_is_finished = True
                     done = True
         # Clear the screen
         screen.fill(GRAYDARK)

@@ -252,12 +252,13 @@ while not done:
                 blocksRevealed=0
                 for block in all_sprites_list:
                     if block.rect.collidepoint(x, y):
-                        if button1:
+                        if button1 and not block.revealed:
                             block.reveal()
                             while len(blocks_to_reveal) > 0:
                                 block = blocks_to_reveal.pop(0)
-                                block.reveal()
-                                title_score.score+=block.neighbors
+                                if not block.revealed:
+                                    block.reveal()
+                                    title_score.score+=block.neighbors
                     # usa colisao:
                     # vantagem -> ignora se clicar entre dois quadrados
 

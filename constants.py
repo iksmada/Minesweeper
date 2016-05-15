@@ -1,3 +1,17 @@
+# GAME SETTINGS
+
+MINA_SIZE   = 20 # tamanho de uma mina
+BLOCK_SIZE  = 22 # tamanho de um bloco que contem uma mina
+COLUMNS     = 20
+ROWS        = 10
+BOMBS       = 20
+# espaco entre tabuleiro e minas
+PADDING = (BLOCK_SIZE - MINA_SIZE)
+TITLE_AND_SCORE_SIZE = BLOCK_SIZE
+# tamanho da janela depende do numero de columas linhas e do tamanho de cada celula da matrix
+SCREEN_WIDTH  = COLUMNS * BLOCK_SIZE + PADDING
+SCREEN_HEIGHT = ROWS * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+
 # COLORS
 BLACK    = (   0,   0,   0)
 WHITE    = ( 255, 255, 255)

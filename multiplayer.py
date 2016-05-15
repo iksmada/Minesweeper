@@ -1,7 +1,5 @@
 import requests
-import threading
-import time
-from constants import SERVER_ADRESS, ROUTE_PARTIDAS
+from constants import ROUTE_PARTIDAS
 
 
 def thread_get_data(player,partida,lista):

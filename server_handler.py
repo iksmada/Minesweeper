@@ -23,6 +23,12 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         # print self.requestline
         path = clean_path(self.path)
 
+        if len(path) < 2:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(':(')
+            return
+
         if path[0] not in accepted_services:
             self.send_response(403)
             self.end_headers()
@@ -73,6 +79,12 @@ class MineSweeperServer(BaseHTTPRequestHandler):
     def do_POST(self):
         # print self.requestline
         path = clean_path(self.path)
+
+        if len(path) < 2:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(':(')
+            return
 
         if path[0] not in accepted_services:
             self.send_response(403)
@@ -155,6 +167,12 @@ class MineSweeperServer(BaseHTTPRequestHandler):
     def do_DELETE(self):
         # print self.requestline
         path = clean_path(self.path)
+
+        if len(path) < 2:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(':(')
+            return
 
         if path[0] not in accepted_services:
             self.send_response(403)

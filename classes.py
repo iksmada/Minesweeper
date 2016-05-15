@@ -8,6 +8,7 @@ class Block(pygame.sprite.Sprite):
             minas (subclasse), avisos de minas ou vazio
     """
 
+    # Atributos estaticos atualizados no main()
     matrix = None
     blocks_to_reveal = None
     all_sprites_list = None
@@ -51,7 +52,6 @@ class Block(pygame.sprite.Sprite):
     def reveal(self):
         """
             Revela um bloco e adiciona seus vizinhos na lista de blocos para serem revelados
-            :param first: indica se este e o primeiro elemento da chamada dessa funcao
             :return: nada
         """
 
@@ -59,6 +59,8 @@ class Block(pygame.sprite.Sprite):
             return
 
         self.revealed = True
+        GameController.score += self.neighbors
+        GameController.revealedBlocks += 1
 
         if self.neighbors>0:
             # Atualiza numero de bombas no tabuleiro
@@ -133,7 +135,7 @@ class Block(pygame.sprite.Sprite):
         """
         if not self.revealed and not self.marked:
             #conta movimentos, ja faz a checagem pra nao checar mais de uma vez
-
+            GameController.score -= 10
             #muda imagem para marcacao
             self.next_image = pygame.image.load("images/mark1.png").convert_alpha()
             self.marked=True
@@ -148,29 +150,39 @@ class Mine(Block):
             self.next_image = pygame.image.load("images/mina.png").convert_alpha()
 
         self.revealed = True
+        GameController.score -= 10
+        GameController.movs += 1
 
         self.update_image()
         self.all_sprites_list.draw(self.screen)
         pygame.display.flip()
 
+    def mark(self):
+        if not self.marked:
+            super(Mine,self).mark()
+            # Chamando o pai, entao 10 pontos sao removidos e entao mais 10 + 10 sao adicionados
+            GameController.score += 20
+
     def __repr__(self):
         return "Mine" + super(Mine,self).__repr__()
 
-class Title_and_Score:
+class GameController:
 
-    # Atributo estatico atualizado do main()
-    screen = None
+    # Atributos estaticos atualizados no main()
+    score = None
+    movs = None
+    markedBombs = None
+    revealedBlocks = None
 
-    def __init__(self,score=0):
-        #super(Title,self).__init__()
-        self.score = score
-        self.movs = 0
-        self.font = pygame.font.Font(None, SCREEN_WIDTH/15)
+    def __init__(self):
+        raise AssertionError('Classe GameController nao tem instancias.')
 
-    def draw(self,top="MINESWEEPER",color=COLOR_TITLE):
-        title = self.font.render(top, 1, color)
-        self.screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING/2))
-        movs = self.font.render("MOVS: %3d" % self.movs, 1, COLOR_SCORE)
-        self.screen.blit(movs, (PADDING,PADDING/2))
-        score = self.font.render("SCORE: %3d" % self.score, 1, COLOR_SCORE)
-        self.screen.blit(score, (SCREEN_WIDTH - (PADDING + score.get_size()[0]), PADDING/2))
+    @staticmethod
+    def draw(screen,top="MINESWEEPER",color=COLOR_TITLE):
+        font = pygame.font.Font(None, BLOCK_SIZE)
+        title = font.render(top, 1, color)
+        screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING/2))
+        movs = font.render("MOVS: %3d" % GameController.movs, 1, COLOR_SCORE)
+        screen.blit(movs, (PADDING,PADDING/2))
+        score = font.render("SCORE: %3d" % GameController.score, 1, COLOR_SCORE)
+        screen.blit(score, (SCREEN_WIDTH - (PADDING + score.get_size()[0]), PADDING/2))

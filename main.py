@@ -148,7 +148,7 @@ class Block(pygame.sprite.Sprite):
             self.update_image()
 
 
-class Mina(Block):
+class Mine(Block):
 
     def reveal(self):
 
@@ -162,7 +162,7 @@ class Mina(Block):
         pygame.display.flip()
 
     def __repr__(self):
-        return "Mina" + super(Mina,self).__repr__()
+        return "Mine" + super(Mine,self).__repr__()
 
 class Title_and_Score:
 
@@ -207,7 +207,7 @@ while not done:
         posY=random.randrange(ROWS)
        # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
         if matrix[posX][posY]==0:
-            mina = Mina(posX,posY)
+            mina = Mine(posX,posY)
             matrix[posX][posY]=mina
         # Add the block to the list of objects
             mines.add(mina)
@@ -220,21 +220,21 @@ while not done:
             #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
             if matrix[posX][posY] == 0:
                 neighbors = 0
-                if type(matrix[posX + 1][posY]) is Mina:
+                if type(matrix[posX + 1][posY]) is Mine:
                     neighbors += 1
-                if type(matrix[posX][posY + 1]) is Mina:
+                if type(matrix[posX][posY + 1]) is Mine:
                     neighbors += 1
-                if type(matrix[posX - 1][posY]) is Mina:
+                if type(matrix[posX - 1][posY]) is Mine:
                     neighbors += 1
-                if type(matrix[posX][posY - 1]) is Mina:
+                if type(matrix[posX][posY - 1]) is Mine:
                     neighbors += 1
-                if type(matrix[posX + 1][posY + 1]) is Mina:
+                if type(matrix[posX + 1][posY + 1]) is Mine:
                     neighbors += 1
-                if type(matrix[posX - 1][posY + 1]) is Mina:
+                if type(matrix[posX - 1][posY + 1]) is Mine:
                     neighbors += 1
-                if type(matrix[posX + 1][posY - 1]) is Mina:
+                if type(matrix[posX + 1][posY - 1]) is Mine:
                     neighbors += 1
-                if type(matrix[posX - 1][posY - 1]) is Mina:
+                if type(matrix[posX - 1][posY - 1]) is Mine:
                     neighbors += 1
 
                 block = Block(posX,posY,neighbors)
@@ -255,7 +255,7 @@ while not done:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 button1, button2, button3 = pygame.mouse.get_pressed()
                 x, y = event.pos
-                bombMarked=0
+                bombsMarked=0
                 blocksRevealed=0
                 for block in all_sprites_list:
                     if block.rect.collidepoint(x, y):
@@ -272,21 +272,21 @@ while not done:
                         elif button3:
                     #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
                             block.mark()
-                        #se for Mina
-                    if type(block)==Mina:
+                        #se for mina
+                    if type(block)==Mine:
                             #revelou uma mina
                         if block.revealed:
                             #PERDEU
                             round_is_finished=True
                             #marcou uma mina
                         if block.marked:
-                            bombMarked+=1
+                            bombsMarked+=1
                         #se for bloco normal ese revelou o bloco
                     elif block.revealed:
                             blocksRevealed+=1
                         #se marcou todas as bombas e revelou todos os blocos
-                    #print "bombas marcadas:"+str(bombMarked)+" e blocos revelados:"+ str(blocksRevealed)
-                if bombMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
+                    #print "bombas marcadas:"+str(bombsMarked)+" e blocos revelados:"+ str(blocksRevealed)
+                if bombsMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
                             #GANHOU
                     round_is_finished=True;
 

@@ -33,7 +33,10 @@ ACTION_REGISTER_CLICK = 1
 ACTION_REGISTER_MARK = 2
 
 # MULTIPLAYER
+SERVER_NAME = 'http://127.0.0.1'
+#SERVER_NAME = 'http://ec2-52-67-17-125.sa-east-1.compute.amazonaws.com'
 SERVER_PORT = 8000
-SERVER_ADRESS = 'http://127.0.0.1:' + str(SERVER_PORT) + '/jogos/'
+
+SERVER_ADRESS =  SERVER_NAME + ':' + str(SERVER_PORT) + '/jogos/'
 ROUTE_PARTIDAS = SERVER_ADRESS + 'partidas/'
 ROUTE_TABULEIROS = SERVER_ADRESS + 'tabuleiros/'

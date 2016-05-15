@@ -3,10 +3,10 @@ import random
 from constants import *
 
 #TODO Placa e wait avisando se ganho uo perdeu e quantos pontos
-#TODO arruamr vetor blocks_to_reaveal, pois tenta revelar bloco ja revelado, erro ligado ao parametro first da funcao reveal ou a ordem de adicao ao vetor dentro da recursao de revelar vizinhos
+#TODO pintar de vermelho bomba que clicou e fez perde
 
 MINA_SIZE   = 20 # tamanho de uma mina
-BLOCK_SIZE  = 30 # tamanho de um bloco que contem uma mina
+BLOCK_SIZE  = 22 # tamanho de um bloco que contem uma mina
 COLUMNS     = 10
 ROWS        = 10
 BOMBS       = 2
@@ -169,13 +169,16 @@ class Title_and_Score:
     def __init__(self,score=0):
         #super(Title,self).__init__()
         self.score = score
-        self.font = pygame.font.Font(None, BLOCK_SIZE)
+        self.movs = 0
+        self.font = pygame.font.Font(None, SCREEN_WIDTH/15)
 
-    def draw(self):
-        title = self.font.render("MINESWEEPER", 1, COLOR_TITLE)
-        screen.blit(title, (PADDING,PADDING))
-        score = self.font.render("SCORE: %4d" % self.score, 1, COLOR_SCORE)
-        screen.blit(score, (SCREEN_WIDTH - (PADDING + score.get_size()[0]), PADDING))
+    def draw(self,top="MINESWEEPER",color=COLOR_TITLE):
+        title = self.font.render(top, 1, color)
+        screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING/2))
+        movs = self.font.render("MOVS: %3d" % self.movs, 1, COLOR_SCORE)
+        screen.blit(movs, (PADDING,PADDING/2))
+        score = self.font.render("SCORE: %3d" % self.score, 1, COLOR_SCORE)
+        screen.blit(score, (SCREEN_WIDTH - (PADDING + score.get_size()[0]), PADDING/2))
 
 # Initialize Pygame
 pygame.init()
@@ -202,16 +205,15 @@ while not done:
     i=0
     while i < BOMBS:
 
-        empty=True
         posX=random.randrange(COLUMNS)
         posY=random.randrange(ROWS)
        # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
         if matrix[posX][posY]==0:
-            mina = Mine(posX,posY)
-            matrix[posX][posY]=mina
+            mine = Mine(posX,posY)
+            matrix[posX][posY]=mine
         # Add the block to the list of objects
-            mines.add(mina)
-            all_sprites_list.add(mina)
+            mines.add(mine)
+            all_sprites_list.add(mine)
             i+=1
            # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
@@ -220,13 +222,13 @@ while not done:
             #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
             if matrix[posX][posY] == 0:
                 neighbors = 0
-                if type(matrix[posX + 1][posY]) is Mine:
+                if type(matrix[posX + 1][posY    ]) is Mine:
                     neighbors += 1
-                if type(matrix[posX][posY + 1]) is Mine:
+                if type(matrix[posX    ][posY + 1]) is Mine:
                     neighbors += 1
-                if type(matrix[posX - 1][posY]) is Mine:
+                if type(matrix[posX - 1][posY    ]) is Mine:
                     neighbors += 1
-                if type(matrix[posX][posY - 1]) is Mine:
+                if type(matrix[posX    ][posY - 1]) is Mine:
                     neighbors += 1
                 if type(matrix[posX + 1][posY + 1]) is Mine:
                     neighbors += 1
@@ -244,6 +246,7 @@ while not done:
 
     #Loop until the user clicks the close button.
     round_is_finished = False
+    win=False
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
@@ -281,14 +284,15 @@ while not done:
                             #marcou uma mina
                         if block.marked:
                             bombsMarked+=1
-                        #se for bloco normal ese revelou o bloco
+                    #se for bloco normal e se revelou o bloco
                     elif block.revealed:
                             blocksRevealed+=1
                         #se marcou todas as bombas e revelou todos os blocos
                     #print "bombas marcadas:"+str(bombsMarked)+" e blocos revelados:"+ str(blocksRevealed)
                 if bombsMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
                             #GANHOU
-                    round_is_finished=True;
+                    round_is_finished=True
+                    win=True
 
             if event.type == pygame.QUIT:  # If user clicked close
                 round_is_finished = True  # Flag that we are round so we exit this loop
@@ -310,8 +314,33 @@ while not done:
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
 
-    #terminou rodada, mostra tabuleiro e coolocar para mostrar os pontos
+    #terminou rodada,mas nao pediu pra sair do jogo
     if not done:
-        pygame.time.wait(2000)
+        #mostrar se ganhou ou perdeu
+        screen.fill(COLOR_CLEAR_SCREEN)
+        all_sprites_list.draw(screen)
+        #perder
+        if not win:
+            title_score.draw("LOST", COLOR_RESULT)
+            #revela minas
+            for mine in mines:
+                mine.reveal()
+        # ganhou
+        else:
+            title_score.draw("WIN", COLOR_RESULT)
+        pygame.display.flip()
+
+        # espera clicar pra continuar nova rodada ou sair do jogo
+        clicked=False
+        while not clicked and not done:
+            pygame.time.wait(500)
+            for event in pygame.event.get():  # User did something
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    clicked=True
+                if event.type == pygame.QUIT:  # If user clicked close
+                    done = True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        done = True
 
 pygame.quit()

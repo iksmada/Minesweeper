@@ -2,9 +2,9 @@
 
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 22 # tamanho de um bloco que contem uma mina
-COLUMNS     = 20
 ROWS        = 10
-BOMBS       = 20
+COLUMNS     = 2 * ROWS
+BOMBS       = 1
 # espaco entre tabuleiro e minas
 PADDING = (BLOCK_SIZE - MINA_SIZE)
 TITLE_AND_SCORE_SIZE = BLOCK_SIZE

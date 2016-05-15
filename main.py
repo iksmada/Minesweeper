@@ -13,11 +13,6 @@ from threading import Thread
 pygame.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
-# Inicializa variaveis estaticas
-Block.screen = screen
-Title_and_Score.screen = screen
-
-title_score = Title_and_Score()
 done = False
 # Variavel para controlar alguns componentes multiplayer
 IS_MULTIPLAYER = False
@@ -30,20 +25,25 @@ if IS_MULTIPLAYER:
     thread_get.start()
 
 while not done:
-    #grupo dos elementos de minas e total
+    #grupo dos elementos para minas e todos os outros elementos
     mines = pygame.sprite.Group()
     all_sprites_list = pygame.sprite.Group()
-    #cria bombas
     # Criando matriz ROWS+1 por COLUMNS+1
     # Neste caso, nao sera gerado IndexError quando elemento esta fora da matriz
     matrix = [[0 for x in range(ROWS + 1)] for y in range(COLUMNS + 1)]
     # Fila de elementos que precisam ser atualizados a cada clique
     blocks_to_reveal = []
 
-    # Inicializa variaveis estaticas
+    # Inicializa variaveis estaticas (e compartilhadas)
+    Block.screen = screen
     Block.all_sprites_list = all_sprites_list
     Block.matrix = matrix
     Block.blocks_to_reveal = blocks_to_reveal
+
+    GameController.score = 0
+    GameController.movs = 0
+    GameController.markedBombs = 0
+    GameController.revealedBlocks = 0
 
     for i in range(BOMBS):
         posX=random.randrange(COLUMNS)
@@ -87,7 +87,6 @@ while not done:
     #Loop until the user clicks the close button.
     round_is_finished = False
     win=False
-    title_score.movs=0
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
@@ -110,7 +109,7 @@ while not done:
                 elif ACTION_REGISTER_MARK:
                     bloco.mark()
 
-        for event in pygame.event.get(): # User did something
+        for event in pygame.event.get():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 button1, button2, button3 = pygame.mouse.get_pressed()
@@ -118,6 +117,8 @@ while not done:
                 bombsMarked=0
                 blocksRevealed=0
                 for bloco in all_sprites_list:
+                    # usa colisao:
+                    # vantagem -> ignora se clicar entre dois quadrados
                     if bloco.rect.collidepoint(x, y):
                         if button1:
                             if IS_MULTIPLAYER:
@@ -125,14 +126,12 @@ while not done:
                                                          args=(bloco.posX, bloco.posY, PLAYER_ID, PARTIDA_KEY,
                                                                ACTION_REGISTER_CLICK))
                                 thread_send.start()
-                            if not bloco.revealed: title_score.movs+=1
-                            bloco.reveal()
-                            while len(blocks_to_reveal) > 0:
-                                bloco = blocks_to_reveal.pop(0)
+                            if not bloco.revealed:
+                                GameController.movs += 1
                                 bloco.reveal()
-                    # usa colisao:
-                    # vantagem -> ignora se clicar entre dois quadrados
-
+                                while len(blocks_to_reveal) > 0:
+                                    bloco = blocks_to_reveal.pop(0)
+                                    bloco.reveal()
                         elif button3:
                             if IS_MULTIPLAYER:
                                 thread_send = Thread(target=thread_send_data,
@@ -140,24 +139,23 @@ while not done:
                                                                ACTION_REGISTER_MARK))
                                 thread_send.start()
                             bloco.mark()
-                        #se for mina
-                    if type(bloco)==Mine:
-                            #revelou uma mina
+                    #se for mina
+                    if type(bloco) is Mine:
+                        #revelou uma mina
                         if bloco.revealed:
                             #PERDEU
                             round_is_finished=True
-                            #marcou uma mina
+                        #marcou uma mina
                         if bloco.marked:
-                            bombsMarked+=1
-                    #se for bloco normal e se revelou o bloco
-                    elif bloco.revealed:
-                            blocksRevealed+=1
+                            GameController.markedBombs+=1
                         #se marcou todas as bombas e revelou todos os blocos
                     #print "bombas marcadas:"+str(bombsMarked)+" e blocos revelados:"+ str(blocksRevealed)
-                if bombsMarked==BOMBS and blocksRevealed==(COLUMNS*ROWS-BOMBS):
-                            #GANHOU
-                    round_is_finished=True
-                    win=True
+
+                    #GANHOU
+                    if GameController.markedBombs == BOMBS \
+                            and GameController.revealedBlocks == (COLUMNS*ROWS-BOMBS):
+                        round_is_finished=True
+                        win=True
 
             if event.type == pygame.QUIT:  # If user clicked close
                 round_is_finished = True  # Flag that we are round so we exit this loop
@@ -170,29 +168,28 @@ while not done:
         # Clear the screen
         screen.fill(COLOR_CLEAR_SCREEN)
 
-        #for block in all_sprites_list: block.reveal()
         all_sprites_list.draw(screen)
-        title_score.draw()
+        GameController.draw(screen)
         # Limit to 20 frames per second
         clock.tick(20)
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
 
-    #terminou rodada,mas nao pediu pra sair do jogo
+    #terminou rodada, mas nao pediu pra sair do jogo
     if not done:
         #mostrar se ganhou ou perdeu
         screen.fill(COLOR_CLEAR_SCREEN)
         all_sprites_list.draw(screen)
         #perder
         if not win:
-            title_score.draw("LOST", COLOR_RESULT)
+            GameController.draw(screen, "LOST", COLOR_RESULT)
             #revela minas
             for mine in mines:
                 mine.reveal()
         # ganhou
         else:
-            title_score.draw("WIN", COLOR_RESULT)
+            GameController.draw(screen, "WIN", COLOR_RESULT)
         pygame.display.flip()
 
         # espera clicar pra continuar nova rodada ou sair do jogo

@@ -30,7 +30,7 @@ while not done:
     all_sprites_list = pygame.sprite.Group()
     # Criando matriz ROWS+1 por COLUMNS+1
     # Neste caso, nao sera gerado IndexError quando elemento esta fora da matriz
-    matrix = [[0 for x in range(ROWS + 1)] for y in range(COLUMNS + 1)]
+    matrix = [[None for x in range(ROWS + 1)] for y in range(COLUMNS + 1)]
     # Fila de elementos que precisam ser atualizados a cada clique
     blocks_to_reveal = []
 
@@ -49,7 +49,7 @@ while not done:
         posX=random.randrange(COLUMNS)
         posY=random.randrange(ROWS)
        # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
-        if matrix[posX][posY]==0:
+        if matrix[posX][posY] is None:
             mine = Mine(posX,posY)
             matrix[posX][posY]=mine
         # Add the block to the list of objects
@@ -60,7 +60,7 @@ while not done:
     for posX in range(COLUMNS):
         for posY in range(ROWS):
             #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
-            if matrix[posX][posY] == 0:
+            if matrix[posX][posY] is None:
                 neighbors = 0
                 if type(matrix[posX + 1][posY    ]) is Mine:
                     neighbors += 1
@@ -127,7 +127,9 @@ while not done:
                                                                ACTION_REGISTER_CLICK))
                                 thread_send.start()
                             if not bloco.revealed:
-                                GameController.movs += 1
+                                # Nao adiciona movimentos quando todas as bombas foram encontradas
+                                if not GameController.markedBombs == BOMBS:
+                                    GameController.movs += 1
                                 bloco.reveal()
                                 while len(blocks_to_reveal) > 0:
                                     bloco = blocks_to_reveal.pop(0)

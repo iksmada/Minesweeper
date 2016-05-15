@@ -1,6 +1,24 @@
 import requests
-from constants import ROUTE_PARTIDAS
+from constants import *
 
+
+def get_tauleiro_from_server(partida):
+
+    ROUTE = ROUTE_TABULEIROS + '/' + str(partida)
+    tabuleiro = ''
+    data = {'rows':ROWS,'cols':COLUMNS,'bombs':BOMBS}
+    try:
+        requests.post(ROUTE,data)
+        result = requests.get(ROUTE).content
+        if result is not None and len(result) > 0:
+            for par in result.split('&'):
+                par = str(par).split('=')
+                if str(par[0]) == 'tabuleiro':
+                    tabuleiro = str(par[1])
+    except Exception as ex:
+        print ex
+
+    return tabuleiro
 
 def thread_get_data(player,partida,lista):
 
@@ -33,7 +51,7 @@ def thread_send_data(x,y,player,partida,action):
     ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
     data = {'x':x,'y':y,'player':player,'action':action}
     try:
-        for i in range(2):
+        for i in range(5):
             requests.post(ROUTE + '/' + str(i), data)
     except:
         print "Nao foi possivel salvar clique"

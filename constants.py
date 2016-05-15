@@ -1,10 +1,9 @@
 # GAME SETTINGS
-
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 22 # tamanho de um bloco que contem uma mina
 ROWS        = 10
 COLUMNS     = 2 * ROWS
-BOMBS       = 1
+BOMBS       = 5
 # espaco entre tabuleiro e minas
 PADDING = (BLOCK_SIZE - MINA_SIZE)
 TITLE_AND_SCORE_SIZE = BLOCK_SIZE
@@ -37,3 +36,4 @@ ACTION_REGISTER_MARK = 2
 SERVER_PORT = 8000
 SERVER_ADRESS = 'http://127.0.0.1:' + str(SERVER_PORT) + '/jogos/'
 ROUTE_PARTIDAS = SERVER_ADRESS + 'partidas/'
+ROUTE_TABULEIROS = SERVER_ADRESS + 'tabuleiros/'

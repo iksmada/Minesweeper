@@ -16,13 +16,14 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 done = False
 # Variavel para controlar alguns componentes multiplayer
 IS_MULTIPLAYER = False
-
+tabuleiro = None
 if IS_MULTIPLAYER:
     shared_click_list = []
     PLAYER_ID = raw_input('ID:')
     PARTIDA_KEY = raw_input('PARTIDA:')
     thread_get = Thread(target=thread_get_data, args=(PLAYER_ID, PARTIDA_KEY, shared_click_list))
     thread_get.start()
+    tabuleiro = get_tauleiro_from_server(PARTIDA_KEY).replace('\n','')
 
 while not done:
     #grupo dos elementos para minas e todos os outros elementos
@@ -45,19 +46,28 @@ while not done:
     GameController.markedBombs = 0
     GameController.revealedBlocks = 0
 
-    i = 0
-    while i < BOMBS:
-        posX=random.randrange(COLUMNS)
-        posY=random.randrange(ROWS)
-       # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
-        if matrix[posX][posY] is None:
-            mine = Mine(posX,posY)
-            matrix[posX][posY]=mine
-        # Add the block to the list of objects
-            mines.add(mine)
-            all_sprites_list.add(mine)
-            i += 1
-           # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+    if not IS_MULTIPLAYER:
+        i = 0
+        while i < BOMBS:
+            posX=random.randrange(COLUMNS)
+            posY=random.randrange(ROWS)
+           # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+            if matrix[posX][posY] is None:
+                mine = Mine(posX,posY)
+                matrix[posX][posY]=mine
+                # Add the block to the list of objects
+                mines.add(mine)
+                all_sprites_list.add(mine)
+                i += 1
+               # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
+    else:
+        for posX in range(COLUMNS):
+            for posY in range(ROWS):
+                if tabuleiro[posY*COLUMNS + posX] == '1':
+                    mine = Mine(posX, posY)
+                    matrix[posX][posY] = mine
+                    mines.add(mine)
+                    all_sprites_list.add(mine)
 
     for posX in range(COLUMNS):
         for posY in range(ROWS):
@@ -97,7 +107,6 @@ while not done:
     while not round_is_finished:
         if IS_MULTIPLAYER and len(shared_click_list) > 0:
             click = shared_click_list.pop(0)
-            print click
             posX = int(click[0])
             posY = int(click[1])
             action = int(click[2])

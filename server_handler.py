@@ -1,6 +1,7 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from constants import SERVER_PORT
 import datetime
+import random
 server_data = {}
 
 def clean_path(path):
@@ -9,15 +10,37 @@ def clean_path(path):
     path = [x for x in path if x]
     return path
 
+accepted_services = ['jogos']
+accepted_route = {'jogos':['partidas', 'tabuleiros']}
+
 class MineSweeperServer(BaseHTTPRequestHandler):
 
     # Remova esse metodo para ver todas as requests chegando
-    def log_message(self, format, *args):
+    def log_message(self, f, *args):
         pass
 
     def do_GET(self):
         # print self.requestline
         path = clean_path(self.path)
+
+        if path[0] not in accepted_services:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown service')
+            return
+
+        if path[1] not in accepted_route[path[0]]:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown access route')
+            return
+
+        path = path[1:]
+
+        if path[0] == 'partidas':
+            OPERATION = 1
+        elif path[0] == 'tabuleiros':
+            OPERATION = 2
 
         ultimo_dict = server_data
         while len(path) > 0:
@@ -29,25 +52,46 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
             path = path[1:]
 
-        try:
-            chave_mais_antiga = sorted(ultimo_dict.keys())[0]
-            ultimo_dict = ultimo_dict[chave_mais_antiga]
-        except:
-            pass # Dict esta vazio
+        if OPERATION == 1:
+            try:
+                chave_mais_antiga = sorted(ultimo_dict.keys())[0]
+                ultimo_dict = ultimo_dict[chave_mais_antiga]
+            except:
+                pass # Dict esta vazio
 
         response = ''
         for key, val in ultimo_dict.items():
-            response += '&' + key + '=' + val
+            response += '&' + str(key) + '=' + str(val)
         response = response[1:]
         # print response
 
         self.send_response(200)
         self.end_headers()
         self.wfile.write(response)
+        return
 
     def do_POST(self):
         # print self.requestline
         path = clean_path(self.path)
+
+        if path[0] not in accepted_services:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown service')
+            return
+
+        if path[1] not in accepted_route[path[0]]:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown access route')
+            return
+
+        path = path[1:]
+
+        if path[0] == 'partidas':
+            OPERATION = 1
+        elif path[0] == 'tabuleiros':
+            OPERATION = 2
 
         ultimo_dict = server_data
         while len(path) > 0:
@@ -62,27 +106,77 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         content_length = int(self.headers.getheader('content-length', 0))
         POST_data = self.rfile.read(content_length)
 
-        instante = datetime.datetime.now()
-        chave_instante = str(instante).replace('.', ':')
-        ultimo_dict[chave_instante] = {}
-        ultimo_dict = ultimo_dict[chave_instante]
+        if OPERATION == 1:
+            instante = datetime.datetime.now()
+            chave_instante = str(instante).replace('.', ':')
+            ultimo_dict[chave_instante] = {}
+            ultimo_dict = ultimo_dict[chave_instante]
 
-        for par in str(POST_data).split('&'):
-            par = str(par).split('=')
-            ultimo_dict[str(par[0])] = str(par[1])
+            for par in str(POST_data).split('&'):
+                par = str(par).split('=')
+                ultimo_dict[str(par[0])] = str(par[1])
+        elif OPERATION == 2:
+            temp_dict = {}
+            for par in str(POST_data).split('&'):
+                par = str(par).split('=')
+                temp_dict[str(par[0])] = str(par[1])
+            try:
+                rows = int(temp_dict['rows'])
+                cols = int(temp_dict['cols'])
+                bombs = int(temp_dict['bombs'])
+            except:
+                self.send_response(406)
+                self.end_headers()
+                self.wfile.write('Invalid parameters')
+                return
+            tabuleiro = ('0'*cols + '\n')*rows
+            i = 0
+            while i < bombs:
+                r = random.randrange(rows)
+                c = random.randrange(cols)
+                if tabuleiro[r*cols + c] == '0':
+                    tabuleiro = tabuleiro[:r*cols + c] + '1' + tabuleiro[r*cols + c + 1:]
+                    i += 1
+            if 'tabuleiro' not in ultimo_dict \
+                    or ultimo_dict['soma'] != rows + cols + bombs\
+                    or ultimo_dict['mult'] != rows * cols * bombs:
+                ultimo_dict['tabuleiro']=tabuleiro
+                # Usado para comparar a assinatura do tabuleiro atual com o antigo
+                ultimo_dict['soma'] = rows + cols + bombs
+                ultimo_dict['mult'] = rows * cols * bombs
 
         # print server_data
 
         self.send_response(200)
         self.end_headers()
-        self.wfile.write('OK')
+        self.wfile.write('Done!')
+        return
 
     def do_DELETE(self):
         # print self.requestline
         path = clean_path(self.path)
 
+        if path[0] not in accepted_services:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown service')
+            return
+
+        if path[1] not in accepted_route[path[0]]:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown access route')
+            return
+
+        path = path[1:]
+
+        if path[0] == 'partidas':
+            LOOP = 0
+        elif path[0] == 'tabuleiros':
+            LOOP = 1
+
         ultimo_dict = server_data
-        while len(path) > 0:
+        while len(path) > LOOP:
             if path[0] in ultimo_dict:
                 ultimo_dict = ultimo_dict[path[0]]
             else:
@@ -90,17 +184,22 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 ultimo_dict = ultimo_dict[path[0]]
 
             path = path[1:]
-
-        try:
-            chave_mais_antiga = sorted(ultimo_dict.keys())[0]
-
-            del ultimo_dict[chave_mais_antiga]
-        except:
-            pass # Dict esta vazio
+        if LOOP == 0:
+            try:
+                chave_mais_antiga = sorted(ultimo_dict.keys())[0]
+                del ultimo_dict[chave_mais_antiga]
+            except:
+                pass # Dict esta vazio
+        elif LOOP == 1:
+            try:
+                del ultimo_dict[path[0]]
+            except:
+                pass
 
         self.send_response(200)
         self.end_headers()
-        self.wfile.write('')
+        self.wfile.write('Done!')
+        return
 
 if __name__ == '__main__':
     server_address = ('', SERVER_PORT)

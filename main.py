@@ -9,7 +9,7 @@ MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 30 # tamanho de um bloco que contem uma mina
 COLUMNS     = 10
 ROWS        = 10
-BOMBS       = 10
+BOMBS       = 2
 
 PADDING = (BLOCK_SIZE - MINA_SIZE) # espaco entre tabuleiro e minas
 TITLE_AND_SCORE_SIZE = BLOCK_SIZE
@@ -79,35 +79,43 @@ class Block(pygame.sprite.Sprite):
             self.next_image = ACTION_FILL_CLICKED
 
             bloco = matrix[self.posX + 1][self.posY]
-            if type(bloco) is Block and bloco.revealed==False:
+            if type(bloco) is Block and not bloco.revealed \
+                    and blocks_to_reveal.count(bloco)==0: #se ja estiver na lista nao coloca denovo
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX][self.posY + 1]
-            if type(bloco) is Block and bloco.revealed == False:
+            if type(bloco) is Block and not bloco.revealed  \
+                    and blocks_to_reveal.count(bloco) == 0:
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX - 1][self.posY]
-            if type(bloco) is Block and bloco.revealed == False:
+            if type(bloco) is Block and not bloco.revealed \
+                    and blocks_to_reveal.count(bloco) == 0:
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX][self.posY - 1]
-            if type(bloco) is Block and bloco.revealed == False:
+            if type(bloco) is Block and not bloco.revealed \
+                    and blocks_to_reveal.count(bloco) == 0:
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX + 1][self.posY - 1]
-            if type(bloco) is Block and bloco.revealed == False:
+            if type(bloco) is Block and bloco.revealed == False \
+                    and blocks_to_reveal.count(bloco) == 0:
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX + 1][self.posY + 1]
-            if type(bloco) is Block and bloco.revealed == False:
+            if type(bloco) is Block and not bloco.revealed  \
+                    and blocks_to_reveal.count(bloco) == 0:
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX - 1][self.posY + 1]
-            if type(bloco) is Block and bloco.revealed == False:
+            if type(bloco) is Block and not bloco.revealed \
+                    and blocks_to_reveal.count(bloco) == 0:
                 blocks_to_reveal.append(bloco)
 
             bloco = matrix[self.posX - 1][self.posY - 1]
-            if type(bloco) is Block and bloco.revealed == False:
+            if type(bloco) is Block and not bloco.revealed \
+                    and blocks_to_reveal.count(bloco) == 0:
                 blocks_to_reveal.append(bloco)
 
         self.update_image()
@@ -181,7 +189,6 @@ done = False
 #score = 0
 
 while not done:
-    print "round"
     #grupo dos elementos de minas e total
     mines = pygame.sprite.Group()
     all_sprites_list = pygame.sprite.Group()
@@ -254,11 +261,11 @@ while not done:
                     if block.rect.collidepoint(x, y):
                         if button1 and not block.revealed:
                             block.reveal()
+                            title_score.score += block.neighbors
                             while len(blocks_to_reveal) > 0:
                                 block = blocks_to_reveal.pop(0)
-                                if not block.revealed:
-                                    block.reveal()
-                                    title_score.score+=block.neighbors
+                                block.reveal()
+                                title_score.score+=block.neighbors
                     # usa colisao:
                     # vantagem -> ignora se clicar entre dois quadrados
 
@@ -304,6 +311,7 @@ while not done:
         pygame.display.flip()
 
     #terminou rodada, mostra tabuleiro e coolocar para mostrar os pontos
-    pygame.time.wait(1000)
+    if not done:
+        pygame.time.wait(2000)
 
 pygame.quit()

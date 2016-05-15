@@ -14,6 +14,7 @@ def thread_get_data(player,partida,lista):
         if len(lista) > 0 and type(lista[0]) is bool:
             break
 
+
         try:
             result = requests.get(ROUTE).content
             params = {}

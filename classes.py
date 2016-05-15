@@ -140,6 +140,8 @@ class Block(pygame.sprite.Sprite):
             self.next_image = pygame.image.load("images/mark1.png").convert_alpha()
             self.marked=True
             self.update_image()
+            self.all_sprites_list.draw(self.screen)
+            pygame.display.flip()
 
 
 class Mine(Block):
@@ -159,9 +161,10 @@ class Mine(Block):
 
     def mark(self):
         if not self.marked:
-            super(Mine,self).mark()
-            # Chamando o pai, entao 10 pontos sao removidos e entao mais 10 + 10 sao adicionados
+            # Chamando o pai, entao 10 pontos sao removidos e entao mais -10 +20 sao adicionados
             GameController.score += 20
+            super(Mine,self).mark()
+
 
     def __repr__(self):
         return "Mine" + super(Mine,self).__repr__()

@@ -117,7 +117,13 @@ while not done:
                     while len(blocks_to_reveal) > 0:
                         bloco = blocks_to_reveal.pop(0)
                         bloco.reveal()
-                elif ACTION_REGISTER_MARK:
+                elif action == ACTION_REGISTER_MARK:
+                    bloco.mark()
+            elif type(bloco) is Mine and not bloco.revealed:
+                if action == ACTION_REGISTER_CLICK:
+                    pass
+                    #TODO O que fazer quando seu parceiro clica na mina?
+                elif action == ACTION_REGISTER_MARK:
                     bloco.mark()
 
         for event in pygame.event.get():

@@ -69,6 +69,7 @@ class Block(pygame.sprite.Sprite):
         if self.revealed:
             return
 
+        title_score.score += block.neighbors
         self.revealed = True
 
         if self.neighbors>0:
@@ -143,6 +144,10 @@ class Block(pygame.sprite.Sprite):
             :return: nada
         """
         if not self.revealed and not self.marked:
+            #conta movimentos, ja faz a checagem pra nao checar mais de uma vez
+            title_score.movs += 1
+
+            #muda imagem para marcacao
             self.next_image = pygame.image.load("images/mark1.png").convert_alpha()
             self.marked=True
             self.update_image()
@@ -247,6 +252,7 @@ while not done:
     #Loop until the user clicks the close button.
     round_is_finished = False
     win=False
+    title_score.movs=0
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
@@ -262,18 +268,16 @@ while not done:
                 blocksRevealed=0
                 for block in all_sprites_list:
                     if block.rect.collidepoint(x, y):
-                        if button1 and not block.revealed:
+                        if button1:
+                            if not block.revealed: title_score.movs+=1
                             block.reveal()
-                            title_score.score += block.neighbors
                             while len(blocks_to_reveal) > 0:
                                 block = blocks_to_reveal.pop(0)
                                 block.reveal()
-                                title_score.score+=block.neighbors
                     # usa colisao:
                     # vantagem -> ignora se clicar entre dois quadrados
 
                         elif button3:
-                    #print "matrix[" + str(x / MATRIXSIZE) + "][" + str(y / MATRIXSIZE) + "] = " + str(matrix[x / MATRIXSIZE][y / MATRIXSIZE])
                             block.mark()
                         #se for mina
                     if type(block)==Mine:

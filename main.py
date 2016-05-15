@@ -45,7 +45,8 @@ while not done:
     GameController.markedBombs = 0
     GameController.revealedBlocks = 0
 
-    for i in range(BOMBS):
+    i = 0
+    while i < BOMBS:
         posX=random.randrange(COLUMNS)
         posY=random.randrange(ROWS)
        # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
@@ -55,6 +56,7 @@ while not done:
         # Add the block to the list of objects
             mines.add(mine)
             all_sprites_list.add(mine)
+            i += 1
            # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
     for posX in range(COLUMNS):

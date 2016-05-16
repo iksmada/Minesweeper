@@ -176,16 +176,22 @@ class GameController:
     movs = None
     markedBombs = None
     revealedBlocks = None
+    playerID = 0
+    partidaKey='-'
 
     def __init__(self):
         raise AssertionError('Classe GameController nao tem instancias.')
 
     @staticmethod
     def draw(screen,top="MINESWEEPER",color=COLOR_TITLE):
-        font = pygame.font.Font(None, BLOCK_SIZE)
+        font = pygame.font.Font(None, SCREEN_WIDTH/20)
         title = font.render(top, 1, color)
         screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING/2))
-        movs = font.render("MOVS: %3d" % GameController.movs, 1, COLOR_SCORE)
+        movs = font.render("MOVS:%3d " % GameController.movs, 1, COLOR_SCORE)
         screen.blit(movs, (PADDING,PADDING/2))
-        score = font.render("SCORE: %3d" % GameController.score, 1, COLOR_SCORE)
-        screen.blit(score, (SCREEN_WIDTH - (PADDING + score.get_size()[0]), PADDING/2))
+        score = font.render("SCORE:%3d" % GameController.score, 1, COLOR_SCORE)
+        screen.blit(score, ((PADDING + movs.get_size()[0]), PADDING/2))
+        id = font.render("ID:%1d " % GameController.playerID, 1, COLOR_SCORE)
+        screen.blit(id, (SCREEN_WIDTH-(PADDING+id.get_size()[0]),PADDING/2))
+        partida = font.render("PARTIDA:%s " % GameController.partidaKey, 1, COLOR_SCORE)
+        screen.blit(partida, (SCREEN_WIDTH-(id.get_size()[0] + partida.get_size()[0]), PADDING/2))

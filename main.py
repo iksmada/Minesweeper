@@ -19,11 +19,11 @@ IS_MULTIPLAYER = False
 tabuleiro = None
 if IS_MULTIPLAYER:
     shared_click_list = []
-    PLAYER_ID = raw_input('ID:')
-    PARTIDA_KEY = raw_input('PARTIDA:')
-    thread_get = Thread(target=thread_get_data, args=(PLAYER_ID, PARTIDA_KEY, shared_click_list))
+    GameController.playerID=raw_input('ID:')
+    GameController.partidaKey = raw_input('PARTIDA:')
+    thread_get = Thread(target=thread_get_data, args=(GameController.playerID, GameController.playerID, shared_click_list))
     thread_get.start()
-    tabuleiro = get_tauleiro_from_server(PARTIDA_KEY).replace('\n','')
+    tabuleiro = get_tauleiro_from_server(GameController.playerID).replace('\n','')
 
 while not done:
     #grupo dos elementos para minas e todos os outros elementos
@@ -141,7 +141,7 @@ while not done:
                             if not bloco.revealed:
                                 if IS_MULTIPLAYER:
                                     thread_send = Thread(target=thread_send_data, args=(
-                                    bloco.posX, bloco.posY, PLAYER_ID, PARTIDA_KEY, ACTION_REGISTER_CLICK))
+                                    bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_CLICK))
                                     thread_send.start()
                                 # Nao adiciona movimentos quando todas as bombas foram encontradas
                                 if not GameController.markedBombs == BOMBS:
@@ -154,7 +154,7 @@ while not done:
                             if not bloco.marked:
                                 if IS_MULTIPLAYER:
                                     thread_send = Thread(target=thread_send_data, args=(
-                                    bloco.posX, bloco.posY, PLAYER_ID, PARTIDA_KEY, ACTION_REGISTER_MARK))
+                                    bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_MARK))
                                     thread_send.start()
                                 bloco.mark()
                     #se for mina

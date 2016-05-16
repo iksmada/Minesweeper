@@ -23,7 +23,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         # print self.requestline
         path = clean_path(self.path)
 
-        if len(path) < 2:
+        if len(path) < 3:
             self.send_response(404)
             self.end_headers()
             self.wfile.write(':(')
@@ -80,7 +80,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         # print self.requestline
         path = clean_path(self.path)
 
-        if len(path) < 2:
+        if len(path) < 3:
             self.send_response(404)
             self.end_headers()
             self.wfile.write(':(')
@@ -168,7 +168,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         # print self.requestline
         path = clean_path(self.path)
 
-        if len(path) < 2:
+        if len(path) < 3:
             self.send_response(404)
             self.end_headers()
             self.wfile.write(':(')

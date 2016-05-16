@@ -1,9 +1,9 @@
 # GAME SETTINGS
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 22 # tamanho de um bloco que contem uma mina
-ROWS        = 20
+ROWS        = 10
 COLUMNS     = 2 * ROWS
-BOMBS       = 100
+BOMBS       = ROWS*COLUMNS/4 #25% do tabuleiro sao bombas
 # espaco entre tabuleiro e minas
 PADDING = (BLOCK_SIZE - MINA_SIZE)
 TITLE_AND_SCORE_SIZE = BLOCK_SIZE

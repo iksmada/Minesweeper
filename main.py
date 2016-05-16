@@ -138,12 +138,11 @@ while not done:
                     # vantagem -> ignora se clicar entre dois quadrados
                     if bloco.rect.collidepoint(x, y):
                         if button1:
-                            if IS_MULTIPLAYER:
-                                thread_send = Thread(target=thread_send_data,
-                                                         args=(bloco.posX, bloco.posY, PLAYER_ID, PARTIDA_KEY,
-                                                               ACTION_REGISTER_CLICK))
-                                thread_send.start()
                             if not bloco.revealed:
+                                if IS_MULTIPLAYER:
+                                    thread_send = Thread(target=thread_send_data, args=(
+                                    bloco.posX, bloco.posY, PLAYER_ID, PARTIDA_KEY, ACTION_REGISTER_CLICK))
+                                    thread_send.start()
                                 # Nao adiciona movimentos quando todas as bombas foram encontradas
                                 if not GameController.markedBombs == BOMBS:
                                     GameController.movs += 1
@@ -152,12 +151,12 @@ while not done:
                                     bloco = blocks_to_reveal.pop(0)
                                     bloco.reveal()
                         elif button3:
-                            if IS_MULTIPLAYER:
-                                thread_send = Thread(target=thread_send_data,
-                                                         args=(bloco.posX, bloco.posY, PLAYER_ID, PARTIDA_KEY,
-                                                               ACTION_REGISTER_MARK))
-                                thread_send.start()
-                            bloco.mark()
+                            if not bloco.marked:
+                                if IS_MULTIPLAYER:
+                                    thread_send = Thread(target=thread_send_data, args=(
+                                    bloco.posX, bloco.posY, PLAYER_ID, PARTIDA_KEY, ACTION_REGISTER_MARK))
+                                    thread_send.start()
+                                bloco.mark()
                     #se for mina
                     if type(bloco) is Mine:
                         #revelou uma mina

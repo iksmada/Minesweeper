@@ -149,12 +149,16 @@ while not done:
                                     bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_CLICK))
                                     thread_send.start()
                                 # Nao adiciona movimentos quando todas as bombas foram encontradas
-                                if not GameController.markedBombs == BOMBS:
+                                if not (GameController.markedBombs == BOMBS or isinstance(bloco,Mine)):
                                     GameController.movs += 1
                                 bloco.reveal()
                                 while len(blocks_to_reveal) > 0:
                                     bloco = blocks_to_reveal.pop(0)
                                     bloco.reveal()
+                                # revelou uma mina
+                                if isinstance(bloco,Mine) and not bloco.marked:
+                                    # PERDEU
+                                    round_is_finished = True
                         elif button3:
                             if not bloco.marked:
                                 if IS_MULTIPLAYER:
@@ -162,15 +166,11 @@ while not done:
                                     bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_MARK))
                                     thread_send.start()
                                 bloco.mark()
-                    #se for mina
-                    if type(bloco) is Mine:
-                        #revelou uma mina
-                        if bloco.revealed:
-                            #PERDEU
-                            round_is_finished=True
-                        #marcou uma mina
-                        if bloco.marked:
-                            GameController.markedBombs+=1
+                                #se for mina
+                                if isinstance(bloco,Mine):
+                                    #marcou uma mina
+                                    if bloco.marked:
+                                        GameController.markedBombs+=1
                         #se marcou todas as bombas e revelou todos os blocos
                     #print "bombas marcadas:"+str(bombsMarked)+" e blocos revelados:"+ str(blocksRevealed)
 
@@ -209,7 +209,7 @@ while not done:
             GameController.draw(screen, "LOST", COLOR_RESULT)
             #revela minas
             for mine in mines:
-                mine.reveal()
+                mine.reveal_unrevealed()
         # ganhou
         else:
             GameController.draw(screen, "WIN", COLOR_RESULT)

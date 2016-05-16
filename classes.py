@@ -184,14 +184,39 @@ class GameController:
 
     @staticmethod
     def draw(screen,top="MINESWEEPER",color=COLOR_TITLE):
-        font = pygame.font.Font(None, SCREEN_WIDTH/20)
+        font = pygame.font.Font(None, NORMAL_FONT_SIZE)
         title = font.render(top, 1, color)
-        screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING/2))
-        movs = font.render("MOVS:%3d " % GameController.movs, 1, COLOR_SCORE)
-        screen.blit(movs, (PADDING,PADDING/2))
-        score = font.render("SCORE:%3d" % GameController.score, 1, COLOR_SCORE)
-        screen.blit(score, ((PADDING + movs.get_size()[0]), PADDING/2))
-        id = font.render("ID:%1d " % GameController.playerID, 1, COLOR_SCORE)
-        screen.blit(id, (SCREEN_WIDTH-(PADDING+id.get_size()[0]),PADDING/2))
-        partida = font.render("PARTIDA:%s " % GameController.partidaKey, 1, COLOR_SCORE)
-        screen.blit(partida, (SCREEN_WIDTH-(id.get_size()[0] + partida.get_size()[0]), PADDING/2))
+        screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING + BLOCK_SIZE/2))
+        score = font.render("SCORE: %3d" % GameController.score, 1, COLOR_SCORE)
+        screen.blit(score, (PADDING, PADDING))
+        movs = font.render("MOVIMENTS: %3d " % GameController.movs, 1, COLOR_SCORE)
+        screen.blit(movs, (PADDING, PADDING + BLOCK_SIZE))
+        player_id = font.render("ID: %1d " % GameController.playerID, 1, COLOR_SCORE)
+        screen.blit(player_id, (SCREEN_WIDTH-(PADDING+player_id.get_size()[0]),PADDING))
+        partida = font.render("PARTIDA :%s " % GameController.partidaKey, 1, COLOR_SCORE)
+        screen.blit(partida, (SCREEN_WIDTH-(PADDING + partida.get_size()[0]), PADDING + BLOCK_SIZE))
+
+class Button(pygame.sprite.Sprite):
+
+    def __init__(self, ID, text, posX, posY, tamX, tamY,
+                 font_size=NORMAL_FONT_SIZE,buttonColor=BLACK, textColor=RED):
+        super(Button,self).__init__()
+        self.image = pygame.Surface([tamX, tamY ])
+        self.image.fill(buttonColor)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = posX
+        self.rect.y = posY
+
+        self.posX = posX
+        self.posY = posY
+
+        self.text = text
+        self.font_size = font_size
+        self.color = textColor
+
+    def update(self,screen):
+        font = pygame.font.Font(None, self.font_size)
+        text = font.render(self.text, 1, self.color)
+        screen.blit(text, (self.posX + self.image.get_width() / 2 - text.get_width() / 2,
+                           self.posY + self.image.get_height() / 2 - text.get_height() / 2))

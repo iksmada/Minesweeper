@@ -1,3 +1,4 @@
+from title import *
 from multiplayer import *
 from classes import *
 from constants import *
@@ -9,9 +10,8 @@ from threading import Thread
 #TODO Placa e wait avisando se ganho uo perdeu e quantos pontos
 #TODO pintar de vermelho bomba que clicou e fez perde
 
-# Initialize Pygame
-pygame.init()
-screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+# Menu inicial
+open_title()
 
 done = False
 # Variavel para controlar alguns componentes multiplayer
@@ -24,6 +24,11 @@ if IS_MULTIPLAYER:
     thread_get = Thread(target=thread_get_data, args=(GameController.playerID, GameController.playerID, shared_click_list))
     thread_get.start()
     tabuleiro = get_tauleiro_from_server(GameController.playerID).replace('\n','')
+
+
+# Initialize Pygame
+pygame.init()
+screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
 while not done:
     #grupo dos elementos para minas e todos os outros elementos

@@ -1,4 +1,5 @@
 import requests
+import time
 from constants import *
 
 
@@ -46,6 +47,8 @@ def thread_get_data(player,partida,lista):
         except Exception as ex:
             print ex
             break
+
+        time.sleep(0.1)
 
 def thread_send_data(x,y,player,partida,action):
     ROUTE = ROUTE_PARTIDAS + '/' + str(partida)

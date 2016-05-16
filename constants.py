@@ -1,9 +1,9 @@
 # GAME SETTINGS
 MINA_SIZE   = 20 # tamanho de uma mina
 BLOCK_SIZE  = 22 # tamanho de um bloco que contem uma mina
-ROWS        = 10
+ROWS        = 20
 COLUMNS     = 2 * ROWS
-BOMBS       = 5
+BOMBS       = 100
 # espaco entre tabuleiro e minas
 PADDING = (BLOCK_SIZE - MINA_SIZE)
 TITLE_AND_SCORE_SIZE = BLOCK_SIZE
@@ -33,8 +33,8 @@ ACTION_REGISTER_CLICK = 1
 ACTION_REGISTER_MARK = 2
 
 # MULTIPLAYER
-SERVER_NAME = 'http://127.0.0.1'
-#SERVER_NAME = 'http://ec2-52-67-17-125.sa-east-1.compute.amazonaws.com'
+#SERVER_NAME = 'http://127.0.0.1'
+SERVER_NAME = 'http://ec2-52-67-17-125.sa-east-1.compute.amazonaws.com'
 SERVER_PORT = 8000
 
 SERVER_ADRESS =  SERVER_NAME + ':' + str(SERVER_PORT) + '/jogos/'

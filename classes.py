@@ -64,7 +64,7 @@ class Block(pygame.sprite.Sprite):
 
         if self.neighbors>0:
             # Atualiza numero de bombas no tabuleiro
-            self.next_image = pygame.image.load("images/number"+str(self.neighbors)+".png").convert_alpha()
+            self.next_image = pygame.image.load("images/number_"+str(self.neighbors)+".png").convert_alpha()
         else:
             # Adiciona vizinhos na lista de blocos para serem revelados
             self.next_image = ACTION_FILL_CLICKED
@@ -137,7 +137,7 @@ class Block(pygame.sprite.Sprite):
             #conta movimentos, ja faz a checagem pra nao checar mais de uma vez
             GameController.score -= 10
             #muda imagem para marcacao
-            self.next_image = pygame.image.load("images/mark1.png").convert_alpha()
+            self.next_image = pygame.image.load("images/mark_red.png").convert_alpha()
             self.marked=True
             self.update_image()
             self.all_sprites_list.draw(self.screen)
@@ -148,12 +148,20 @@ class Mine(Block):
 
     def reveal(self):
 
-        if not self.revealed:
-            self.next_image = pygame.image.load("images/mina.png").convert_alpha()
+        if not self.revealed and not self.marked:
+            self.next_image = pygame.image.load("images/mine_exploded.png").convert_alpha()
+            self.revealed = True
+            GameController.score -= 10
 
-        self.revealed = True
-        GameController.score -= 10
-        GameController.movs += 1
+        self.update_image()
+        self.all_sprites_list.draw(self.screen)
+        pygame.display.flip()
+
+    def reveal_unrevealed(self):
+
+        if not self.revealed and not self.marked:
+            self.next_image = pygame.image.load("images/mine.png").convert_alpha()
+            self.revealed = True
 
         self.update_image()
         self.all_sprites_list.draw(self.screen)
@@ -189,8 +197,8 @@ class GameController:
         screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING + BLOCK_SIZE/2))
         score = font.render("SCORE: %3d" % GameController.score, 1, COLOR_SCORE)
         screen.blit(score, (PADDING, PADDING))
-        movs = font.render("MOVIMENTS: %3d " % GameController.movs, 1, COLOR_SCORE)
-        screen.blit(movs, (PADDING, PADDING + BLOCK_SIZE))
+        nr_movs = font.render("MOVIMENTS: %3d " % GameController.movs, 1, COLOR_SCORE)
+        screen.blit(nr_movs, (PADDING, PADDING + BLOCK_SIZE))
         player_id = font.render("ID: %1d " % GameController.playerID, 1, COLOR_SCORE)
         screen.blit(player_id, (SCREEN_WIDTH-(PADDING+player_id.get_size()[0]),PADDING))
         partida = font.render("PARTIDA :%s " % GameController.partidaKey, 1, COLOR_SCORE)

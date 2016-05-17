@@ -8,6 +8,8 @@ from kivy.uix.settings import (SettingsWithSidebar,
                                SettingsWithTabbedPanel)
 from kivy.properties import OptionProperty, ObjectProperty
 from classes import GameController
+from kivy.config import ConfigParser
+
 class TestApp(App):
 
     def build_config(self, config):
@@ -99,3 +101,6 @@ class TestApp(App):
             elif token == ('section3', 'key4'):
                 GameController.columns = int(value)
                 print('GameController.columns = ', GameController.columns)
+
+    def on_stop(self):
+        GameController.totalBlocks=GameController.rows*GameController.columns

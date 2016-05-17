@@ -8,13 +8,20 @@ from kivy.uix.settings import (SettingsWithSidebar,
                                SettingsWithSpinner,
                                SettingsWithTabbedPanel)
 from kivy.properties import OptionProperty, ObjectProperty
-from classes import GameController
 from constants import *
 from kivy.config import ConfigParser, Config
 
+from classes import GameController
+from game import game
 
-class TestApp(App):
+
+class SettingsApp(App):
     use_kivy_settings = False
+    # variaveis locais auxiliares
+    is_multiplayer = False
+    rows = 10
+    columns = 20
+    bombs = 20
 
     def build_config(self, config):
         config.setdefaults('section1', {
@@ -31,18 +38,18 @@ class TestApp(App):
 
     def open_settings(self, *largs):
         Window.size = (300, 450)
-        super(TestApp, self).open_settings()
+        super(SettingsApp, self).open_settings()
 
     def close_settings(self, *largs):
         Window.size = (300, 100)
-        super(TestApp, self).close_settings()
+        super(SettingsApp, self).close_settings()
 
     def build(self):
         settings_text = Label(text='Alterar Configuracoes do Tabuleiro?')
         open_settings_button = Button(text='Open settings')
         open_settings_button.bind(on_press=self.open_settings)
         start_button = Button(text='Start')
-        start_button.bind(on_press=self.stop)
+        start_button.bind(on_press=lambda j: self.on_game())
         settings_buttons = BoxLayout(orientation='horizontal')
         settings_buttons.add_widget(open_settings_button)
         settings_buttons.add_widget(start_button)
@@ -54,7 +61,7 @@ class TestApp(App):
         return layout
 
     def build_settings(self, settings):
-        #carrega arquivo JSON com layout
+        # carrega arquivo JSON com layout
         jsondata = open('settings.json').read()
         settings.add_json_panel('Minesweeper',
                                 self.config, data=jsondata)
@@ -63,35 +70,46 @@ class TestApp(App):
         if config is self.config:
             token = (section, key)
             if token == ('section1', 'key1'):
-                #print('Our key1 have been changed to', value)
-                if value=="Single":
-                    GameController.is_multiplayer=False
+                # print('Our key1 have been changed to', value)
+                if value == "Single":
+                    self.is_multiplayer = False
                 else:
-                    GameController.is_multiplayer = True
-                print('GameController.is_multiplayer = ',GameController.is_multiplayer)
+                    self.is_multiplayer = True
+                print('GameController.is_multiplayer = ', self.is_multiplayer)
             elif token == ('section2', 'key2'):
-                #print('Our key2 have been changed to', value)
-                GameController.bombs=int(value)
-                print('GameController.bombs = ', GameController.bombs)
+                # print('Our key2 have been changed to', value)
+                self.bombs = int(value)
+                print('GameController.bombs = ', self.bombs)
             elif token == ('section3', 'key3'):
-                GameController.rows=int(value)
-                print('GameController.rows = ', GameController.rows)
+                self.rows = int(value)
+                print('GameController.rows = ', self.rows)
             elif token == ('section3', 'key4'):
-                GameController.columns = int(value)
-                print('GameController.columns = ', GameController.columns)
+                self.columns = int(value)
+                print('GameController.columns = ', self.columns)
 
-    def on_stop(self):
-        GameController.totalBlocks=GameController.rows*GameController.columns
-        GameController.screen_width = GameController.columns * BLOCK_SIZE + PADDING
-        GameController.screen_height = GameController.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+    def on_game(self):
+        # salva valores
+        GameController.is_multiplayer = self.is_multiplayer
+        GameController.bombs = self.bombs
+        GameController.rows = self.rows
+        GameController.columns = self.columns
+        GameController.totalBlocks = self.rows * self.columns
+        GameController.screen_width = self.columns * BLOCK_SIZE + PADDING
+        GameController.screen_height = self.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+        # TODO criar trhread quando cria game
+        game()
 
     def on_start(self):
         Window.size = (300, 100)
         config = ConfigParser()
-        #carrega ultimas configuracoes
-        config.read('test.ini')
-        #atribui ao controlador as ultimas configuracoes
-        GameController.bombs    =   config.getint('section2', 'key2')
-        GameController.rows     =   config.getint('section3', 'key3')
-        GameController.columns  =   config.getint('section3', 'key4')
+        # carrega ultimas configuracoes
+        config.read('settings.ini')
 
+        # atribui ao controlador as ultimas configuracoes
+        if config.get('section1', 'key1') == "Single":
+            self.is_multiplayer = False
+        else:
+            self.is_multiplayer = True
+        self.bombs = config.getint('section2', 'key2')
+        self.rows = config.getint('section3', 'key3')
+        self.columns = config.getint('section3', 'key4')

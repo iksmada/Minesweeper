@@ -188,7 +188,7 @@ class GameController:
     screen_height= rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     done = False
     round_is_finished=False
-    score = None
+    score = 0
     movs = None
     markedBombs = None
     revealedBlocks = None
@@ -201,17 +201,20 @@ class GameController:
 
     @staticmethod
     def draw(screen,top="MINESWEEPER",color=COLOR_TITLE):
-        font = pygame.font.Font(None, NORMAL_FONT_SIZE)
+        if GameController.screen_width/15>BLOCK_SIZE:
+            font = pygame.font.Font(None, LARGE_FONT_SIZE)
+        else:
+            font = pygame.font.Font(None, GameController.screen_width / 15)
         title = font.render(top, 1, color)
-        screen.blit(title, (SCREEN_WIDTH/2 - (PADDING + title.get_size()[0])/2, PADDING + BLOCK_SIZE/2))
-        score = font.render("SCORE: %3d" % GameController.score, 1, COLOR_SCORE)
-        screen.blit(score, (PADDING, PADDING))
-        nr_movs = font.render("MOVIMENTS: %3d " % GameController.movs, 1, COLOR_SCORE)
+        screen.blit(title, (GameController.screen_width/2 - (PADDING + title.get_size()[0])/2, PADDING + BLOCK_SIZE/2))
+        score_text = font.render("SCORE: %3d" % GameController.score, 1, COLOR_SCORE)
+        screen.blit(score_text, (PADDING, PADDING))
+        nr_movs = font.render("MOVS: %3d " % GameController.movs, 1, COLOR_SCORE)
         screen.blit(nr_movs, (PADDING, PADDING + BLOCK_SIZE))
         player_id = font.render("ID: %1d " % GameController.playerID, 1, COLOR_SCORE)
-        screen.blit(player_id, (SCREEN_WIDTH-(PADDING+player_id.get_size()[0]),PADDING))
-        partida = font.render("PARTIDA :%s " % GameController.partidaKey, 1, COLOR_SCORE)
-        screen.blit(partida, (SCREEN_WIDTH-(PADDING + partida.get_size()[0]), PADDING + BLOCK_SIZE))
+        screen.blit(player_id, (GameController.screen_width-(PADDING+player_id.get_size()[0]),PADDING))
+        partida = font.render("GAME :%s " % GameController.partidaKey, 1, COLOR_SCORE)
+        screen.blit(partida, (GameController.screen_width-(PADDING + partida.get_size()[0]), PADDING + BLOCK_SIZE))
 
 class Button(pygame.sprite.Sprite):
 

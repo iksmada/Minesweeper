@@ -37,7 +37,6 @@ def game():
         Block.matrix = matrix
         Block.blocks_to_reveal = blocks_to_reveal
 
-        GameController.score = 0
         GameController.movs = 0
         GameController.markedBombs = 0
         GameController.revealedBlocks = 0

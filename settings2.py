@@ -7,38 +7,33 @@ from kivy.uix.settings import (SettingsWithSidebar,
                                SettingsWithSpinner,
                                SettingsWithTabbedPanel)
 from kivy.properties import OptionProperty, ObjectProperty
+from classes import GameController
 class TestApp(App):
 
     def build_config(self, config):
         config.setdefaults('section1', {
-            'key1': 'value1',
-            'key2': '42'
+            'key1': 'Single'
+        })
+        config.setdefaults('section2', {
+            'key2': str(GameController.bombs),
+        })
+
+        config.setdefaults('section3', {
+            'key3': '10',
+            'key4': '20'
         })
 
     def build(self):
-        paneltype = Label(text='Tipo de jogo')
-
-        multi_button = Button(text='Multi Player')
-        multi_button.bind(on_press=lambda j: self.set_multiplayer())
-        single_button = Button(text='Single Player')
-        single_button.bind(on_press=lambda j: self.set_singleplayer())
-
-        mode_buttons = BoxLayout(orientation='horizontal')
-        mode_buttons.add_widget(multi_button)
-        mode_buttons.add_widget(single_button)
-
         settings_text = Label(text='Alterar Configuracoes do Tabuleiro?')
         open_settings_button = Button(text='Open settings')
         open_settings_button.bind(on_press=self.open_settings)
         start_button = Button(text='Start')
-        start_button.bind(on_press=self.close_settings)
+        start_button.bind(on_press=self.stop)
         settings_buttons = BoxLayout(orientation='horizontal')
         settings_buttons.add_widget(open_settings_button)
         settings_buttons.add_widget(start_button)
 
         layout = BoxLayout(orientation='vertical')
-        layout.add_widget(paneltype)
-        layout.add_widget(mode_buttons)
         layout.add_widget(settings_text)
         layout.add_widget(settings_buttons)
 
@@ -47,28 +42,60 @@ class TestApp(App):
     def build_settings(self, settings):
         jsondata = """[
     { "type": "title",
-      "title": "Test application" },
+      "title": "Modo" },
 
     { "type": "options",
-      "title": "My first key",
-      "desc": "Description of my first key",
+      "title": "Multi/Single Player",
+      "desc": "escolha o modo de jogo",
       "section": "section1",
       "key": "key1",
-      "options": ["value1", "value2", "another value"] },
+      "options": ["Single", "Multi"] },
 
-    { "type": "numeric",
-      "title": "My second key",
-      "desc": "Description of my second key",
-      "section": "section1",
-      "key": "key2" }
+      { "type": "title",
+      "title": "Bombas" },
+      { "type": "numeric",
+      "title": "Numero de bombas",
+      "desc": "deixe algo entre 25-10%",
+      "section": "section2",
+      "key": "key2" },
+
+      { "type": "title",
+      "title": "Dimensoes" },
+      { "type": "numeric",
+      "title": "Numero linhas",
+      "desc": "valor bom entre 10 e 20",
+      "section": "section3",
+      "key": "key3" },
+      { "type": "numeric",
+      "title": "Numero colunas",
+      "desc": "valor bom 2x Linhas",
+      "section": "section3",
+      "key": "key4" }
+
+
+
+
 ]"""
-        settings.add_json_panel('Test application',
+        settings.add_json_panel('Minesweeper',
                                 self.config, data=jsondata)
 
     def on_config_change(self, config, section, key, value):
         if config is self.config:
             token = (section, key)
             if token == ('section1', 'key1'):
-                print('Our key1 have been changed to', value)
-            elif token == ('section1', 'key2'):
-                print('Our key2 have been changed to', value)
+                #print('Our key1 have been changed to', value)
+                if value=="Single":
+                    GameController.is_multiplayer=False
+                else:
+                    GameController.is_multiplayer = True
+                print('GameController.is_multiplayer = ',GameController.is_multiplayer)
+            elif token == ('section2', 'key2'):
+                #print('Our key2 have been changed to', value)
+                GameController.bombs=int(value)
+                print('GameController.bombs = ', GameController.bombs)
+            elif token == ('section3', 'key3'):
+                GameController.rows=int(value)
+                print('GameController.rows = ', GameController.rows)
+            elif token == ('section3', 'key4'):
+                GameController.columns = int(value)
+                print('GameController.columns = ', GameController.columns)

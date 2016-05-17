@@ -2,7 +2,6 @@ from title import *
 from multiplayer import *
 from classes import *
 from constants import *
-from settings import *
 from settings2 import *
 
 import pygame
@@ -14,9 +13,12 @@ from threading import Thread
 
 # Menu inicial
 TestApp().run()
-print IS_MULTIPLAYER
+
+print('GameController.bombs = '+ str(GameController.bombs))
+print('GameController.rows = '+ str(GameController.rows))
+print('GameController.columns = '+str(GameController.columns))
 tabuleiro = None
-if IS_MULTIPLAYER:
+if GameController.is_multiplayer:
     shared_click_list = []
     GameController.playerID=raw_input('ID:')
     GameController.partidaKey = raw_input('PARTIDA:')
@@ -35,7 +37,7 @@ while not done:
     all_sprites_list = pygame.sprite.Group()
     # Criando matriz ROWS+1 por COLUMNS+1
     # Neste caso, nao sera gerado IndexError quando elemento esta fora da matriz
-    matrix = [[None for x in range(ROWS + 1)] for y in range(COLUMNS + 1)]
+    matrix = [[None for x in range(GameController.rows + 1)] for y in range(GameController.columns + 1)]
     # Fila de elementos que precisam ser atualizados a cada clique
     blocks_to_reveal = []
 
@@ -50,11 +52,11 @@ while not done:
     GameController.markedBombs = 0
     GameController.revealedBlocks = 0
 
-    if not IS_MULTIPLAYER:
+    if not GameController.is_multiplayer:
         i = 0
-        while i < BOMBS:
-            posX=random.randrange(COLUMNS)
-            posY=random.randrange(ROWS)
+        while i < GameController.bombs:
+            posX=random.randrange(GameController.columns)
+            posY=random.randrange(GameController.rows)
            # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
             if matrix[posX][posY] is None:
                 mine = Mine(posX,posY)
@@ -65,16 +67,16 @@ while not done:
                 i += 1
                # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
     else:
-        for posX in range(COLUMNS):
-            for posY in range(ROWS):
-                if tabuleiro[posY*COLUMNS + posX] == '1':
+        for posX in range(GameController.columns):
+            for posY in range(GameController.rows):
+                if tabuleiro[posY*GameController.columns + posX] == '1':
                     mine = Mine(posX, posY)
                     matrix[posX][posY] = mine
                     mines.add(mine)
                     all_sprites_list.add(mine)
 
-    for posX in range(COLUMNS):
-        for posY in range(ROWS):
+    for posX in range(GameController.columns):
+        for posY in range(GameController.rows):
             #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
             if matrix[posX][posY] is None:
                 neighbors = 0
@@ -109,7 +111,7 @@ while not done:
 
     # -------- Main Program Loop -----------
     while not round_is_finished:
-        if IS_MULTIPLAYER and len(shared_click_list) > 0:
+        if GameController.is_multiplayer and len(shared_click_list) > 0:
             click = shared_click_list.pop(0)
             posX = int(click[0])
             posY = int(click[1])
@@ -143,12 +145,12 @@ while not done:
                     if bloco.rect.collidepoint(x, y):
                         if button1:
                             if not bloco.revealed:
-                                if IS_MULTIPLAYER:
+                                if GameController.is_multiplayer:
                                     thread_send = Thread(target=thread_send_data, args=(
                                     bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_CLICK))
                                     thread_send.start()
                                 # Nao adiciona movimentos quando todas as bombas foram encontradas
-                                if not (GameController.markedBombs == BOMBS or isinstance(bloco,Mine)):
+                                if not (GameController.markedBombs == GameController.bombs or isinstance(bloco,Mine)):
                                     GameController.movs += 1
                                 bloco.reveal()
                                 while len(blocks_to_reveal) > 0:
@@ -160,7 +162,7 @@ while not done:
                                     round_is_finished = True
                         elif button3:
                             if not bloco.marked:
-                                if IS_MULTIPLAYER:
+                                if GameController.is_multiplayer:
                                     thread_send = Thread(target=thread_send_data, args=(
                                     bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_MARK))
                                     thread_send.start()
@@ -174,8 +176,7 @@ while not done:
                     #print "bombas marcadas:"+str(bombsMarked)+" e blocos revelados:"+ str(blocksRevealed)
 
                     #GANHOU
-                    if GameController.markedBombs == BOMBS \
-                            and GameController.revealedBlocks == (COLUMNS*ROWS-BOMBS):
+                    if GameController.markedBombs+GameController.revealedBlocks == GameController.totalBlocks:
                         round_is_finished=True
                         win=True
 
@@ -227,6 +228,6 @@ while not done:
                     if event.key == pygame.K_ESCAPE:
                         done = True
 
-if IS_MULTIPLAYER:
+if GameController.is_multiplayer:
     shared_click_list.insert(0,True)
 pygame.quit()

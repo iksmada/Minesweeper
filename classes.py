@@ -184,8 +184,8 @@ class GameController:
     rows = 10
     columns = 20
     bombs =20  # 10% do tabuleiro sao bombas
-    #SCREEN_WIDTH = COLUMNS * BLOCK_SIZE + PADDING
-    #SCREEN_HEIGHT = ROWS * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+    screen_width = columns * BLOCK_SIZE + PADDING
+    screen_height= rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     score = None
     movs = None
     markedBombs = None

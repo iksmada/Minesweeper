@@ -26,10 +26,9 @@ if GameController.is_multiplayer:
     thread_get.start()
     tabuleiro = get_tauleiro_from_server(GameController.playerID).replace('\n','')
 
-
 # Initialize Pygame
 pygame.init()
-screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+screen = pygame.display.set_mode([GameController.screen_width, GameController.screen_height])
 done = False
 while not done:
     #grupo dos elementos para minas e todos os outros elementos

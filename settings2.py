@@ -17,7 +17,7 @@ class TestApp(App):
             'key1': 'Single'
         })
         config.setdefaults('section2', {
-            'key2': str(GameController.bombs),
+            'key2': '20',
         })
 
         config.setdefaults('section3', {
@@ -104,3 +104,13 @@ class TestApp(App):
 
     def on_stop(self):
         GameController.totalBlocks=GameController.rows*GameController.columns
+
+    def on_start(self):
+        config = ConfigParser()
+        #carrega ultimas configuracoes
+        config.read('test.ini')
+        #atribui ao controlador as ultimas configuracoes
+        GameController.bombs    =   config.getint('section2', 'key2')
+        GameController.rows     =   config.getint('section3', 'key3')
+        GameController.columns  =   config.getint('section3', 'key4')
+

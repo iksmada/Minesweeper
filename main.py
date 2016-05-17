@@ -2,6 +2,8 @@ from title import *
 from multiplayer import *
 from classes import *
 from constants import *
+from settings import *
+from settings2 import *
 
 import pygame
 import random
@@ -11,11 +13,8 @@ from threading import Thread
 #TODO pintar de vermelho bomba que clicou e fez perde
 
 # Menu inicial
-open_title()
-
-done = False
-# Variavel para controlar alguns componentes multiplayer
-IS_MULTIPLAYER = False
+TestApp().run()
+print IS_MULTIPLAYER
 tabuleiro = None
 if IS_MULTIPLAYER:
     shared_click_list = []
@@ -29,7 +28,7 @@ if IS_MULTIPLAYER:
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-
+done = False
 while not done:
     #grupo dos elementos para minas e todos os outros elementos
     mines = pygame.sprite.Group()

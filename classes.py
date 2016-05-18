@@ -195,7 +195,7 @@ class GameController:
     totalBlocks = rows*columns
     username = ''
     player_ID = 0
-    partidaKey = ''
+    match_ID = ''
 
     def __init__(self):
         raise AssertionError('Classe GameController nao tem instancias.')
@@ -212,8 +212,8 @@ class GameController:
         screen.blit(score_text, (PADDING, PADDING))
         movs = font.render("MOVS: %03d " % GameController.movs, 1, COLOR_SCORE)
         screen.blit(movs, (PADDING, PADDING + BLOCK_SIZE))
-        username = font.render("ID: %s " % GameController.username, 1, COLOR_SCORE)
+        username = font.render("USERNAME: %s " % GameController.username, 1, COLOR_SCORE)
         screen.blit(username, (GameController.screen_width-(PADDING + username.get_size()[0]),PADDING))
         if GameController.is_multiplayer:
-            match = font.render("GAME: %s " % GameController.match, 1, COLOR_SCORE)
+            match = font.render("MATCH: %s " % GameController.match_ID, 1, COLOR_SCORE)
             screen.blit(match, (GameController.screen_width-(PADDING + match.get_size()[0]), PADDING + BLOCK_SIZE))

@@ -93,7 +93,10 @@ class SettingsApp(App):
         # salva valores
         GameController.is_multiplayer = self.is_multiplayer
         GameController.username = self.username
-        GameController.match = self.match
+        if len(self.match) > 0:
+            GameController.match_ID = self.match
+        else:
+            GameController.match_ID = self.username
         GameController.bombs = self.columns*self.rows*self.bombs/100
         GameController.rows = self.rows
         GameController.columns = self.columns

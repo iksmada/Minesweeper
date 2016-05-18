@@ -142,13 +142,16 @@ def game():
                                     if not (GameController.markedBombs == GameController.bombs or isinstance(bloco,Mine)):
                                         GameController.movs += 1
                                     bloco.reveal()
+                                    GameController.score += bloco.neighbors
                                     while len(blocks_to_reveal) > 0:
                                         bloco = blocks_to_reveal.pop(0)
                                         bloco.reveal()
+                                        GameController.score += bloco.neighbors
                                     # revelou uma mina
                                     if isinstance(bloco,Mine) and not bloco.marked:
                                         # PERDEU
                                         GameController.round_is_finished = True
+                                        GameController.score -= 9999
                             elif button3:
                                 if not bloco.marked:
                                     if GameController.is_multiplayer:
@@ -159,8 +162,10 @@ def game():
                                     #se for mina
                                     if isinstance(bloco,Mine):
                                         #marcou uma mina
-                                        if bloco.marked:
-                                            GameController.markedBombs+=1
+                                        GameController.markedBombs+=1
+                                        GameController.score += 100
+                                    else:
+                                        GameController.score -= 10
                             #se marcou todas as bombas e revelou todos os blocos
                         #print "bombas marcadas:"+str(bombsMarked)+" e blocos revelados:"+ str(blocksRevealed)
 

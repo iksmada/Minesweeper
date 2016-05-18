@@ -59,7 +59,7 @@ class Block(pygame.sprite.Sprite):
             return
 
         self.revealed = True
-        GameController.score += self.neighbors
+        #GameController.score += self.neighbors
         GameController.revealedBlocks += 1
 
         if self.neighbors>0:
@@ -135,7 +135,7 @@ class Block(pygame.sprite.Sprite):
         """
         if not self.revealed and not self.marked:
             #conta movimentos, ja faz a checagem pra nao checar mais de uma vez
-            GameController.score -= 10
+            #GameController.score -= 10
             #muda imagem para marcacao
             self.next_image = pygame.image.load("images/mark_red.png").convert_alpha()
             self.marked=True
@@ -151,7 +151,7 @@ class Mine(Block):
         if not self.revealed and not self.marked:
             self.next_image = pygame.image.load("images/mine_exploded.png").convert_alpha()
             self.revealed = True
-            GameController.score -= 10
+            #GameController.score -= 10
 
         self.update_image()
         self.all_sprites_list.draw(self.screen)
@@ -170,7 +170,7 @@ class Mine(Block):
     def mark(self):
         if not self.marked:
             # Chamando o pai, entao 10 pontos sao removidos e entao mais -10 +20 sao adicionados
-            GameController.score += 20
+            #GameController.score += 20
             super(Mine,self).mark()
 
 

@@ -1,33 +1,46 @@
 [
-    { "type": "title",
-      "title": "Modo" },
-
-    { "type": "options",
-      "title": "Multi/Single Player",
-      "desc": "escolha o modo de jogo",
-      "section": "section1",
-      "key": "key1",
-      "options": ["Single", "Multi"] },
-
-      { "type": "title",
-      "title": "Bombas" },
-      { "type": "numeric",
-      "title": "Numero de bombas",
-      "desc": "deixe algo entre 25-10%",
-      "section": "section2",
-      "key": "key2" },
-
-      { "type": "title",
-      "title": "Dimensoes" },
-      { "type": "numeric",
-      "title": "Numero linhas",
-      "desc": "valor bom entre 10 e 20",
-      "section": "section3",
-      "key": "key3" },
-      { "type": "numeric",
-      "title": "Numero colunas",
-      "desc": "valor bom 2x Linhas",
-      "section": "section3",
-      "key": "key4" }
-
+  {
+    "type": "title",
+    "title": "Modo"
+  },
+  {
+    "type": "options",
+    "title": "Multi/Single Player",
+    "desc": "Escolha o modo de jogo",
+    "section": "section1",
+    "key": "key1",
+    "options": [
+      "Single",
+      "Multi"
+    ]
+  },
+  {
+    "type": "title",
+    "title": "Dimensoes"
+  },
+  {
+    "type": "numeric",
+    "title": "Numero linhas",
+    "desc": "Recomendado: entre 10 e 20 linhas",
+    "section": "section2",
+    "key": "key3"
+  },
+  {
+    "type": "numeric",
+    "title": "Numero colunas",
+    "desc": "Recomendado: o dobro do número de linhas",
+    "section": "section2",
+    "key": "key4"
+  },
+  {
+    "type": "title",
+    "title": "Bombas"
+  },
+  {
+    "type": "numeric",
+    "title": "Numero de bombas",
+    "desc": "Recomendado: entre 10 e 25% do total",
+    "section": "section3",
+    "key": "key2"
+  }
 ]

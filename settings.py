@@ -28,16 +28,15 @@ class SettingsApp(App):
             'key1': 'Single'
         })
         config.setdefaults('section2', {
-            'key2': '20',
-        })
-
-        config.setdefaults('section3', {
             'key3': '10',
             'key4': '20'
         })
+        config.setdefaults('section3', {
+            'key2': '20',
+        })
 
     def open_settings(self, *largs):
-        Window.size = (300, 450)
+        Window.size = (500, 445)
         super(SettingsApp, self).open_settings()
 
     def close_settings(self, *largs):
@@ -76,16 +75,16 @@ class SettingsApp(App):
                 else:
                     self.is_multiplayer = True
                 print('GameController.is_multiplayer = ', self.is_multiplayer)
-            elif token == ('section2', 'key2'):
+            elif token == ('section2', 'key3'):
+                self.rows = int(value)
+                print('GameController.rows = ', self.rows)
+            elif token == ('section2', 'key4'):
+                self.columns = int(value)
+                print('GameController.columns = ', self.columns)
+            elif token == ('section3', 'key2'):
                 # print('Our key2 have been changed to', value)
                 self.bombs = int(value)
                 print('GameController.bombs = ', self.bombs)
-            elif token == ('section3', 'key3'):
-                self.rows = int(value)
-                print('GameController.rows = ', self.rows)
-            elif token == ('section3', 'key4'):
-                self.columns = int(value)
-                print('GameController.columns = ', self.columns)
 
     def on_game(self):
         # salva valores
@@ -110,6 +109,7 @@ class SettingsApp(App):
             self.is_multiplayer = False
         else:
             self.is_multiplayer = True
-        self.bombs = config.getint('section2', 'key2')
-        self.rows = config.getint('section3', 'key3')
-        self.columns = config.getint('section3', 'key4')
+
+        self.rows = config.getint('section2', 'key3')
+        self.columns = config.getint('section2', 'key4')
+        self.bombs = config.getint('section3', 'key2')

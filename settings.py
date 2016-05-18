@@ -21,7 +21,7 @@ class SettingsApp(App):
     is_multiplayer = False
     rows = 10
     columns = 20
-    bombs = 20
+    bombs = 10
 
     def build_config(self, config):
         config.setdefaults('section1', {
@@ -89,7 +89,7 @@ class SettingsApp(App):
     def on_game(self):
         # salva valores
         GameController.is_multiplayer = self.is_multiplayer
-        GameController.bombs = self.bombs
+        GameController.bombs = self.columns*self.rows*self.bombs/100
         GameController.rows = self.rows
         GameController.columns = self.columns
         GameController.totalBlocks = self.rows * self.columns

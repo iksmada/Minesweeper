@@ -38,7 +38,7 @@
   },
   {
     "type": "numeric",
-    "title": "Numero de bombas",
+    "title": "Porcentagem de bombas",
     "desc": "Recomendado: entre 10 e 25% do total",
     "section": "section3",
     "key": "key2"

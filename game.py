@@ -8,7 +8,7 @@ def game():
     tabuleiro = None
     if GameController.is_multiplayer:
         shared_click_list = []
-        GameController.playerID = raw_input('ID:')
+        #GameController.playerID = raw_input('ID:')
         GameController.partidaKey = raw_input('PARTIDA:')
         thread_get = Thread(target=thread_get_data, args=(GameController.playerID, GameController.partidaKey, shared_click_list))
         thread_get.start()

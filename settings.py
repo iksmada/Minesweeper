@@ -22,10 +22,12 @@ class SettingsApp(App):
     rows = 10
     columns = 20
     bombs = 10
+    id = '-'
 
     def build_config(self, config):
         config.setdefaults('section1', {
-            'key1': 'Single'
+            'key1': 'Single',
+            'key5': 'Bobao'
         })
         config.setdefaults('section2', {
             'key3': '10',
@@ -73,6 +75,8 @@ class SettingsApp(App):
                     self.is_multiplayer = False
                 else:
                     self.is_multiplayer = True
+            elif token == ('section1', 'key5'):
+                self.id = value
             elif token == ('section2', 'key3'):
                 self.rows = int(value)
             elif token == ('section2', 'key4'):
@@ -90,6 +94,7 @@ class SettingsApp(App):
         GameController.screen_width = self.columns * BLOCK_SIZE + PADDING
         GameController.screen_height = self.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
         GameController.score=0
+        GameController.playerID=self.id
         # TODO criar trhread quando cria game
         game()
 
@@ -104,7 +109,7 @@ class SettingsApp(App):
             self.is_multiplayer = False
         else:
             self.is_multiplayer = True
-
+        self.id = config.get('section1','key5')
         self.rows = config.getint('section2', 'key3')
         self.columns = config.getint('section2', 'key4')
         self.bombs = config.getint('section3', 'key2')

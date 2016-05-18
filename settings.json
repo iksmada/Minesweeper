@@ -1,5 +1,12 @@
 [
   {
+    "type": "numeric",
+    "title": "Numero linhas",
+    "desc": "Recomendado: entre 10 e 20 linhas",
+    "section": "section2",
+    "key": "key3"
+  },
+  {
     "type": "title",
     "title": "Modo"
   },
@@ -13,6 +20,13 @@
       "Single",
       "Multi"
     ]
+  },
+  {
+    "type": "string",
+    "title": "ID",
+    "desc": "insira seu nome no jogo",
+    "section": "section1",
+    "key": "key5"
   },
   {
     "type": "title",

@@ -180,21 +180,22 @@ class Mine(Block):
 class GameController:
 
     # Atributos estaticos atualizados no main()
-    is_multiplayer=False
+    is_multiplayer = False
     rows = 10
     columns = 20
     bombs = 10  # 10% do tabuleiro sao bombas
     screen_width = columns * BLOCK_SIZE + PADDING
-    screen_height= rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+    screen_height = rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     done = False
-    round_is_finished=False
+    round_is_finished = False
     score = 0
     movs = None
     markedBombs = None
     revealedBlocks = None
-    totalBlocks=rows*columns
-    playerID = 0
-    partidaKey='-'
+    totalBlocks = rows*columns
+    username = ''
+    player_ID = 0
+    partidaKey = ''
 
     def __init__(self):
         raise AssertionError('Classe GameController nao tem instancias.')
@@ -202,41 +203,17 @@ class GameController:
     @staticmethod
     def draw(screen,top="MINESWEEPER",color=COLOR_TITLE):
         if GameController.screen_width/15>BLOCK_SIZE:
-            font = pygame.font.Font(None, LARGE_FONT_SIZE)
+            font = pygame.font.Font(None, NORMAL_FONT_SIZE)
         else:
             font = pygame.font.Font(None, GameController.screen_width / 15)
         title = font.render(top, 1, color)
         screen.blit(title, (GameController.screen_width/2 - (PADDING + title.get_size()[0])/2, PADDING + BLOCK_SIZE/2))
-        score_text = font.render("SCORE: %3d" % GameController.score, 1, COLOR_SCORE)
+        score_text = font.render("SCORE: %05d" % GameController.score, 1, COLOR_SCORE)
         screen.blit(score_text, (PADDING, PADDING))
-        nr_movs = font.render("MOVS: %3d " % GameController.movs, 1, COLOR_SCORE)
-        screen.blit(nr_movs, (PADDING, PADDING + BLOCK_SIZE))
-        player_id = font.render("ID: %s " % GameController.playerID, 1, COLOR_SCORE)
-        screen.blit(player_id, (GameController.screen_width-(PADDING+player_id.get_size()[0]),PADDING))
-        partida = font.render("GAME: %s " % GameController.partidaKey, 1, COLOR_SCORE)
-        screen.blit(partida, (GameController.screen_width-(PADDING + partida.get_size()[0]), PADDING + BLOCK_SIZE))
-
-class Button(pygame.sprite.Sprite):
-
-    def __init__(self, ID, text, posX, posY, tamX, tamY,
-                 font_size=NORMAL_FONT_SIZE,buttonColor=BLACK, textColor=RED):
-        super(Button,self).__init__()
-        self.image = pygame.Surface([tamX, tamY ])
-        self.image.fill(buttonColor)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = posX
-        self.rect.y = posY
-
-        self.posX = posX
-        self.posY = posY
-
-        self.text = text
-        self.font_size = font_size
-        self.color = textColor
-
-    def update(self,screen):
-        font = pygame.font.Font(None, self.font_size)
-        text = font.render(self.text, 1, self.color)
-        screen.blit(text, (self.posX + self.image.get_width() / 2 - text.get_width() / 2,
-                           self.posY + self.image.get_height() / 2 - text.get_height() / 2))
+        movs = font.render("MOVS: %03d " % GameController.movs, 1, COLOR_SCORE)
+        screen.blit(movs, (PADDING, PADDING + BLOCK_SIZE))
+        username = font.render("ID: %s " % GameController.username, 1, COLOR_SCORE)
+        screen.blit(username, (GameController.screen_width-(PADDING + username.get_size()[0]),PADDING))
+        if GameController.is_multiplayer:
+            match = font.render("GAME: %s " % GameController.match, 1, COLOR_SCORE)
+            screen.blit(match, (GameController.screen_width-(PADDING + match.get_size()[0]), PADDING + BLOCK_SIZE))

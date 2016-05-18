@@ -15,7 +15,7 @@ def clean_path(path):
     return path
 
 accepted_services = ['jogos']
-accepted_route = {'jogos':['partidas', 'tabuleiros', 'segredo']}
+accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'segredo']}
 
 class MineSweeperServer(BaseHTTPRequestHandler):
 
@@ -49,7 +49,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = path[1:]
 
-        if path[0] == 'partidas':
+        if path[0] == 'jogadas':
             OPERATION = 1
         elif path[0] == 'tabuleiros':
             OPERATION = 2
@@ -115,7 +115,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = path[1:]
 
-        if path[0] == 'partidas':
+        if path[0] == 'jogadas':
             OPERATION = 1
         elif path[0] == 'tabuleiros':
             OPERATION = 2
@@ -207,7 +207,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = path[1:]
 
-        if path[0] == 'partidas':
+        if path[0] == 'jogadas':
             LOOP = 0
         elif path[0] == 'tabuleiros':
             LOOP = 1
@@ -247,13 +247,13 @@ def garbage_collector():
     # Server_data is cleaned after one hour that it has not been used.
     while True:
         d = datetime.datetime.fromtimestamp(last_timestamp)
-        d = datetime.datetime(d.year, d.month, d.day, d.hour + 1, d.minute, d.second, d.microsecond)
+        d = datetime.datetime(d.year, d.month, d.day, d.hour, d.minute + 5, d.second, d.microsecond)
 
         if d < datetime.datetime.now():
             server_data.clear()
             print "Server has been cleaned at %s" % str(datetime.datetime.now())
 
-        time.sleep(60*5)
+        time.sleep(60)
 
 
 if __name__ == '__main__':

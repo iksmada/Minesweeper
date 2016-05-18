@@ -27,7 +27,7 @@ def thread_get_data(player,partida,lista):
     if lista is None:
         raise RuntimeError('Lista compartilhada nao pode ser nula')
 
-    ROUTE = ROUTE_PARTIDAS + '/' + str(partida) + '/' + str(player)
+    ROUTE = ROUTE_JOGADAS + '/' + str(partida) + '/' + str(player)
     while True:
 
         if len(lista) > 0 and type(lista[0]) is bool:
@@ -52,7 +52,7 @@ def thread_get_data(player,partida,lista):
         time.sleep(0.1)
 
 def thread_send_data(x,y,player,partida,action):
-    ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
+    ROUTE = ROUTE_JOGADAS + '/' + str(partida)
     data = {'x':x,'y':y,'player':player,'action':action}
     try:
         for i in range(5):

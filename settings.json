@@ -1,6 +1,17 @@
 [
   {
     "type": "title",
+    "title": "Usuário"
+  },
+  {
+    "type": "string",
+    "title": "Nome de usuário",
+    "desc": "Escolha o seu nome de usuário",
+    "section": "section0",
+    "key": "key0"
+  },
+  {
+    "type": "title",
     "title": "Modo"
   },
   {
@@ -15,19 +26,26 @@
     ]
   },
   {
+    "type": "string",
+    "title": "Nome da partida",
+    "desc": "Nome do usuário que criou uma partida\nCampo vazio para criar uma nova partida",
+    "section": "section1",
+    "key": "key10"
+  },
+  {
     "type": "title",
-    "title": "Dimensoes"
+    "title": "Dimensões"
   },
   {
     "type": "numeric",
-    "title": "Numero linhas",
+    "title": "Número de linhas",
     "desc": "Recomendado: entre 10 e 20 linhas",
     "section": "section2",
     "key": "key3"
   },
   {
     "type": "numeric",
-    "title": "Numero colunas",
+    "title": "Número de colunas",
     "desc": "Recomendado: o dobro do número de linhas",
     "section": "section2",
     "key": "key4"

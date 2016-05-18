@@ -5,9 +5,6 @@ import random
 from threading import Thread
 
 def game():
-    print('GameController.bombs = '+ str(GameController.bombs))
-    print('GameController.rows = '+ str(GameController.rows))
-    print('GameController.columns = '+str(GameController.columns))
     tabuleiro = None
     if GameController.is_multiplayer:
         shared_click_list = []
@@ -46,7 +43,6 @@ def game():
             while i < GameController.bombs:
                 posX=random.randrange(GameController.columns)
                 posY=random.randrange(GameController.rows)
-               # print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
                 if matrix[posX][posY] is None:
                     mine = Mine(posX,posY)
                     matrix[posX][posY]=mine
@@ -54,7 +50,6 @@ def game():
                     mines.add(mine)
                     all_sprites_list.add(mine)
                     i += 1
-                   # print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
         else:
             for posX in range(GameController.columns):
                 for posY in range(GameController.rows):
@@ -66,7 +61,6 @@ def game():
 
         for posX in range(GameController.columns):
             for posY in range(GameController.rows):
-                #print "antes matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
                 if matrix[posX][posY] is None:
                     neighbors = 0
                     if type(matrix[posX + 1][posY    ]) is Mine:
@@ -89,7 +83,6 @@ def game():
                     bloco = Block(posX, posY, neighbors)
                     matrix[posX][posY] = bloco
                     all_sprites_list.add(bloco)
-                    #print "depois matrix[" + str(posX) + "][" + str(posY) + "] = " + str(matrix[posX][posY])
 
         #Loop until the user clicks the close button.
         GameController.round_is_finished = False
@@ -167,7 +160,6 @@ def game():
                                     else:
                                         GameController.score -= 10
                             #se marcou todas as bombas e revelou todos os blocos
-                        #print "bombas marcadas:"+str(bombsMarked)+" e blocos revelados:"+ str(blocksRevealed)
 
                         #GANHOU
                         if GameController.markedBombs+GameController.revealedBlocks == GameController.totalBlocks:

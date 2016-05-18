@@ -183,7 +183,7 @@ class GameController:
     is_multiplayer=False
     rows = 10
     columns = 20
-    bombs = 20  # 10% do tabuleiro sao bombas
+    bombs = 10  # 10% do tabuleiro sao bombas
     screen_width = columns * BLOCK_SIZE + PADDING
     screen_height= rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     done = False

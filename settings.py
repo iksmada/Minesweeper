@@ -32,7 +32,7 @@ class SettingsApp(App):
             'key4': '20'
         })
         config.setdefaults('section3', {
-            'key2': '20',
+            'key2': '10',
         })
 
     def open_settings(self, *largs):
@@ -45,9 +45,9 @@ class SettingsApp(App):
 
     def build(self):
         settings_text = Label(text='Alterar Configuracoes do Tabuleiro?')
-        open_settings_button = Button(text='Open settings')
+        open_settings_button = Button(text='Abrir configuracoes')
         open_settings_button.bind(on_press=self.open_settings)
-        start_button = Button(text='Start')
+        start_button = Button(text='Iniciar')
         start_button.bind(on_press=lambda j: self.on_game())
         settings_buttons = BoxLayout(orientation='horizontal')
         settings_buttons.add_widget(open_settings_button)
@@ -69,22 +69,16 @@ class SettingsApp(App):
         if config is self.config:
             token = (section, key)
             if token == ('section1', 'key1'):
-                # print('Our key1 have been changed to', value)
                 if value == "Single":
                     self.is_multiplayer = False
                 else:
                     self.is_multiplayer = True
-                print('GameController.is_multiplayer = ', self.is_multiplayer)
             elif token == ('section2', 'key3'):
                 self.rows = int(value)
-                print('GameController.rows = ', self.rows)
             elif token == ('section2', 'key4'):
                 self.columns = int(value)
-                print('GameController.columns = ', self.columns)
             elif token == ('section3', 'key2'):
-                # print('Our key2 have been changed to', value)
                 self.bombs = int(value)
-                print('GameController.bombs = ', self.bombs)
 
     def on_game(self):
         # salva valores

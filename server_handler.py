@@ -2,7 +2,11 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from constants import SERVER_PORT
 import datetime
 import random
+from threading import Thread
+import time
+
 server_data = {}
+last_timestamp = 0
 
 def clean_path(path):
     path = path.strip().split('/')
@@ -11,7 +15,7 @@ def clean_path(path):
     return path
 
 accepted_services = ['jogos']
-accepted_route = {'jogos':['partidas', 'tabuleiros']}
+accepted_route = {'jogos':['partidas', 'tabuleiros', 'segredo']}
 
 class MineSweeperServer(BaseHTTPRequestHandler):
 
@@ -20,7 +24,9 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         pass
 
     def do_GET(self):
-        # print self.requestline
+        global last_timestamp
+        last_timestamp = time.time()
+
         path = clean_path(self.path)
 
         if len(path) < 3:
@@ -47,6 +53,13 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             OPERATION = 1
         elif path[0] == 'tabuleiros':
             OPERATION = 2
+        elif path[0] == 'segredo':
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(str(server_data))
+            return
+        else:
+            OPERATION = 0
 
         ultimo_dict = server_data
         while len(path) > 0:
@@ -77,7 +90,9 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         return
 
     def do_POST(self):
-        # print self.requestline
+        global last_timestamp
+        last_timestamp = time.time()
+
         path = clean_path(self.path)
 
         if len(path) < 3:
@@ -104,6 +119,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             OPERATION = 1
         elif path[0] == 'tabuleiros':
             OPERATION = 2
+        else:
+            OPERATION = 0
 
         ultimo_dict = server_data
         while len(path) > 0:
@@ -165,13 +182,15 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         return
 
     def do_DELETE(self):
-        # print self.requestline
+        global last_timestamp
+        last_timestamp = time.time()
+
         path = clean_path(self.path)
 
         if len(path) < 3:
             self.send_response(404)
             self.end_headers()
-            self.wfile.write(':(')
+            self.wfile.write('Running :)')
             return
 
         if path[0] not in accepted_services:
@@ -192,6 +211,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             LOOP = 0
         elif path[0] == 'tabuleiros':
             LOOP = 1
+        else:
+            LOOP = len(path)
 
         ultimo_dict = server_data
         while len(path) > LOOP:
@@ -219,7 +240,25 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         self.wfile.write('Done!')
         return
 
+def garbage_collector():
+    global last_timestamp
+    last_timestamp = time.time()
+
+    # Server_data is cleaned after one hour that it has not been used.
+    while True:
+        d = datetime.datetime.fromtimestamp(last_timestamp)
+        d = datetime.datetime(d.year, d.month, d.day, d.hour + 1, d.minute, d.second, d.microsecond)
+
+        if d < datetime.datetime.now():
+            server_data.clear()
+            print "Server has been cleaned at %s" % str(datetime.datetime.now())
+
+        time.sleep(60*5)
+
+
 if __name__ == '__main__':
+    clean_server_data = Thread(target=garbage_collector)
+    clean_server_data.start()
     server_address = ('', SERVER_PORT)
     server = HTTPServer(server_address, MineSweeperServer)
     sa = server.socket.getsockname()

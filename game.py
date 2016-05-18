@@ -11,11 +11,11 @@ def game():
     tabuleiro = None
     if GameController.is_multiplayer:
         shared_click_list = []
-        GameController.playerID=raw_input('ID:')
+        GameController.playerID = raw_input('ID:')
         GameController.partidaKey = raw_input('PARTIDA:')
-        thread_get = Thread(target=thread_get_data, args=(GameController.playerID, GameController.playerID, shared_click_list))
+        thread_get = Thread(target=thread_get_data, args=(GameController.playerID, GameController.partidaKey, shared_click_list))
         thread_get.start()
-        tabuleiro = get_tauleiro_from_server(GameController.playerID).replace('\n','')
+        tabuleiro = get_tauleiro_from_server(GameController.partidaKey).replace('\n','')
 
     # Initialize Pygame
     pygame.init()
@@ -136,7 +136,7 @@ def game():
                                 if not bloco.revealed:
                                     if GameController.is_multiplayer:
                                         thread_send = Thread(target=thread_send_data, args=(
-                                        bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_CLICK))
+                                        bloco.posX, bloco.posY, GameController.playerID, GameController.partidaKey, ACTION_REGISTER_CLICK))
                                         thread_send.start()
                                     # Nao adiciona movimentos quando todas as bombas foram encontradas
                                     if not (GameController.markedBombs == GameController.bombs or isinstance(bloco,Mine)):
@@ -153,7 +153,7 @@ def game():
                                 if not bloco.marked:
                                     if GameController.is_multiplayer:
                                         thread_send = Thread(target=thread_send_data, args=(
-                                        bloco.posX, bloco.posY, GameController.playerID, GameController.playerID, ACTION_REGISTER_MARK))
+                                        bloco.posX, bloco.posY, GameController.playerID, GameController.partidaKey, ACTION_REGISTER_MARK))
                                         thread_send.start()
                                     bloco.mark()
                                     #se for mina

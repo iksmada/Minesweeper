@@ -5,7 +5,7 @@
   },
   {
     "type": "string",
-    "title": "Nome de usuário",
+    "title": "Nome do usuário",
     "desc": "Escolha o seu nome de usuário",
     "section": "section0",
     "key": "key0"

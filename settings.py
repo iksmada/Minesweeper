@@ -115,7 +115,6 @@ class SettingsApp(App):
             self.is_multiplayer = False
         else:
             self.is_multiplayer = True
-
         self.rows = config.getint('section2', 'key3')
         self.columns = config.getint('section2', 'key4')
         self.bombs = config.getint('section3', 'key2')

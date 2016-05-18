@@ -15,7 +15,7 @@ def clean_path(path):
     return path
 
 accepted_services = ['jogos']
-accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'segredo']}
+accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','segredo']}
 
 class MineSweeperServer(BaseHTTPRequestHandler):
 
@@ -53,6 +53,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             OPERATION = 1
         elif path[0] == 'tabuleiros':
             OPERATION = 2
+        elif path[0] == 'partidas':
+            OPERATION = 3
         elif path[0] == 'segredo':
             self.send_response(200)
             self.end_headers()
@@ -71,18 +73,17 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
             path = path[1:]
 
+        response = ''
         if OPERATION == 1:
             try:
                 chave_mais_antiga = sorted(ultimo_dict.keys())[0]
                 ultimo_dict = ultimo_dict[chave_mais_antiga]
             except:
                 pass # Dict esta vazio
-
-        response = ''
-        for key, val in ultimo_dict.items():
-            response += '&' + str(key) + '=' + str(val)
-        response = response[1:]
-        # print response
+        if OPERATION in {1, 2, 3}:
+            for key, val in ultimo_dict.items():
+                response += '&' + str(key) + '=' + str(val)
+            response = response[1:]
 
         self.send_response(200)
         self.end_headers()
@@ -119,6 +120,10 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             OPERATION = 1
         elif path[0] == 'tabuleiros':
             OPERATION = 2
+        elif path[0] == 'partidas':
+            OPERATION = 3
+        elif path[0] == 'jogadores':
+            OPERATION = 4
         else:
             OPERATION = 0
 
@@ -173,12 +178,27 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 # Usado para comparar a assinatura do tabuleiro atual com o antigo
                 ultimo_dict['soma'] = rows + cols + bombs
                 ultimo_dict['mult'] = rows * cols * bombs
+        elif OPERATION == 3:
+            ultimo_dict['conectando'] = True
+        elif OPERATION == 4:
+            for par in str(POST_data).split('&'):
+                par = str(par).split('=')
+                if par[0] == 'player':
+                    if len(ultimo_dict) == 0:
+                        ultimo_dict[par[1]] = 0
+                    elif par[1] not in ultimo_dict.keys():
+                        ultimo_dict[par[1]] = max(ultimo_dict.values()) + 1
+
+                    response = ultimo_dict[par[1]]
 
         # print server_data
 
         self.send_response(200)
         self.end_headers()
-        self.wfile.write('Done!')
+        if OPERATION != 4:
+            self.wfile.write('Done!')
+        else:
+            self.wfile.write(str(response))
         return
 
     def do_DELETE(self):
@@ -207,9 +227,9 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = path[1:]
 
-        if path[0] == 'jogadas':
+        if path[0] == 'jogadas' or 'partidas':
             LOOP = 0
-        elif path[0] == 'tabuleiros':
+        elif path[0] == 'tabuleiros' :
             LOOP = 1
         else:
             LOOP = len(path)

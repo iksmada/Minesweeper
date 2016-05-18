@@ -32,7 +32,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         if len(path) < 3:
             self.send_response(404)
             self.end_headers()
-            self.wfile.write(':(')
+            self.wfile.write('Running :)')
             return
 
         if path[0] not in accepted_services:
@@ -190,7 +190,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         if len(path) < 3:
             self.send_response(404)
             self.end_headers()
-            self.wfile.write('Running :)')
+            self.wfile.write(':(')
             return
 
         if path[0] not in accepted_services:

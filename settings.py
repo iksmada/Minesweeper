@@ -95,6 +95,7 @@ class SettingsApp(App):
         GameController.totalBlocks = self.rows * self.columns
         GameController.screen_width = self.columns * BLOCK_SIZE + PADDING
         GameController.screen_height = self.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+        GameController.score=0
         # TODO criar trhread quando cria game
         game()
 

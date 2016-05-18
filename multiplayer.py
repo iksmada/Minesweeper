@@ -1,13 +1,14 @@
 import requests
 import time
 from constants import *
+from classes import GameController
 
 
 def get_tauleiro_from_server(partida):
 
     ROUTE = ROUTE_TABULEIROS + '/' + str(partida)
     tabuleiro = ''
-    data = {'rows':ROWS,'cols':COLUMNS,'bombs':BOMBS}
+    data = {'rows':GameController.rows,'cols':GameController.columns,'bombs':GameController.bombs}
     try:
         requests.post(ROUTE,data)
         result = requests.get(ROUTE).content

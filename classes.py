@@ -183,7 +183,7 @@ class GameController:
     is_multiplayer=False
     rows = 10
     columns = 20
-    bombs =20  # 10% do tabuleiro sao bombas
+    bombs = 20  # 10% do tabuleiro sao bombas
     screen_width = columns * BLOCK_SIZE + PADDING
     screen_height= rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     done = False
@@ -211,9 +211,9 @@ class GameController:
         screen.blit(score_text, (PADDING, PADDING))
         nr_movs = font.render("MOVS: %3d " % GameController.movs, 1, COLOR_SCORE)
         screen.blit(nr_movs, (PADDING, PADDING + BLOCK_SIZE))
-        player_id = font.render("ID: %1d " % GameController.playerID, 1, COLOR_SCORE)
+        player_id = font.render("ID: %s " % GameController.playerID, 1, COLOR_SCORE)
         screen.blit(player_id, (GameController.screen_width-(PADDING+player_id.get_size()[0]),PADDING))
-        partida = font.render("GAME :%s " % GameController.partidaKey, 1, COLOR_SCORE)
+        partida = font.render("GAME: %s " % GameController.partidaKey, 1, COLOR_SCORE)
         screen.blit(partida, (GameController.screen_width-(PADDING + partida.get_size()[0]), PADDING + BLOCK_SIZE))
 
 class Button(pygame.sprite.Sprite):

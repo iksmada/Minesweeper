@@ -8,11 +8,12 @@ def game():
     tabuleiro = None
     if GameController.is_multiplayer:
         shared_click_list = []
-        GameController.player_ID = raw_input('ID:')
+        GameController.player_ID = get_player_ID(GameController.username,GameController.match_ID)
+        print GameController.player_ID, GameController.match_ID
         #GameController.match = raw_input('PARTIDA:')
         thread_get = Thread(target=thread_get_data, args=(GameController.player_ID, GameController.match_ID, shared_click_list))
         thread_get.start()
-        tabuleiro = get_tauleiro_from_server(GameController.match_ID).replace('\n','')
+        tabuleiro = get_tabuleiro_from_server(GameController.match_ID).replace('\n','')
 
     # Initialize Pygame
     pygame.init()

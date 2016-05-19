@@ -107,15 +107,15 @@ def thread_get_data(player,partida,lista):
                 requests.delete(ROUTE)
                 if str(params['player']) != str(player):
                     print params
-                    lista.append((params['x'], params['y'], params['action']))
+                    lista.append((params['x'], params['y'], params['color'], params['action']))
         except:
             raise RuntimeError('Nao foi possivel conectar no servidor')
 
         time.sleep(0.1)
 
-def thread_send_data(x,y,player,partida,action):
+def thread_send_data(x,y,player,partida,color,action):
     ROUTE = ROUTE_JOGADAS + '/' + str(partida)
-    data = {'x':x,'y':y,'player':player,'action':action}
+    data = {'x':x,'y':y,'player':player,'color':color,'action':action}
     try:
         for i in range(5):
             requests.post(ROUTE + '/' + str(i), data)

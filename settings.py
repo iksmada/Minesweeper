@@ -22,22 +22,24 @@ class SettingsApp(App):
     bombs = 10
     username = ''
     match = ''
+    color = ''
 
     def build_config(self, config):
         random_id = randint(1000,9999)
         config.setdefaults('section0', {
-            'key0':'player' + str(random_id)
+            'key00':'player' + str(random_id),
+            'key01':'Branco'
         })
         config.setdefaults('section1', {
-            'key1': 'Single',
-            'key10': ''
+            'key10': 'Single',
+            'key11': ''
         })
         config.setdefaults('section2', {
-            'key3': '10',
-            'key4': '20'
+            'key20': '10',
+            'key21': '20'
         })
         config.setdefaults('section3', {
-            'key2': '10',
+            'key30': '10',
         })
 
     def open_settings(self, *largs):
@@ -69,30 +71,53 @@ class SettingsApp(App):
         jsondata = open('settings.json').read()
         settings.add_json_panel('Minesweeper',
                                 self.config, data=jsondata)
+    @staticmethod
+    def get_color(color):
+        if color == "Amarelo":
+            return 'yellow'
+        elif color == "Azul":
+            return 'blue'
+        elif color == "Branco":
+            return 'white'
+        elif color == "Ciano":
+            return 'cyan'
+        elif color == "Rosa":
+            return 'pink'
+        elif color == "Roxo":
+            return 'violet'
+        elif color == "Verde":
+            return 'green'
+        elif color == "Vermelho":
+            return 'red'
+
 
     def on_config_change(self, config, section, key, value):
         if config is self.config:
             token = (section, key)
-            if token == ('section0','key0'):
+            if token == ('section0','key00'):
                 self.username = str(value)
-            elif token == ('section1', 'key1'):
+            elif token == ('section0','key01'):
+                self.color = SettingsApp.get_color(value)
+                print self.color
+            elif token == ('section1', 'key10'):
                 if value == "Single":
                     self.is_multiplayer = False
                 else:
                     self.is_multiplayer = True
-            elif token == ('section1','key10'):
+            elif token == ('section1','key11'):
                 self.match = str(value)
-            elif token == ('section2', 'key3'):
+            elif token == ('section2', 'key20'):
                 self.rows = int(value)
-            elif token == ('section2', 'key4'):
+            elif token == ('section2', 'key21'):
                 self.columns = int(value)
-            elif token == ('section3', 'key2'):
+            elif token == ('section3', 'key30'):
                 self.bombs = int(value)
 
     def on_game(self, *largs):
         # salva valores
         GameController.is_multiplayer = self.is_multiplayer
         GameController.username = self.username
+        GameController.player_color = self.color
         if len(self.match) > 0:
             GameController.match_ID = self.match
         else:
@@ -113,13 +138,16 @@ class SettingsApp(App):
         # carrega ultimas configuracoes
         config.read('settings.ini')
 
+        self.username = config.get('section0', 'key00')
+        self.color = SettingsApp.get_color(config.get('section0', 'key01'))
         # atribui ao controlador as ultimas configuracoes
-        if config.get('section1', 'key1') == "Single":
+        if config.get('section1', 'key10') == "Single":
             self.is_multiplayer = False
         else:
             self.is_multiplayer = True
-        self.rows = config.getint('section2', 'key3')
-        self.columns = config.getint('section2', 'key4')
-        self.bombs = config.getint('section3', 'key2')
-        self.username = config.get('section0','key0')
-        self.match = config.get('section1','key10')
+        self.match = config.get('section1', 'key11')
+        self.rows = config.getint('section2', 'key20')
+        self.columns = config.getint('section2', 'key21')
+        self.bombs = config.getint('section3', 'key30')
+
+

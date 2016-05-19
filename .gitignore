@@ -1,6 +1,7 @@
 #This project's ignored files
 running.txt
 server_output.txt
+settings.ini
 
 #PyCharm setup files
 .idea/

@@ -8,7 +8,24 @@
     "title": "Nome do usuário",
     "desc": "Escolha o seu nome de usuário",
     "section": "section0",
-    "key": "key0"
+    "key": "key00"
+  },
+  {
+    "type": "options",
+    "title": "Cor da bandeira",
+    "desc": "Escolha a sua cor de bandeira quando uma bomba é marcada",
+    "section": "section0",
+    "key": "key01",
+    "options": [
+      "Amarelo",
+      "Azul",
+      "Branco",
+      "Ciano",
+      "Rosa",
+      "Roxo",
+      "Verde",
+      "Vermelho"
+    ]
   },
   {
     "type": "title",
@@ -19,7 +36,7 @@
     "title": "Multi/Single Player",
     "desc": "Escolha o modo de jogo",
     "section": "section1",
-    "key": "key1",
+    "key": "key10",
     "options": [
       "Single",
       "Multi"
@@ -27,10 +44,10 @@
   },
   {
     "type": "string",
-    "title": "Nome da partida",
+    "title": "Nome da partida multiplayer",
     "desc": "Nome do usuário que criou uma partida\nCampo vazio para criar uma nova partida",
     "section": "section1",
-    "key": "key10"
+    "key": "key11"
   },
   {
     "type": "title",
@@ -41,14 +58,14 @@
     "title": "Número de linhas",
     "desc": "Recomendado: entre 10 e 20 linhas",
     "section": "section2",
-    "key": "key3"
+    "key": "key20"
   },
   {
     "type": "numeric",
     "title": "Número de colunas",
     "desc": "Recomendado: o dobro do número de linhas",
     "section": "section2",
-    "key": "key4"
+    "key": "key21"
   },
   {
     "type": "title",
@@ -59,6 +76,6 @@
     "title": "Porcentagem de bombas",
     "desc": "Recomendado: entre 10 e 25% do total",
     "section": "section3",
-    "key": "key2"
+    "key": "key30"
   }
 ]

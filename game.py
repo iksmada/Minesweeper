@@ -141,7 +141,8 @@ def game():
                 click = shared_click_list.pop(0)
                 posX = int(click[0])
                 posY = int(click[1])
-                action = int(click[2])
+                color = str(click[2])
+                action = int(click[3])
                 bloco = matrix[posX][posY]
                 if type(bloco) is Block and not bloco.revealed:
                     if action == ACTION_REGISTER_CLICK:
@@ -150,13 +151,13 @@ def game():
                             bloco = blocks_to_reveal.pop(0)
                             bloco.reveal()
                     elif action == ACTION_REGISTER_MARK:
-                        bloco.mark()
+                        bloco.mark(color)
                 elif type(bloco) is Mine and not bloco.revealed:
                     if action == ACTION_REGISTER_CLICK:
                         pass
                         #TODO O que fazer quando seu parceiro clica na mina?
                     elif action == ACTION_REGISTER_MARK:
-                        bloco.mark()
+                        bloco.mark(color)
 
             for event in pygame.event.get():
 
@@ -171,7 +172,7 @@ def game():
                                 if not bloco.revealed:
                                     if GameController.is_multiplayer:
                                         thread_send = Thread(target=thread_send_data, args=(
-                                        bloco.posX, bloco.posY, GameController.player_ID, GameController.match_ID, ACTION_REGISTER_CLICK))
+                                        bloco.posX, bloco.posY, GameController.player_ID, GameController.match_ID, GameController.player_color, ACTION_REGISTER_CLICK))
                                         thread_send.start()
                                     # Nao adiciona movimentos quando todas as bombas foram encontradas
                                     if not (GameController.markedBombs == GameController.bombs or isinstance(bloco,Mine)):
@@ -191,9 +192,9 @@ def game():
                                 if not bloco.marked:
                                     if GameController.is_multiplayer:
                                         thread_send = Thread(target=thread_send_data, args=(
-                                        bloco.posX, bloco.posY, GameController.player_ID, GameController.match_ID, ACTION_REGISTER_MARK))
+                                        bloco.posX, bloco.posY, GameController.player_ID, GameController.match_ID, GameController.player_color, ACTION_REGISTER_MARK))
                                         thread_send.start()
-                                    bloco.mark()
+                                    bloco.mark(GameController.player_color)
                                     #se for mina
                                     if isinstance(bloco,Mine):
                                         #marcou uma mina

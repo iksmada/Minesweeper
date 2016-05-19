@@ -267,7 +267,7 @@ def garbage_collector():
     # Server_data is cleaned after one hour that it has not been used.
     while True:
         d = datetime.datetime.fromtimestamp(last_timestamp)
-        d = datetime.datetime(d.year, d.month, d.day, d.hour, d.minute + 5, d.second, d.microsecond)
+        d = datetime.datetime(d.year, d.month, d.day, d.hour, min(d.minute + 5,59), d.second, d.microsecond)
 
         if d < datetime.datetime.now():
             server_data.clear()

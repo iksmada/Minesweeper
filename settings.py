@@ -80,7 +80,7 @@ class SettingsApp(App):
                     self.is_multiplayer = False
                 else:
                     self.is_multiplayer = True
-            elif token == ('section','key10'):
+            elif token == ('section1','key10'):
                 self.match = str(value)
             elif token == ('section2', 'key3'):
                 self.rows = int(value)

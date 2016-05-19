@@ -39,7 +39,7 @@ def get_player_ID(player,partida):
     dados = {'player':player}
 
     try:
-        ID = requests.post(ROUTE, player).content
+        ID = requests.post(ROUTE, dados).content
         return int(ID)
     except:
         raise RuntimeError('Nao foi possivel conectar no servidor')

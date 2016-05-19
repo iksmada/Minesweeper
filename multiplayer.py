@@ -56,7 +56,7 @@ def start_match(partida):
     ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
 
     try:
-        requests.delete(ROUTE, partida)
+        requests.delete(ROUTE)
     except:
         raise RuntimeError('Nao foi possivel conectar no servidor')
 
@@ -65,7 +65,7 @@ def wait_match_to_begin(partida):
 
     while True:
         try:
-            response = requests.get(ROUTE, partida).content
+            response = requests.get(ROUTE).content
             if len(response) == 0:
                 break
         except:

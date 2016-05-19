@@ -4,12 +4,40 @@ import pygame
 import random
 from threading import Thread
 
+def wait_for_click_message(screen):
+    font = pygame.font.Font(None, NORMAL_FONT_SIZE)
+    wait = font.render('PRESS SPACE TO START MATCH', 1, BLACK)
+    screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
+                (GameController.screen_height - wait.get_size()[1]) / 2))
+    pygame.display.flip()
+
+    set_up_new_match(GameController.match_ID)
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    done = True
+                elif event.key == pygame.K_ESCAPE:
+                    GameController.round_is_finished = True
+                    GameController.done = True
+                    done = True
+
+    start_match(GameController.match_ID)
+
+def wait_for_match_message(screen):
+    font = pygame.font.Font(None, NORMAL_FONT_SIZE)
+    wait = font.render('WAIT FOR MATCH TO START', 1, BLACK)
+    screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
+                (GameController.screen_height - wait.get_size()[1]) / 2))
+    pygame.display.flip()
+
 def game():
     tabuleiro = None
     if GameController.is_multiplayer:
         shared_click_list = []
         GameController.player_ID = get_player_ID(GameController.username,GameController.match_ID)
-        print GameController.player_ID, GameController.match_ID
+        print GameController.username, GameController.player_ID, GameController.match_ID
         #GameController.match = raw_input('PARTIDA:')
         thread_get = Thread(target=thread_get_data, args=(GameController.player_ID, GameController.match_ID, shared_click_list))
         thread_get.start()
@@ -88,9 +116,15 @@ def game():
         #Loop until the user clicks the close button.
         GameController.round_is_finished = False
         win=False
+        new_game = True
 
         # Used to manage how fast the screen updates
         clock = pygame.time.Clock()
+
+        # Clean former clicked points
+        if GameController.is_multiplayer:
+            while len(shared_click_list) > 0:
+                shared_click_list.pop()
 
         # -------- Main Program Loop -----------
         while not GameController.round_is_finished:
@@ -120,8 +154,6 @@ def game():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     button1, button2, button3 = pygame.mouse.get_pressed()
                     x, y = event.pos
-                    bombsMarked=0
-                    blocksRevealed=0
                     for bloco in all_sprites_list:
                         # usa colisao:
                         # vantagem -> ignora se clicar entre dois quadrados
@@ -186,12 +218,20 @@ def game():
             # Go ahead and update the screen with what we've drawn.
             pygame.display.flip()
 
+            if GameController.is_multiplayer and new_game:
+                if GameController.username == GameController.match_ID:
+                    wait_for_click_message(screen)
+                else:
+                    wait_for_match_message(screen)
+                    wait_match_to_begin(GameController.match_ID)
+                new_game = False
+
         #terminou rodada, mas nao pediu pra sair do jogo
         if not GameController.done:
             #mostrar se ganhou ou perdeu
             screen.fill(COLOR_CLEAR_SCREEN)
             all_sprites_list.draw(screen)
-            #perder
+            #perdeu
             if not win:
                 GameController.draw(screen, "LOST", COLOR_RESULT)
                 #revela minas

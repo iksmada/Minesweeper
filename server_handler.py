@@ -272,6 +272,7 @@ def garbage_collector():
         if d < datetime.datetime.now():
             server_data.clear()
             print "Server has been cleaned at %s" % str(datetime.datetime.now())
+            last_timestamp = time.time()
 
         time.sleep(60)
 

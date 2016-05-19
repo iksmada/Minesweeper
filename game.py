@@ -4,7 +4,7 @@ import pygame
 import random
 from threading import Thread
 
-def wait_for_click_message(screen):
+def wait_for_space_key_message(screen):
     font = pygame.font.Font(None, NORMAL_FONT_SIZE)
     wait = font.render('PRESS SPACE TO START MATCH', 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
@@ -31,6 +31,15 @@ def wait_for_match_message(screen):
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                 (GameController.screen_height - wait.get_size()[1]) / 2))
     pygame.display.flip()
+
+def match_has_started_message(screen):
+    font = pygame.font.Font(None, NORMAL_FONT_SIZE)
+    wait = font.render('SORRY, THIS MATCH HAS STARTED WITHOUT YOU :(', 1, BLACK)
+    screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
+                       (GameController.screen_height - wait.get_size()[1]) / 2))
+    pygame.display.flip()
+
+    time.sleep(5)
 
 def game():
     tabuleiro = None
@@ -220,10 +229,15 @@ def game():
 
             if GameController.is_multiplayer and new_game:
                 if GameController.username == GameController.match_ID:
-                    wait_for_click_message(screen)
+                    wait_for_space_key_message(screen)
                 else:
-                    wait_for_match_message(screen)
-                    wait_match_to_begin(GameController.match_ID)
+                    if not check_match_has_begun(GameController.match_ID):
+                        wait_for_match_message(screen)
+                        wait_match_to_begin(GameController.match_ID)
+                    else:
+                        match_has_started_message(screen)
+                        GameController.round_is_finished = True
+                        GameController.done = True
                 new_game = False
 
         #terminou rodada, mas nao pediu pra sair do jogo

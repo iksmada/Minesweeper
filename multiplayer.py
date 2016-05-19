@@ -73,6 +73,17 @@ def wait_match_to_begin(partida):
 
         time.sleep(0.1)
 
+def check_match_has_begun(partida):
+    ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
+
+    try:
+        response = requests.get(ROUTE).content
+        if len(response) == 0:
+            return True
+        else:
+            return False
+    except:
+        raise RuntimeError('Nao foi possivel conectar no servidor')
 
 def thread_get_data(player,partida,lista):
 

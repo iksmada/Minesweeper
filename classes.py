@@ -194,7 +194,7 @@ class GameController:
     revealedBlocks = None
     totalBlocks = rows*columns
     username = ''
-    player_ID = 0
+    player_ID = -1
     match_ID = ''
 
     def __init__(self):

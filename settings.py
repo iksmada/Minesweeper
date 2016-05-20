@@ -111,7 +111,8 @@ class SettingsApp(App):
             elif token == ('section2', 'key21'):
                 self.columns = int(value)
             elif token == ('section3', 'key30'):
-                self.bombs = int(value)
+                if int(value)<100 and int(value)>0:
+                    self.bombs = int(value)
 
     def on_game(self, *largs):
         # salva valores

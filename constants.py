@@ -7,9 +7,6 @@ BOMBS       = ROWS*COLUMNS/10 #10% do tabuleiro sao bombas
 # espaco entre tabuleiro e minas
 PADDING = (BLOCK_SIZE - MINA_SIZE)
 TITLE_AND_SCORE_SIZE = 2 * BLOCK_SIZE
-# tamanho da janela depende do numero de columas linhas e do tamanho de cada celula da matrix
-SCREEN_WIDTH  = COLUMNS * BLOCK_SIZE + PADDING
-SCREEN_HEIGHT = ROWS * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
 
 # FONT
 EXTRA_SMALL_FONT_SIZE =     BLOCK_SIZE/2

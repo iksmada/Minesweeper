@@ -1,29 +1,52 @@
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from constants import SERVER_PORT
+# -*- coding: utf-8
+
 import datetime
 import random
-from threading import Thread
 import time
+
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from threading import Thread
+
+from constants import SERVER_PORT
 
 server_data = {}
 last_timestamp = 0
 
+"""
+    Servidor de partidas multiplayer
+"""
+
 def clean_path(path):
+    """
+        Método que faz parse da rota REST e transforma em uma lista
+    :param path:
+    :return:
+    """
     path = path.strip().split('/')
     # Remove string vazias
     path = [x for x in path if x]
     return path
 
+# Rotas acessíveis
 accepted_services = ['jogos']
+# Sub-rotas acessíveis
 accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','segredo']}
 
 class MineSweeperServer(BaseHTTPRequestHandler):
+    """
+        Servidor REST (HTTP) para partidas multiplayer
+    """
 
     # Remova esse metodo para ver todas as requests chegando
     def log_message(self, f, *args):
         pass
 
     def do_GET(self):
+        """
+            Método que responde a requisições GET
+        :return:
+        """
+        # Atualiza último acesso
         global last_timestamp
         last_timestamp = time.time()
 
@@ -91,6 +114,11 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         return
 
     def do_POST(self):
+        """
+            Método que responde a requisições POST
+        :return:
+        """
+        # Atualiza último acesso
         global last_timestamp
         last_timestamp = time.time()
 
@@ -202,6 +230,11 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         return
 
     def do_DELETE(self):
+        """
+            Método que responde a requisições DELETE
+        :return:
+        """
+        # Atualiza último acesso
         global last_timestamp
         last_timestamp = time.time()
 
@@ -261,27 +294,38 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         return
 
 def garbage_collector():
+    """
+        Thread que limpa as informações do servidor a cada 15 minutos
+    :return: nada
+    """
+    # Atualiza primeiro acesso
     global last_timestamp
     last_timestamp = time.time()
 
-    # Server_data is cleaned after one hour that it has not been used.
     while True:
+        # Horário do último acesso
         d = datetime.datetime.fromtimestamp(last_timestamp)
-        d = datetime.datetime(d.year, d.month, d.day, d.hour, min(d.minute + 5,59), d.second, d.microsecond)
+        # Horário do último acesso + 15 minutos
+        d = datetime.datetime(d.year, d.month, d.day, d.hour, min(d.minute + 15,59), d.second, d.microsecond)
 
+        # Se passou 15 minutos
         if d < datetime.datetime.now():
             server_data.clear()
             print "Server has been cleaned at %s" % str(datetime.datetime.now())
             last_timestamp = time.time()
 
+        #  Dorme um minuto
         time.sleep(60)
 
 
 if __name__ == '__main__':
+    """
+        Inicia a thread para limpar dados e inicia servidor
+    """
     clean_server_data = Thread(target=garbage_collector)
     clean_server_data.start()
     server_address = ('', SERVER_PORT)
     server = HTTPServer(server_address, MineSweeperServer)
     sa = server.socket.getsockname()
-    print "Serving HTTP on", sa[0], "port", sa[1], "..."
+    print "Serving on", sa[0], "port", sa[1], "..."
     server.serve_forever()

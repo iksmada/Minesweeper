@@ -305,8 +305,8 @@ def garbage_collector():
     while True:
         # Horário do último acesso
         d = datetime.datetime.fromtimestamp(last_timestamp)
-        # Horário do último acesso + 15 minutos
-        d = datetime.datetime(d.year, d.month, d.day, d.hour, min(d.minute + 15,59), d.second, d.microsecond)
+        # Horário do último acesso + 1 mês
+        d = datetime.datetime(d.year, d.month + 1, d.day, d.hour, d.minute, d.second, d.microsecond)
 
         # Se passou 15 minutos
         if d < datetime.datetime.now():

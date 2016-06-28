@@ -56,14 +56,14 @@
   {
     "type": "numeric",
     "title": "Número de linhas",
-    "desc": "Recomendado: entre 10 e 20 linhas",
+    "desc": "Mínimo:5\nRecomendado: entre 10 e 20 linhas",
     "section": "section2",
     "key": "key20"
   },
   {
     "type": "numeric",
     "title": "Número de colunas",
-    "desc": "Recomendado: o dobro do número de linhas",
+    "desc": "Mínimo: 10\nRecomendado: o dobro do número de linhas",
     "section": "section2",
     "key": "key21"
   },
@@ -74,7 +74,7 @@
   {
     "type": "numeric",
     "title": "Porcentagem de bombas",
-    "desc": "Recomendado: entre 10 e 25% do total",
+    "desc": "Mínimo:5%\nRecomendado: entre 10 e 25% do total",
     "section": "section3",
     "key": "key30"
   }

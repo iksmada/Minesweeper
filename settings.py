@@ -147,12 +147,17 @@ class SettingsApp(App):
             elif token == ('section1','key11'):             # atualiza username de quem criou a partida
                 self.match = str(value)
             elif token == ('section2', 'key20'):            # atualiza numero de linhas do tabuleiro
-                self.rows = int(value)
+                self.rows = max(int(value), 5)
+                config.set(section, key, self.rows)
+                config.write()
+                self.build_settings(self._app_settings)
             elif token == ('section2', 'key21'):            # atualiza numero de colunas
-                self.columns = int(value)
+                self.columns = max(int(value), 10)
             elif token == ('section3', 'key30'):            # atualiza porcentagem de bombas
                 if 100 >= int(value) > 0:
-                    self.bombs = int(value)
+                    self.bombs = max(5,int(value))
+                else:
+                    self.bombs = 5
 
     def on_game(self, *largs):
         """

@@ -1,13 +1,22 @@
+# -*- coding: utf-8
+
 import pygame
+
 from constants import *
 
 class GameController:
+    """
+        Classe estática que faz o controle das variáveis do jogo.
+        Todo o acesso é por meio de variáveis estáticas da classe
 
-    # Atributos estaticos atualizados no main()
+        A classe não pode ser instanciada
+    """
+
+    # Atributos estaticos da classe
     is_multiplayer = False
     rows = 10
     columns = 20
-    bombs = 10  # 10% do tabuleiro sao bombas
+    bombs = 10  # porcentagem de bombas
     screen_width = columns * BLOCK_SIZE + PADDING
     screen_height = rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     done = False
@@ -23,24 +32,39 @@ class GameController:
     player_color = None
 
     def __init__(self):
-        raise AssertionError('Classe GameController nao tem instancias.')
+        raise AssertionError('Classe GameController não é instanciavel.')
 
     @staticmethod
     def draw(screen,top="MINESWEEPER",color=COLOR_TITLE):
-        if GameController.screen_width/15>BLOCK_SIZE:
+        """
+            Método que insere as informações da partida na janela d jogo
+        :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
+        :param top: texto a ser exibido no menu
+        :param color: cor do texto
+        :return:
+        """
+        username = "USERNAME: %s" % GameController.username
+        match = "MATCH: %s" % GameController.match_ID
+        if len(username) >= len(match):
+            text = username
+        else:
+            text = match
+
+        if get_recommended_font_size(screen,50,text) > NORMAL_FONT_SIZE:
             font = pygame.font.Font(None, NORMAL_FONT_SIZE)
         else:
-            font = pygame.font.Font(None, GameController.screen_width / 15)
+            font = pygame.font.Font(None, get_recommended_font_size(screen,50,text))
+
         title = font.render(top, 1, color)
         screen.blit(title, (GameController.screen_width/2 - (PADDING + title.get_size()[0])/2, PADDING + BLOCK_SIZE/2))
         score_text = font.render("SCORE: %05d" % GameController.score, 1, COLOR_SCORE)
         screen.blit(score_text, (PADDING, PADDING))
         movs = font.render("MOVS: %03d " % GameController.movs, 1, COLOR_SCORE)
         screen.blit(movs, (PADDING, PADDING + BLOCK_SIZE))
-        username = font.render("USERNAME: %s " % GameController.username, 1, COLOR_SCORE)
+        username = font.render(username, 1, COLOR_SCORE)
         screen.blit(username, (GameController.screen_width-(PADDING + username.get_size()[0]),PADDING))
         if GameController.is_multiplayer:
-            match = font.render("MATCH: %s " % GameController.match_ID, 1, COLOR_SCORE)
+            match = font.render(match, 1, COLOR_SCORE)
             screen.blit(match, (GameController.screen_width-(PADDING + match.get_size()[0]), PADDING + BLOCK_SIZE))
 
 

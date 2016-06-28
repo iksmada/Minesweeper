@@ -5,8 +5,9 @@ import random
 from threading import Thread
 
 def wait_for_space_key_message(screen):
-    font = pygame.font.Font(None, NORMAL_FONT_SIZE)
-    wait = font.render('PRESS SPACE TO START MATCH', 1, BLACK)
+    message = 'PRESS SPACE TO START MATCH'
+    font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
+    wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                 (GameController.screen_height - wait.get_size()[1]) / 2))
     pygame.display.flip()
@@ -26,15 +27,17 @@ def wait_for_space_key_message(screen):
     start_match(GameController.match_ID)
 
 def wait_for_match_message(screen):
-    font = pygame.font.Font(None, NORMAL_FONT_SIZE)
-    wait = font.render('WAIT FOR MATCH TO START', 1, BLACK)
+    message = 'WAIT FOR MATCH TO START'
+    font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
+    wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                 (GameController.screen_height - wait.get_size()[1]) / 2))
     pygame.display.flip()
 
 def match_has_started_message(screen):
-    font = pygame.font.Font(None, NORMAL_FONT_SIZE)
-    wait = font.render('SORRY, THIS MATCH HAS STARTED WITHOUT YOU :(', 1, BLACK)
+    message = 'SORRY, THIS MATCH HAS STARTED WITHOUT YOU :('
+    font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
+    wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                        (GameController.screen_height - wait.get_size()[1]) / 2))
     pygame.display.flip()

@@ -8,6 +8,7 @@ from classes import GameController
 """
     Arquivo que contém métodos auxiliares para partidas multiplayer
 """
+
 def get_tabuleiro_from_server(partida):
     """
         Método que obtém o tabuleiro de uma partida do servidor
@@ -34,8 +35,8 @@ def get_tabuleiro_from_server(partida):
 def create_new_tabuleiro_on_server(partida):
     """
         Método que gera um novo tabuleiro no servidor
-    :param partida:
-    :return:
+    :param partida: string com o criador da partida
+    :return: nada
     """
 
     # Servidor sempre muda o tabuleiro quando pelo menos uma das variaveis mudam

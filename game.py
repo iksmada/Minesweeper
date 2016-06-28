@@ -53,7 +53,6 @@ def game():
         #GameController.match = raw_input('PARTIDA:')
         thread_get = Thread(target=thread_get_data, args=(GameController.player_ID, GameController.match_ID, shared_click_list))
         thread_get.start()
-        tabuleiro = get_tabuleiro_from_server(GameController.match_ID).replace('\n','')
 
     # Initialize Pygame
     pygame.init()
@@ -75,9 +74,15 @@ def game():
         Block.matrix = matrix
         Block.blocks_to_reveal = blocks_to_reveal
 
+        GameController.score = 0
         GameController.movs = 0
         GameController.markedBombs = 0
         GameController.revealedBlocks = 0
+
+        if GameController.player_ID == 0:
+            create_new_tabuleiro_on_server(GameController.match_ID)
+
+        tabuleiro = get_tabuleiro_from_server(GameController.match_ID).replace('\n', '')
 
         if not GameController.is_multiplayer:
             i = 0

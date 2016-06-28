@@ -153,11 +153,15 @@ class SettingsApp(App):
                 self.build_settings(self._app_settings)
             elif token == ('section2', 'key21'):            # atualiza numero de colunas
                 self.columns = max(int(value), 10)
+                config.set(section, key, self.columns)
+                config.write()
             elif token == ('section3', 'key30'):            # atualiza porcentagem de bombas
                 if 100 >= int(value) > 0:
                     self.bombs = max(5,int(value))
                 else:
                     self.bombs = 5
+                config.set(section, key, self.bombs)
+                config.write()
 
     def on_game(self, *largs):
         """

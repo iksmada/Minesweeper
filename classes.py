@@ -43,6 +43,11 @@ class GameController:
         :param color: cor do texto
         :return:
         """
+
+        font = pygame.font.Font(None, get_recommended_font_size(screen,100,top))
+        title = font.render(top, 1, color)
+        screen.blit(title, (GameController.screen_width / 2 - (PADDING + title.get_size()[0]) / 2, PADDING))
+
         username = "USERNAME: %s" % GameController.username
         match = "MATCH: %s" % GameController.match_ID
         if len(username) >= len(match):
@@ -55,17 +60,18 @@ class GameController:
         else:
             font = pygame.font.Font(None, get_recommended_font_size(screen,50,text))
 
-        title = font.render(top, 1, color)
-        screen.blit(title, (GameController.screen_width/2 - (PADDING + title.get_size()[0])/2, PADDING + BLOCK_SIZE/2))
         score_text = font.render("SCORE: %05d" % GameController.score, 1, COLOR_SCORE)
-        screen.blit(score_text, (PADDING, PADDING))
+        screen.blit(score_text, (PADDING, PADDING + 2*BLOCK_SIZE))
+
         movs = font.render("MOVS: %03d " % GameController.movs, 1, COLOR_SCORE)
-        screen.blit(movs, (PADDING, PADDING + BLOCK_SIZE))
+        screen.blit(movs, (PADDING, PADDING + 3*BLOCK_SIZE))
+
         username = font.render(username, 1, COLOR_SCORE)
-        screen.blit(username, (GameController.screen_width-(PADDING + username.get_size()[0]),PADDING))
+        screen.blit(username, (GameController.screen_width-(PADDING + username.get_size()[0]),PADDING + 2*BLOCK_SIZE))
+
         if GameController.is_multiplayer:
             match = font.render(match, 1, COLOR_SCORE)
-            screen.blit(match, (GameController.screen_width-(PADDING + match.get_size()[0]), PADDING + BLOCK_SIZE))
+            screen.blit(match, (GameController.screen_width-(PADDING + match.get_size()[0]), PADDING + 3*BLOCK_SIZE))
 
 
 class Block(pygame.sprite.Sprite):

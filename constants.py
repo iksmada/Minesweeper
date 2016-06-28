@@ -7,7 +7,7 @@ BLOCK_SIZE  = 24 # tamanho de um bloco que contem uma mina
 # Espaço entre tabuleiro e minas
 PADDING = (BLOCK_SIZE - MINA_SIZE)
 # Espaço para informações da partida
-TITLE_AND_SCORE_SIZE = 2 * BLOCK_SIZE
+TITLE_AND_SCORE_SIZE = 4 * BLOCK_SIZE
 
 # Tamanho de fonte padrão
 TINY_FONT_SIZE =            int(BLOCK_SIZE*0.25)
@@ -54,6 +54,8 @@ def get_recommended_font_size(screen_object,screen_percentage,text):
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return TINY_FONT_SIZE
+
+    return TINY_FONT_SIZE
 
 
 # Definição das cores utilizadas

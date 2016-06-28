@@ -9,7 +9,7 @@ def wait_for_space_key_message(screen):
     font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
-                (GameController.screen_height - wait.get_size()[1]) / 2))
+                (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
     pygame.display.flip()
 
     set_up_new_match(GameController.match_ID)
@@ -31,15 +31,15 @@ def wait_for_match_message(screen):
     font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
-                (GameController.screen_height - wait.get_size()[1]) / 2))
+                (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
     pygame.display.flip()
 
 def match_has_started_message(screen):
-    message = 'SORRY, THIS MATCH HAS STARTED WITHOUT YOU :('
+    message = 'SORRY, MATCH IS UNAVALAIBLE :('
     font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
-                       (GameController.screen_height - wait.get_size()[1]) / 2))
+                       (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
     pygame.display.flip()
 
     time.sleep(5)

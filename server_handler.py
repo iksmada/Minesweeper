@@ -28,9 +28,10 @@ def clean_path(path):
     return path
 
 # Rotas acessíveis
-accepted_services = ['jogos']
+accepted_services = ['jogos','score']
 # Sub-rotas acessíveis
-accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','segredo']}
+accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','segredo'],
+                  'score':['global','partidas']}
 
 class MineSweeperServer(BaseHTTPRequestHandler):
     """
@@ -40,6 +41,27 @@ class MineSweeperServer(BaseHTTPRequestHandler):
     # Remova esse metodo para ver todas as requests chegando
     def log_message(self, f, *args):
         pass
+
+    def check_path(self,path):
+        if len(path) < 3:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write('Running :)')
+            return False
+
+        if path[0] not in accepted_services:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown service')
+            return False
+
+        if path[1] not in accepted_route[path[0]]:
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write('Unknown access route')
+            return False
+
+        return True
 
     def do_GET(self):
         """
@@ -52,22 +74,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = clean_path(self.path)
 
-        if len(path) < 3:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write('Running :)')
-            return
-
-        if path[0] not in accepted_services:
-            self.send_response(403)
-            self.end_headers()
-            self.wfile.write('Unknown service')
-            return
-
-        if path[1] not in accepted_route[path[0]]:
-            self.send_response(403)
-            self.end_headers()
-            self.wfile.write('Unknown access route')
+        if not self.check_path(path):
             return
 
         path = path[1:]
@@ -124,22 +131,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = clean_path(self.path)
 
-        if len(path) < 3:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(':(')
-            return
-
-        if path[0] not in accepted_services:
-            self.send_response(403)
-            self.end_headers()
-            self.wfile.write('Unknown service')
-            return
-
-        if path[1] not in accepted_route[path[0]]:
-            self.send_response(403)
-            self.end_headers()
-            self.wfile.write('Unknown access route')
+        if not self.check_path(path):
             return
 
         path = path[1:]
@@ -240,22 +232,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = clean_path(self.path)
 
-        if len(path) < 3:
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(':(')
-            return
-
-        if path[0] not in accepted_services:
-            self.send_response(403)
-            self.end_headers()
-            self.wfile.write('Unknown service')
-            return
-
-        if path[1] not in accepted_route[path[0]]:
-            self.send_response(403)
-            self.end_headers()
-            self.wfile.write('Unknown access route')
+        if not self.check_path(path):
             return
 
         path = path[1:]
@@ -306,16 +283,17 @@ def garbage_collector():
         # Horário do último acesso
         d = datetime.datetime.fromtimestamp(last_timestamp)
         # Horário do último acesso + 1 mês
-        d = datetime.datetime(d.year, d.month + 1, d.day, d.hour, d.minute, d.second, d.microsecond)
+        d = datetime.datetime(d.year, d.month, d.day, d.hour, d.minute, d.second, d.microsecond)
 
         # Se passou 15 minutos
         if d < datetime.datetime.now():
-            server_data.clear()
+            if 'jogos' in server_data:
+                server_data['jogos'].clear()
             print "Server has been cleaned at %s" % str(datetime.datetime.now())
             last_timestamp = time.time()
 
-        #  Dorme um minuto
-        time.sleep(60)
+        # Dorme um dia
+        time.sleep(24*60*60)
 
 
 if __name__ == '__main__':

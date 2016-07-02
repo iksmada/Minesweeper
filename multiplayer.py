@@ -99,13 +99,13 @@ def wait_match_to_begin(partida):
 
     try:
         response = requests.get(ROUTE).content
-        if len(response) == 0:
-            return True
+        if len(response) == 2:
+            return 1
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
     # Checa a cada 100ms
     time.sleep(0.1)
-    return False
+    return 0
 
 def check_match_has_begun(partida):
     """

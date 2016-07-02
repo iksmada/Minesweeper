@@ -20,37 +20,37 @@ HUGE_FONT_SIZE =            int(BLOCK_SIZE*2)
 
 def get_recommended_font_size(screen_object,screen_percentage,text):
     width = int(screen_object.get_width()*screen_percentage/100)
-    font = Font(None, HUGE_FONT_SIZE)
+    font = Font('fonts/UbuntuMono.ttf', HUGE_FONT_SIZE)
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return HUGE_FONT_SIZE
 
-    font = Font(None, EXTRA_LARGE_FONT_SIZE)
+    font = Font('fonts/UbuntuMono.ttf', EXTRA_LARGE_FONT_SIZE)
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return EXTRA_LARGE_FONT_SIZE
 
-    font = Font(None, LARGE_FONT_SIZE)
+    font = Font('fonts/UbuntuMono.ttf', LARGE_FONT_SIZE)
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return LARGE_FONT_SIZE
 
-    font = Font(None, NORMAL_FONT_SIZE)
+    font = Font('fonts/UbuntuMono.ttf', NORMAL_FONT_SIZE)
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return NORMAL_FONT_SIZE
 
-    font = Font(None, SMALL_FONT_SIZE)
+    font = Font('fonts/UbuntuMono.ttf', SMALL_FONT_SIZE)
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return SMALL_FONT_SIZE
 
-    font = Font(None, EXTRA_SMALL_FONT_SIZE)
+    font = Font('fonts/UbuntuMono.ttf', EXTRA_SMALL_FONT_SIZE)
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return EXTRA_SMALL_FONT_SIZE
 
-    font = Font(None, TINY_FONT_SIZE)
+    font = Font('fonts/UbuntuMono.ttf', TINY_FONT_SIZE)
     render = font.render(text, 1, BLACK)
     if width > render.get_width():
         return TINY_FONT_SIZE
@@ -61,8 +61,15 @@ def get_recommended_font_size(screen_object,screen_percentage,text):
 # Definição das cores utilizadas
 BLACK    = (   0,   0,   0)
 WHITE    = ( 255, 255, 255)
+
 RED      = ( 255,   0,   0)
+GREEN    = (   0, 255,   0)
+BLUE     = (   0,   0, 255)
+
 YELLOW   = ( 255, 255,   0)
+PINK     = ( 255,   0, 255)
+CYAN     = (   0, 255, 255)
+
 GRAYDARK = ( 127, 127, 127)
 GRAYLIGHT= ( 215, 215, 215)
 

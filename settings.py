@@ -10,7 +10,7 @@ from kivy.config import ConfigParser
 from constants import *
 from random import randint
 from classes import GameController
-from game import game
+from game import play_game
 
 
 class SettingsApp(App):
@@ -171,12 +171,12 @@ class SettingsApp(App):
         """
         # Transfere os valores do menu para o controlador do jogo
         GameController.is_multiplayer = self.is_multiplayer
-        GameController.username = self.username
+        GameController.username = self.username[:12]
         GameController.player_color = self.color
         if len(self.match) > 0:
-            GameController.match_ID = self.match
+            GameController.match_ID = self.match[:12]
         else:
-            GameController.match_ID = self.username
+            GameController.match_ID = self.username[:12]
         GameController.bombs = max(5,self.columns*self.rows*self.bombs/100)
         GameController.rows = max(5,self.rows)
         GameController.columns = max(10,self.columns)
@@ -186,7 +186,7 @@ class SettingsApp(App):
         GameController.screen_height = GameController.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE + 2*BLOCK_SIZE
         GameController.score = 0
         # Inicia o jogo
-        game()
+        play_game()
 
     @staticmethod
     def get_color(color):

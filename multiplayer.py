@@ -117,7 +117,7 @@ def check_match_has_begun(partida):
 
     try:
         response = requests.get(ROUTE).content
-        if len(response) == 0:
+        if len(response) == 2:
             return True
         else:
             return False

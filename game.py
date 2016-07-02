@@ -6,7 +6,7 @@ from threading import Thread
 
 def wait_for_space_key_message(screen):
     message = 'PRESS SPACE TO START MATCH'
-    font = pygame.font.Font(None, get_recommended_font_size(screen,90,message))
+    font = pygame.font.Font(None, min(EXTRA_LARGE_FONT_SIZE,get_recommended_font_size(screen,95,message)))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                 (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
@@ -32,7 +32,7 @@ def wait_for_space_key_message(screen):
 
 def wait_for_match_message(screen):
     message = 'WAIT FOR MATCH TO START'
-    font = pygame.font.Font(None, get_recommended_font_size(screen,90,message))
+    font = pygame.font.Font(None, min(EXTRA_LARGE_FONT_SIZE,get_recommended_font_size(screen,95,message)))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                 (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
@@ -40,7 +40,7 @@ def wait_for_match_message(screen):
 
 def match_has_started_message(screen):
     message = 'SORRY, MATCH IS UNAVALAIBLE :('
-    font = pygame.font.Font(None, get_recommended_font_size(screen,90,message))
+    font = pygame.font.Font(None, min(EXTRA_LARGE_FONT_SIZE,get_recommended_font_size(screen,95,message)))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                        (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
@@ -48,7 +48,46 @@ def match_has_started_message(screen):
 
     time.sleep(5)
 
-def game():
+def show_score(screen):
+    scores = get_global_score()
+
+    height = BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+    step = BLOCK_SIZE*GameController.rows/float(6)
+    font = pygame.font.Font('fonts/UbuntuMonoBold.ttf', SMALL_FONT_SIZE)
+
+    if GameController.columns >= 20:
+        message = '%-12s %5s %7s %5s %7s %5s %10s' % tuple('USERNAME ROWS COLUMNS BOMBS SCORE MOVS TOTAL'.split())
+    elif GameController.columns >= 15:
+        message = '%-12s %5s %5s %10s' % tuple('USERNAME SCORE MOVS TOTAL'.split())
+    else:
+        message = '%-12s %10s' % tuple('USERNAME TOTAL'.split())
+
+    wait = font.render(message, 1, COLOR_TITLE)
+    screen.blit(wait, ((GameController.screen_width - wait.get_width())/2 , height))
+    pygame.display.flip()
+
+    for score in scores:
+        height += step
+        # score = (final, username, rows, cols, bombs, score, movs)
+        if GameController.columns >= 20:
+            message = '%-12s %5d %7d %5d %7d %5d %10d' % (score[1], score[2], score[3], score[4], score[5], score[6], score[0])
+        elif GameController.columns >= 15:
+            message = '%-12s %5d %5d %10d' % (score[1], score[5], score[6], score[0])
+        else:
+            message = '%-12s %10d' % (score[1], score[0])
+        wait = font.render(message, 1, COLOR_SCORE)
+        screen.blit(wait, ((GameController.screen_width - wait.get_width())/2, height))
+        pygame.time.wait(100)
+        pygame.display.flip()
+
+    message = 'TOTAL = (100*SCORE*BOMBS)/(ROWS*COLUMNS*MOVS)'
+    font = pygame.font.Font('fonts/UbuntuMono.ttf', min(NORMAL_FONT_SIZE,get_recommended_font_size(screen,100,message)))
+    wait = font.render(message, 1, COLOR_RESULT)
+    screen.blit(wait, ((GameController.screen_width - wait.get_width()) / 2, height + step))
+    pygame.time.wait(100)
+    pygame.display.flip()
+
+def play_game():
     if GameController.is_multiplayer:
         shared_click_list = []
         GameController.player_ID = get_player_ID(GameController.username,GameController.match_ID)
@@ -193,30 +232,30 @@ def game():
                                         bloco.reveal()
                                         GameController.score += bloco.neighbors
                                     # revelou uma mina
-                                    if isinstance(bloco,Mine) and not bloco.marked:
+                                    if isinstance(bloco,Mine): #and not bloco.marked:
                                         # PERDEU
                                         GameController.round_is_finished = True
-                                        GameController.score -= 9999
                             elif button3:
                                 if not bloco.marked:
                                     if GameController.is_multiplayer:
-                                        thread_send = Thread(target=thread_send_data, args=(
-                                        bloco.posX, bloco.posY, GameController.player_ID, GameController.match_ID, GameController.player_color, ACTION_REGISTER_MARK))
+                                        thread_send = Thread(target=thread_send_data, args=(bloco.posX, bloco.posY,
+                                                                                            GameController.player_ID,
+                                                                                            GameController.match_ID,
+                                                                                            GameController.player_color,
+                                                                                            ACTION_REGISTER_MARK))
                                         thread_send.start()
                                     bloco.mark(GameController.player_color)
                                     #se for mina
                                     if isinstance(bloco,Mine):
                                         #marcou uma mina
-                                        GameController.markedBombs+=1
+                                        GameController.markedBombs += 1
                                         GameController.score += 100
                                     else:
-                                        GameController.score -= 10
-                            #se marcou todas as bombas e revelou todos os blocos
-
+                                        GameController.score -= 20
                         #GANHOU
-                        if GameController.markedBombs+GameController.revealedBlocks == GameController.totalBlocks:
-                            GameController.round_is_finished=True
-                            win=True
+                        if GameController.markedBombs + GameController.revealedBlocks == GameController.totalBlocks:
+                            GameController.round_is_finished = True
+                            win = True
 
                 if event.type == pygame.QUIT:  # If user clicked close
                     GameController.round_is_finished = True  # Flag that we are round so we exit this loop
@@ -272,20 +311,34 @@ def game():
             # ganhou
             else:
                 GameController.draw(screen, "WIN", COLOR_RESULT)
-            pygame.display.flip()
+
+            pygame.time.wait(1000)
+            if not GameController.is_multiplayer:
+                screen.fill(COLOR_CLEAR_SCREEN)
+                GameController.draw(screen, "SCORE", COLOR_RESULT)
+                register_global_score()
+                show_score(screen)
+                pygame.display.flip()
+                pygame.time.wait(1000)
+            else:
+                pygame.display.flip()
 
             # espera clicar pra continuar nova rodada ou sair do jogo
-            clicked=False
+            clicked = False
             while not clicked and not GameController.done:
-                pygame.time.wait(500)
+                pygame.time.wait(100)
                 for event in pygame.event.get():  # User did something
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        clicked=True
+                        clicked = True
                     if event.type == pygame.QUIT:  # If user clicked close
                         GameController.done = True
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             GameController.done = True
+                        elif event.key == pygame.K_KP_ENTER:
+                            clicked = True
+                        elif event.key == pygame.K_SPACE:
+                            clicked = True
 
     if GameController.is_multiplayer:
         shared_click_list.insert(0,True)

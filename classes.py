@@ -44,7 +44,7 @@ class GameController:
         :return:
         """
 
-        font = pygame.font.Font(None, get_recommended_font_size(screen,100,top))
+        font = pygame.font.Font('fonts/UbuntuMonoBold.ttf', get_recommended_font_size(screen,100,top))
         title = font.render(top, 1, color)
         screen.blit(title, (GameController.screen_width / 2 - (PADDING + title.get_size()[0]) / 2, PADDING))
 
@@ -55,15 +55,15 @@ class GameController:
         else:
             text = match
 
-        if get_recommended_font_size(screen,50,text) > NORMAL_FONT_SIZE:
-            font = pygame.font.Font(None, NORMAL_FONT_SIZE)
+        if get_recommended_font_size(screen,60,text) > NORMAL_FONT_SIZE:
+            font = pygame.font.Font('fonts/UbuntuMono.ttf', NORMAL_FONT_SIZE)
         else:
-            font = pygame.font.Font(None, get_recommended_font_size(screen,50,text))
+            font = pygame.font.Font('fonts/UbuntuMono.ttf', get_recommended_font_size(screen,60,text))
 
-        score_text = font.render("SCORE: %05d" % GameController.score, 1, COLOR_SCORE)
+        score_text = font.render("%5s %07d" % ('SCORE', GameController.score), 1, COLOR_SCORE)
         screen.blit(score_text, (PADDING, PADDING + 2*BLOCK_SIZE))
 
-        movs = font.render("MOVS: %03d " % GameController.movs, 1, COLOR_SCORE)
+        movs = font.render("%-9s %03d " % ('MOVS',GameController.movs), 1, COLOR_SCORE)
         screen.blit(movs, (PADDING, PADDING + 3*BLOCK_SIZE))
 
         username = font.render(username, 1, COLOR_SCORE)
@@ -87,7 +87,7 @@ class Block(pygame.sprite.Sprite):
     all_sprites_list = None
     screen = None
 
-    def __init__(self, posX, posY, neighbors=-10):
+    def __init__(self, posX, posY, neighbors=0):
         # Chama o construtor do Pai
         super(Block,self).__init__()
         # image representa o elemento interno da caixa
@@ -208,7 +208,6 @@ class Block(pygame.sprite.Sprite):
         """
         if not self.revealed and not self.marked:
             #conta movimentos, ja faz a checagem pra nao checar mais de uma vez
-            #GameController.score -= 10
             #muda imagem para marcacao
             self.next_image = pygame.image.load("images/mark_" + str(color) + ".png").convert_alpha()
             self.marked=True
@@ -221,10 +220,9 @@ class Mine(Block):
 
     def reveal(self):
 
-        if not self.revealed and not self.marked:
+        if not self.revealed: #and not self.marked:
             self.next_image = pygame.image.load("images/mine_exploded.png").convert_alpha()
             self.revealed = True
-            #GameController.score -= 10
 
         self.update_image()
         self.all_sprites_list.draw(self.screen)
@@ -242,4 +240,4 @@ class Mine(Block):
 
 
     def __repr__(self):
-        return "Mine" + super(Mine,self).__repr__()
+        return "Mine " + super(Mine,self).__repr__()

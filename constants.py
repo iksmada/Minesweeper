@@ -82,9 +82,9 @@ ACTION_REGISTER_MARK = 2
 
 # Variáveis para partidas multiplayer
 # Troque as próximas linhas para partidas localhost
-SERVER_NAME = 'http://127.0.0.1'
+#SERVER_NAME = 'http://127.0.0.1'
 SERVER_NAME = 'http://ec2-52-67-17-125.sa-east-1.compute.amazonaws.com'
-#SERVER_PORT = 8000
+SERVER_PORT = 8000
 
 SERVER_ADRESS =  SERVER_NAME + ':' + str(SERVER_PORT) + '/'
 

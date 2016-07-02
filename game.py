@@ -54,38 +54,65 @@ def show_score(screen):
     scores = get_global_score()
 
     height = BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
-    step = BLOCK_SIZE*GameController.rows/float(6)
+    step = BLOCK_SIZE*GameController.rows/float(7)
     font = pygame.font.Font('fonts/UbuntuMonoBold.ttf', SMALL_FONT_SIZE)
 
     if GameController.columns >= 20:
-        message = '%-12s %5s %7s %5s %7s %5s %10s' % tuple('USERNAME ROWS COLUMNS BOMBS SCORE MOVS TOTAL'.split())
+        message = '%-12s %5s %7s %7s %7s %5s %8s' % tuple('USERNAME ROWS COLUMNS BOMBS_% SCORE MOVS TOTAL'.split())
     elif GameController.columns >= 15:
-        message = '%-12s %5s %5s %10s' % tuple('USERNAME SCORE MOVS TOTAL'.split())
+        message = '%-12s %5s %5s %8s' % tuple('USERNAME SCORE MOVS TOTAL'.split())
     else:
-        message = '%-12s %10s' % tuple('USERNAME TOTAL'.split())
+        message = '%-12s %8s' % tuple('USERNAME TOTAL'.split())
 
     wait = font.render(message, 1, COLOR_TITLE)
     screen.blit(wait, ((GameController.screen_width - wait.get_width())/2 , height))
     pygame.display.flip()
 
+    final = 100 * GameController.score * GameController.bombs_percentage / \
+            (GameController.columns * GameController.rows * GameController.movs)
+    has_scored = False
     for score in scores:
         height += step
         # score = (final, username, rows, cols, bombs, score, movs)
         if GameController.columns >= 20:
-            message = '%-12s %5d %7d %5d %7d %5d %10d' % (score[1], score[2], score[3], score[4], score[5], score[6], score[0])
+            message = '%-12s %5d %7d %7s %7d %5d %8d' % (score[1], score[2], score[3], str(score[4])+'%', score[5], score[6], score[0])
         elif GameController.columns >= 15:
-            message = '%-12s %5d %5d %10d' % (score[1], score[5], score[6], score[0])
+            message = '%-12s %5d %5d %8d' % (score[1], score[5], score[6], score[0])
         else:
-            message = '%-12s %10d' % (score[1], score[0])
-        wait = font.render(message, 1, COLOR_SCORE)
+            message = '%-12s %8d' % (score[1], score[0])
+        if score[1] == GameController.username  \
+            and score[5] == GameController.score \
+            and score[6] == GameController.movs:
+            wait = font.render(message, 1, COLOR_THIS_SCORE)
+            has_scored = True
+        elif score[1] == GameController.username:
+            wait = font.render(message, 1, COLOR_MY_SCORE)
+        else:
+            wait = font.render(message, 1, COLOR_SCORE)
         screen.blit(wait, ((GameController.screen_width - wait.get_width())/2, height))
+        pygame.time.wait(100)
+        pygame.display.flip()
+
+    score = (final, GameController.username, GameController.rows,
+             GameController.columns, GameController.bombs_percentage,
+             GameController.score, GameController.movs)
+
+    if not has_scored:
+        if GameController.columns >= 20:
+            message = '%-12s %5d %7d %7s %7d %5d %8d' % (score[1], score[2], score[3], str(score[4])+'%', score[5], score[6], score[0])
+        elif GameController.columns >= 15:
+            message = '%-12s %5d %5d %8d' % (score[1], score[5], score[6], score[0])
+        else:
+            message = '%-12s %8d' % (score[1], score[0])
+        wait = font.render(message, 1, COLOR_THIS_SCORE)
+        screen.blit(wait, ((GameController.screen_width - wait.get_width()) / 2, height + step))
         pygame.time.wait(100)
         pygame.display.flip()
 
     message = 'TOTAL = (100*SCORE*BOMBS)/(ROWS*COLUMNS*MOVS)'
     font = pygame.font.Font('fonts/UbuntuMono.ttf', min(NORMAL_FONT_SIZE,get_recommended_font_size(screen,100,message)))
     wait = font.render(message, 1, COLOR_RESULT)
-    screen.blit(wait, ((GameController.screen_width - wait.get_width()) / 2, height + step))
+    screen.blit(wait, ((GameController.screen_width - wait.get_width()) / 2, height + 2*step))
     pygame.time.wait(100)
     pygame.display.flip()
 
@@ -238,7 +265,7 @@ def play_game():
                                         # PERDEU
                                         GameController.round_is_finished = True
                             elif button3:
-                                if not bloco.marked:
+                                if not bloco.marked and not  bloco.revealed:
                                     if GameController.is_multiplayer:
                                         thread_send = Thread(target=thread_send_data, args=(bloco.posX, bloco.posY,
                                                                                             GameController.player_ID,
@@ -316,7 +343,7 @@ def play_game():
 
             pygame.time.wait(1000)
             if not GameController.is_multiplayer:
-                screen.fill(COLOR_CLEAR_SCREEN)
+                screen.fill(COLOR_CLEAR_SCREEN_SCORE)
                 GameController.draw(screen, "SCORE", COLOR_RESULT)
                 register_global_score()
                 show_score(screen)

@@ -200,7 +200,7 @@ def register_global_score():
     data = {'username':     GameController.username,
             'rows':         GameController.rows,
             'cols':         GameController.columns,
-            'bombs':        GameController.bombs,
+            'bombs':        GameController.bombs_percentage,
             'score':        GameController.score,
             'movs':         GameController.movs}
 

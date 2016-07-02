@@ -15,7 +15,8 @@ class GameController:
     is_multiplayer = False
     rows = 10
     columns = 20
-    bombs = 10  # porcentagem de bombas
+    bombs = 10  # numero de bombas
+    bombs_percentage = 5 # porcentagem de bombas
     screen_width = columns * BLOCK_SIZE + PADDING
     screen_height = rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     done = False

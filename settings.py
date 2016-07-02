@@ -177,6 +177,7 @@ class SettingsApp(App):
             GameController.match_ID = self.match[:12]
         else:
             GameController.match_ID = self.username[:12]
+        GameController.bombs_percentage = self.bombs
         GameController.bombs = max(5,self.columns*self.rows*self.bombs/100)
         GameController.rows = max(5,self.rows)
         GameController.columns = max(10,self.columns)

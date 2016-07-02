@@ -88,7 +88,7 @@ def show_score(screen):
         elif score[1] == GameController.username:
             wait = font.render(message, 1, COLOR_MY_SCORE)
         else:
-            wait = font.render(message, 1, COLOR_SCORE)
+            wait = font.render(message, 1, COLOR_OTHER_SCORE)
         screen.blit(wait, ((GameController.screen_width - wait.get_width())/2, height))
         pygame.time.wait(100)
         pygame.display.flip()

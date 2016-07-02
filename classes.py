@@ -60,17 +60,17 @@ class GameController:
         else:
             font = pygame.font.Font('fonts/UbuntuMono.ttf', get_recommended_font_size(screen,60,text))
 
-        score_text = font.render("%5s %07d" % ('SCORE', GameController.score), 1, COLOR_SCORE)
+        score_text = font.render("%5s %07d" % ('SCORE', GameController.score), 1, COLOR_MENU_POINTS)
         screen.blit(score_text, (PADDING, PADDING + 2*BLOCK_SIZE))
 
-        movs = font.render("%-9s %03d " % ('MOVS',GameController.movs), 1, COLOR_SCORE)
+        movs = font.render("%-9s %03d " % ('MOVS',GameController.movs), 1, COLOR_MENU_POINTS)
         screen.blit(movs, (PADDING, PADDING + 3*BLOCK_SIZE))
 
-        username = font.render(username, 1, COLOR_SCORE)
+        username = font.render(username, 1, COLOR_MENU_POINTS)
         screen.blit(username, (GameController.screen_width-(PADDING + username.get_size()[0]),PADDING + 2*BLOCK_SIZE))
 
         if GameController.is_multiplayer:
-            match = font.render(match, 1, COLOR_SCORE)
+            match = font.render(match, 1, COLOR_MENU_POINTS)
             screen.blit(match, (GameController.screen_width-(PADDING + match.get_size()[0]), PADDING + 3*BLOCK_SIZE))
 
 

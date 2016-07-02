@@ -120,11 +120,9 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 chave_mais_antiga = sorted(ultimo_dict.keys())[0]
                 ultimo_dict = ultimo_dict[chave_mais_antiga]
             except:
-                pass # Dict esta vazio
+                ultimo_dict = {} # Dict está vazio
         if OPERATION in {1, 2, 3}:
-            for key, val in ultimo_dict.items():
-                response += '&' + str(key) + '=' + str(val)
-            response = response[1:]
+            response = str(ultimo_dict)
 
         self.send_response(200)
         self.end_headers()

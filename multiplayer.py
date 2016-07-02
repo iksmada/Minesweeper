@@ -17,21 +17,16 @@ def get_tabuleiro_from_server(partida):
     :return: string com a informação do tabuleiro
     """
     ROUTE = ROUTE_TABULEIROS + '/' + str(partida)
-    tabuleiro = ''
     # Envia a informação de linhas, colunas e porcentagem de bombas para criação ou verificação
     data = {'rows':GameController.rows,'cols':GameController.columns,'bombs':GameController.bombs}
     try:
         requests.post(ROUTE,data)
         result = requests.get(ROUTE).content
         if result is not None and len(result) > 0:
-            for par in result.split('&'):
-                par = str(par).split('=')
-                if str(par[0]) == 'tabuleiro':
-                    tabuleiro = str(par[1])
+            result = literal_eval(result)
+            return result['tabuleiro']
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
-
-    return tabuleiro
 
 def create_new_tabuleiro_on_server(partida):
     """
@@ -151,13 +146,10 @@ def thread_get_data(player,partida,lista):
         try:
             # Obtém último clique
             result = requests.get(ROUTE).content
-            params = {}
             # Se existe último clique
-            if result is not None and len(result) > 0:
+            if result is not None and len(result) > 2:
                 # Obtém informação do clique
-                for par in result.split('&'):
-                    par = str(par).split('=')
-                    params[str(par[0])] = str(par[1])
+                params = literal_eval(result)
                 # Remove último clique da lista
                 requests.delete(ROUTE)
                 if str(params['player']) != str(player):

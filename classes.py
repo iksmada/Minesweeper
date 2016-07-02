@@ -1,8 +1,7 @@
 # -*- coding: utf-8
-
 import pygame
 
-from constants import *
+from utils import *
 
 class GameController:
     """

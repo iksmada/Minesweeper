@@ -2,9 +2,10 @@
 
 import requests
 import time
+from ast import literal_eval
+
 from constants import *
 from classes import GameController
-from ast import literal_eval
 
 """
     Arquivo que contém métodos auxiliares para partidas multiplayer

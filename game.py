@@ -1,5 +1,7 @@
-from multiplayer import *
 from classes import *
+from utils import *
+from multiplayer import *
+
 import pygame
 import random
 from threading import Thread

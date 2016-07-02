@@ -100,8 +100,8 @@ class Block(pygame.sprite.Sprite):
         self.posY=posY
         # objeto retangulo que contem o bloco
         self.rect = self.image.get_rect()
-        self.rect.x = BLOCK_SIZE * posX + PADDING
-        self.rect.y = BLOCK_SIZE * posY + PADDING + TITLE_AND_SCORE_SIZE
+        self.rect.x = BLOCK_SIZE * posX + PADDING + BLOCK_SIZE
+        self.rect.y = BLOCK_SIZE * posY + PADDING + TITLE_AND_SCORE_SIZE + BLOCK_SIZE
         # neighbors e o numero de minas vizinhas desse bloco
         self.neighbors = neighbors
         # revealed representa se este bloco ja foi revelado pelo/ao usuario

@@ -6,7 +6,7 @@ from threading import Thread
 
 def wait_for_space_key_message(screen):
     message = 'PRESS SPACE TO START MATCH'
-    font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
+    font = pygame.font.Font(None, get_recommended_font_size(screen,90,message))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                 (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
@@ -23,12 +23,16 @@ def wait_for_space_key_message(screen):
                     GameController.round_is_finished = True
                     GameController.done = True
                     done = True
+            elif event.type == pygame.QUIT:
+                GameController.round_is_finished = True
+                GameController.done = True
+                done = True
 
     start_match(GameController.match_ID)
 
 def wait_for_match_message(screen):
     message = 'WAIT FOR MATCH TO START'
-    font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
+    font = pygame.font.Font(None, get_recommended_font_size(screen,90,message))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                 (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
@@ -36,7 +40,7 @@ def wait_for_match_message(screen):
 
 def match_has_started_message(screen):
     message = 'SORRY, MATCH IS UNAVALAIBLE :('
-    font = pygame.font.Font(None, get_recommended_font_size(screen,100,message))
+    font = pygame.font.Font(None, get_recommended_font_size(screen,90,message))
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                        (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
@@ -45,12 +49,9 @@ def match_has_started_message(screen):
     time.sleep(5)
 
 def game():
-    tabuleiro = None
     if GameController.is_multiplayer:
         shared_click_list = []
         GameController.player_ID = get_player_ID(GameController.username,GameController.match_ID)
-        print GameController.username, GameController.player_ID, GameController.match_ID
-        #GameController.match = raw_input('PARTIDA:')
         thread_get = Thread(target=thread_get_data, args=(GameController.player_ID, GameController.match_ID, shared_click_list))
         thread_get.start()
 
@@ -242,7 +243,15 @@ def game():
                 else:
                     if not check_match_has_begun(GameController.match_ID):
                         wait_for_match_message(screen)
-                        wait_match_to_begin(GameController.match_ID)
+                        while not wait_match_to_begin(GameController.match_ID):
+                            for event in pygame.event.get():
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_ESCAPE:
+                                        GameController.round_is_finished = True
+                                        GameController.done = True
+                                elif event.type == pygame.QUIT:
+                                    GameController.round_is_finished = True
+                                    GameController.done = True
                     else:
                         match_has_started_message(screen)
                         GameController.round_is_finished = True

@@ -177,13 +177,13 @@ class SettingsApp(App):
             GameController.match_ID = self.match
         else:
             GameController.match_ID = self.username
-        GameController.bombs = self.columns*self.rows*self.bombs/100
-        GameController.rows = self.rows
-        GameController.columns = self.columns
+        GameController.bombs = max(5,self.columns*self.rows*self.bombs/100)
+        GameController.rows = max(5,self.rows)
+        GameController.columns = max(10,self.columns)
         # Inicializa valores default
-        GameController.totalBlocks = self.rows * self.columns
-        GameController.screen_width = self.columns * BLOCK_SIZE + PADDING
-        GameController.screen_height = self.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
+        GameController.totalBlocks = GameController.rows * GameController.columns
+        GameController.screen_width = GameController.columns * BLOCK_SIZE + PADDING + 2*BLOCK_SIZE
+        GameController.screen_height = GameController.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE + 2*BLOCK_SIZE
         GameController.score = 0
         # Inicia o jogo
         game()

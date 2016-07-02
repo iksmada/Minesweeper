@@ -63,8 +63,8 @@ BLACK    = (   0,   0,   0)
 WHITE    = ( 255, 255, 255)
 RED      = ( 255,   0,   0)
 YELLOW   = ( 255, 255,   0)
-GRAYDARK = ( 167, 167, 167)
-GRAYLIGHT= ( 205, 205, 205)
+GRAYDARK = ( 127, 127, 127)
+GRAYLIGHT= ( 215, 215, 215)
 
 # Definição de cores em alto-nível
 COLOR_CLEAR_SCREEN = GRAYDARK

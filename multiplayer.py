@@ -101,15 +101,15 @@ def wait_match_to_begin(partida):
     """
     ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
 
-    while True:
-        try:
-            response = requests.get(ROUTE).content
-            if len(response) == 0:
-                break
-        except:
-            raise RuntimeError('Não foi possivel conectar no servidor')
-        # Checa a cada 100ms
-        time.sleep(0.1)
+    try:
+        response = requests.get(ROUTE).content
+        if len(response) == 0:
+            return True
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+    # Checa a cada 100ms
+    time.sleep(0.1)
+    return False
 
 def check_match_has_begun(partida):
     """

@@ -200,7 +200,8 @@ def register_global_score():
             'rows':         GameController.rows,
             'cols':         GameController.columns,
             'bombs':        GameController.bombs,
-            'score':        GameController.score}
+            'score':        GameController.score,
+            'movs':         GameController.movs}
 
     try:
         requests.post(ROUTE, data)

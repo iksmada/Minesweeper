@@ -4,6 +4,7 @@ import requests
 import time
 from constants import *
 from classes import GameController
+from ast import literal_eval
 
 """
     Arquivo que contém métodos auxiliares para partidas multiplayer
@@ -188,6 +189,32 @@ def thread_send_data(x,y,player,partida,color,action):
             requests.post(ROUTE + '/' + str(i), data)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
+
+def get_global_score():
+
+    ROUTE = ROUTE_SCORE
+
+    try:
+        result = requests.get(ROUTE).content
+        if result is not None and len(result) > 0:
+            return literal_eval(result)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+
+def register_global_score():
+
+    ROUTE = ROUTE_SCORE
+    data = {'username':     GameController.username,
+            'rows':         GameController.rows,
+            'cols':         GameController.columns,
+            'bombs':        GameController.bombs,
+            'score':        GameController.score}
+
+    try:
+        requests.post(ROUTE, data)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+
 
 if __name__ == '__main__':
     thread_send_data(10, 10, 1, 'test3', 1)

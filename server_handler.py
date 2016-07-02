@@ -9,7 +9,7 @@ from threading import Thread
 
 from constants import SERVER_PORT
 
-server_data = {}
+server_data = {'jogos':{}, 'score':[]}
 last_timestamp = 0
 
 """
@@ -37,26 +37,28 @@ class MineSweeperServer(BaseHTTPRequestHandler):
     """
         Servidor REST (HTTP) para partidas multiplayer
     """
+    __version__ = '1.0'
+    server_version = "MineSweeperHTTP/" + __version__
 
     # Remova esse metodo para ver todas as requests chegando
     def log_message(self, f, *args):
         pass
 
     def check_path(self,path):
-        if len(path) < 3:
-            self.send_response(404)
+        if 1 <= len(path) < 3 and not path[0] == 'score':
+            self.send_response(200)
             self.end_headers()
             self.wfile.write('Running :)')
             return False
 
         if path[0] not in accepted_services:
-            self.send_response(403)
+            self.send_response(503)
             self.end_headers()
             self.wfile.write('Unknown service')
             return False
 
-        if path[1] not in accepted_route[path[0]]:
-            self.send_response(403)
+        if len(path) >= 2 and path[1] not in accepted_route[path[0]]:
+            self.send_response(503)
             self.end_headers()
             self.wfile.write('Unknown access route')
             return False
@@ -75,6 +77,15 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         path = clean_path(self.path)
 
         if not self.check_path(path):
+            return
+
+        if path[0] == 'score':
+            self.send_response(200)
+            self.end_headers()
+            if 'score' in server_data:
+                self.wfile.write(str(server_data['score']))
+            else:
+                self.wfile.write('[]')
             return
 
         path = path[1:]
@@ -134,9 +145,38 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         if not self.check_path(path):
             return
 
+        content_length = int(self.headers.getheader('content-length', 0))
+        POST_data = self.rfile.read(content_length)
+
+        if path[0] == 'score':
+            temp_dict = {}
+            for par in str(POST_data).split('&'):
+                par = str(par).split('=')
+                temp_dict[str(par[0])] = str(par[1])
+
+            try:
+                rows = int(temp_dict['rows'])
+                cols = int(temp_dict['cols'])
+                bombs = int(temp_dict['bombs'])
+                score = int(temp_dict['score'])
+                username = temp_dict['username']
+                final = 100*score*bombs/(cols*rows)
+                tupla = (final, username, rows, cols, bombs, score)
+                server_data['score'].append(tupla)
+                server_data['score'].sort(reverse=True)
+                if len (server_data['score']) > 5:
+                    server_data['score'] = server_data['score'][:5]
+            except:
+                self.send_response(406)
+                self.end_headers()
+                self.wfile.write('Invalid parameters')
+                return
+
         path = path[1:]
 
-        if path[0] == 'jogadas':
+        if len(path) == 0:
+            OPERATION = 0
+        elif path[0] == 'jogadas':
             OPERATION = 1
         elif path[0] == 'tabuleiros':
             OPERATION = 2
@@ -156,9 +196,6 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 ultimo_dict = ultimo_dict[path[0]]
 
             path = path[1:]
-
-        content_length = int(self.headers.getheader('content-length', 0))
-        POST_data = self.rfile.read(content_length)
 
         if OPERATION == 1:
             instante = datetime.datetime.now()
@@ -210,8 +247,6 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                         ultimo_dict[par[1]] = max(ultimo_dict.values()) + 1
 
                     response = ultimo_dict[par[1]]
-
-        # print server_data
 
         self.send_response(200)
         self.end_headers()

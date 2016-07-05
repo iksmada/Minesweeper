@@ -50,7 +50,7 @@ def match_has_started_message(screen):
 
     time.sleep(5)
 
-def show_score(screen):
+def show_global_score(screen):
     scores = get_global_score()
 
     height = BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
@@ -346,7 +346,7 @@ def play_game():
                 screen.fill(COLOR_CLEAR_SCREEN_SCORE)
                 GameController.draw(screen, "SCORE", COLOR_RESULT)
                 register_global_score()
-                show_score(screen)
+                show_global_score(screen)
                 pygame.display.flip()
                 pygame.time.wait(1000)
             else:

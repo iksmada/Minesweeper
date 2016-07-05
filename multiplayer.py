@@ -185,7 +185,7 @@ def thread_send_data(x,y,player,partida,color,action):
 
 def get_global_score():
 
-    ROUTE = ROUTE_SCORE
+    ROUTE = ROUTE_GLOBAL_SCORE
 
     try:
         result = requests.get(ROUTE).content
@@ -196,7 +196,7 @@ def get_global_score():
 
 def register_global_score():
 
-    ROUTE = ROUTE_SCORE
+    ROUTE = ROUTE_GLOBAL_SCORE
     data = {'username':     GameController.username,
             'rows':         GameController.rows,
             'cols':         GameController.columns,

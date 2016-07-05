@@ -28,16 +28,16 @@ def clean_path(path):
     return path
 
 # Rotas acessíveis
-accepted_services = ['jogos','score']
+accepted_services = ['jogos','global']
 # Sub-rotas acessíveis
-accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','segredo'],
-                  'score':['global','partidas']}
+accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','score','segredo'],
+                  'global':['score']}
 
 class MineSweeperServer(BaseHTTPRequestHandler):
     """
         Servidor REST (HTTP) para partidas multiplayer
     """
-    __version__ = '1.0'
+    __version__ = '3.2'
     server_version = "MineSweeperHTTP/" + __version__
 
     # Remova esse metodo para ver todas as requests chegando
@@ -45,7 +45,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         pass
 
     def check_path(self,path):
-        if 1 <= len(path) < 3 and not path[0] == 'score':
+
+        if len(path) < 2:
             self.send_response(200)
             self.end_headers()
             self.wfile.write('Running :)')
@@ -74,12 +75,15 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         global last_timestamp
         last_timestamp = time.time()
 
+        # Converte endereço da request HTTP para uma lista
         path = clean_path(self.path)
 
+        # Verifica se endereço representa uma rota válida
         if not self.check_path(path):
             return
 
-        if path[0] == 'score':
+        # Retorna a lista de score global
+        if len(path) >= 2 and path[0] == 'global' and path[1] == 'score':
             self.send_response(200)
             self.end_headers()
             if 'score' in server_data:
@@ -96,6 +100,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             OPERATION = 2
         elif path[0] == 'partidas':
             OPERATION = 3
+        elif path[0] == 'score':
+            OPERATION = 4
         elif path[0] == 'segredo':
             self.send_response(200)
             self.end_headers()
@@ -104,7 +110,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         else:
             OPERATION = 0
 
-        ultimo_dict = server_data
+        ultimo_dict = server_data['jogos']
         while len(path) > 0:
             if path[0] in ultimo_dict:
                 ultimo_dict = ultimo_dict[path[0]]
@@ -123,6 +129,11 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 ultimo_dict = {} # Dict está vazio
         if OPERATION in {1, 2, 3}:
             response = str(ultimo_dict)
+        elif OPERATION == 4:
+            try:
+                response = str(ultimo_dict['score'])
+            except:
+                response = str([])
 
         self.send_response(200)
         self.end_headers()
@@ -146,7 +157,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         content_length = int(self.headers.getheader('content-length', 0))
         POST_data = self.rfile.read(content_length)
 
-        if path[0] == 'score':
+        if len(path) >= 2 and path[0] == 'global' and path[1] == 'score':
             temp_dict = {}
             for par in str(POST_data).split('&'):
                 par = str(par).split('=')
@@ -183,10 +194,12 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             OPERATION = 3
         elif path[0] == 'jogadores':
             OPERATION = 4
+        elif path[0] == 'score':
+            OPERATION = 5
         else:
             OPERATION = 0
 
-        ultimo_dict = server_data
+        ultimo_dict = server_data['jogos']
         while len(path) > 0:
             if path[0] in ultimo_dict:
                 ultimo_dict = ultimo_dict[path[0]]
@@ -246,6 +259,33 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                         ultimo_dict[par[1]] = max(ultimo_dict.values()) + 1
 
                     response = ultimo_dict[par[1]]
+        elif OPERATION == 5:
+            if 'score' not in ultimo_dict:
+                ultimo_dict['score'] = []
+
+            temp_dict = {}
+            for par in str(POST_data).split('&'):
+                par = str(par).split('=')
+                temp_dict[str(par[0])] = str(par[1])
+
+            try:
+                rows = int(temp_dict['rows'])
+                cols = int(temp_dict['cols'])
+                bombs = int(temp_dict['bombs'])
+                score = int(temp_dict['score'])
+                movs = int(temp_dict['movs'])
+                username = temp_dict['username']
+                final = 100 * score * bombs / (cols * rows)
+                tupla = (final, username, rows, cols, bombs, score, movs)
+                ultimo_dict['score'].append(tupla)
+                ultimo_dict['score'].sort(reverse=True)
+                if len(ultimo_dict['score']) > 5:
+                    ultimo_dict['score'] = ultimo_dict['score'][:5]
+            except:
+                self.send_response(406)
+                self.end_headers()
+                self.wfile.write('Invalid parameters')
+                return
 
         self.send_response(200)
         self.end_headers()
@@ -271,14 +311,14 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         path = path[1:]
 
-        if path[0] == 'jogadas' or 'partidas':
+        if path[0] in {'jogadas'}:
             LOOP = 0
-        elif path[0] == 'tabuleiros' :
+        elif path[0] in {'tabuleiros','jogadores','score','partidas'} :
             LOOP = 1
         else:
             LOOP = len(path)
 
-        ultimo_dict = server_data
+        ultimo_dict = server_data['jogos']
         while len(path) > LOOP:
             if path[0] in ultimo_dict:
                 ultimo_dict = ultimo_dict[path[0]]
@@ -287,6 +327,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 ultimo_dict = ultimo_dict[path[0]]
 
             path = path[1:]
+
         if LOOP == 0:
             try:
                 chave_mais_antiga = sorted(ultimo_dict.keys())[0]

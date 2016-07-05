@@ -34,7 +34,8 @@ accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','scor
                   'global':['score']}
 
 def compute_total(rows, cols, bombs, score, movs):
-    return (100 * score * bombs / (cols * rows)) * (100 * (cols * rows - movs) / (cols * rows))
+    bonus = rows * cols / 50 - 1
+    return score * (100 + bonus - max(0, movs - bombs)) / 100
 
 class MineSweeperServer(BaseHTTPRequestHandler):
     """

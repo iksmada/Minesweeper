@@ -69,7 +69,7 @@ def show_score(screen):
     pygame.display.flip()
 
     final = 100 * GameController.score * GameController.bombs_percentage / \
-            (GameController.columns * GameController.rows * GameController.movs)
+            (GameController.columns * GameController.rows)
     has_scored = False
     for score in scores:
         height += step
@@ -109,7 +109,7 @@ def show_score(screen):
         pygame.time.wait(100)
         pygame.display.flip()
 
-    message = 'TOTAL = (100*SCORE*BOMBS)/(ROWS*COLUMNS*MOVS)'
+    message = 'TOTAL = (100*SCORE*BOMBS)/(ROWS*COLUMNS)'
     font = pygame.font.Font('fonts/UbuntuMono.ttf', min(NORMAL_FONT_SIZE,get_recommended_font_size(screen,100,message)))
     wait = font.render(message, 1, COLOR_RESULT)
     screen.blit(wait, ((GameController.screen_width - wait.get_width()) / 2, height + 2*step))

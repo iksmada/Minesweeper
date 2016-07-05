@@ -159,7 +159,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 score = int(temp_dict['score'])
                 movs = int(temp_dict['movs'])
                 username = temp_dict['username']
-                final = 100*score*bombs/(cols*rows*movs)
+                final = 100*score*bombs/(cols*rows)
                 tupla = (final, username, rows, cols, bombs, score, movs)
                 server_data['score'].append(tupla)
                 server_data['score'].sort(reverse=True)

@@ -40,11 +40,11 @@ def create_new_tabuleiro_on_server():
 
     # Muda o número de bombas
     GameController.bombs += 1
-    get_tabuleiro_from_server(GameController.match_ID)
+    get_tabuleiro_from_server()
     # Retorna o número de bombas
     GameController.bombs -= 1
     try:
-        return get_tabuleiro_from_server(GameController.match_ID)
+        return get_tabuleiro_from_server()
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 

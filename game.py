@@ -14,7 +14,7 @@ def wait_for_space_key_message(screen):
                 (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
     pygame.display.flip()
 
-    set_up_new_match(GameController.match_ID)
+    set_up_new_match()
     done = False
     while not done:
         for event in pygame.event.get():
@@ -30,7 +30,7 @@ def wait_for_space_key_message(screen):
                 GameController.done = True
                 done = True
 
-    start_match(GameController.match_ID)
+    start_match()
 
 def wait_for_match_message(screen):
     message = 'WAIT FOR MATCH TO START'
@@ -119,7 +119,7 @@ def show_global_score(screen):
 def play_game():
     if GameController.is_multiplayer:
         shared_click_list = []
-        GameController.player_ID = get_player_ID(GameController.username,GameController.match_ID)
+        GameController.player_ID = get_player_ID()
         thread_get = Thread(target=thread_get_data, args=(GameController.player_ID, GameController.match_ID, shared_click_list))
         thread_get.start()
 
@@ -149,9 +149,9 @@ def play_game():
         GameController.revealedBlocks = 0
 
         if GameController.player_ID == 0:
-            create_new_tabuleiro_on_server(GameController.match_ID)
+            create_new_tabuleiro_on_server()
 
-        tabuleiro = get_tabuleiro_from_server(GameController.match_ID).replace('\n', '')
+        tabuleiro = get_tabuleiro_from_server().replace('\n', '')
 
         if not GameController.is_multiplayer:
             i = 0
@@ -309,9 +309,9 @@ def play_game():
                 if GameController.username == GameController.match_ID:
                     wait_for_space_key_message(screen)
                 else:
-                    if not check_match_has_begun(GameController.match_ID):
+                    if not check_match_has_begun():
                         wait_for_match_message(screen)
-                        while not wait_match_to_begin(GameController.match_ID) > 0:
+                        while not wait_match_to_begin() > 0:
                             for event in pygame.event.get():
                                 if event.type == pygame.KEYDOWN:
                                     if event.key == pygame.K_ESCAPE:

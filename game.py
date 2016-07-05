@@ -188,22 +188,38 @@ def show_match_score(screen):
 
 def play_game():
     if GameController.is_multiplayer:
-        shared_click_list = []
+
         GameController.player_ID = get_player_ID()
-        thread_get = Thread(target=thread_get_data, args=(GameController.player_ID, GameController.match_ID, shared_click_list))
+
+        shared_click_list = []
+        thread_get = Thread(target=thread_get_data,
+                            args=(GameController.player_ID, GameController.match_ID, shared_click_list))
         thread_get.start()
 
     # Initialize Pygame
     pygame.init()
-    screen = pygame.display.set_mode([GameController.screen_width, GameController.screen_height])
     GameController.done = False
     while not GameController.done:
-        #grupo dos elementos para minas e todos os outros elementos
-        mines = pygame.sprite.Group()
-        all_sprites_list = pygame.sprite.Group()
+
+        if GameController.is_multiplayer:
+            if GameController.player_ID == 0:
+                result = create_new_tabuleiro_on_server()
+                delete_match_score()
+            else:
+                result = get_tabuleiro_from_server()
+
+            tabuleiro, GameController.rows, GameController.columns = result
+
+        GameController.screen_width = GameController.columns * BLOCK_SIZE + PADDING + 2 * BLOCK_SIZE
+        GameController.screen_height = GameController.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE + 2 * BLOCK_SIZE
+        screen = pygame.display.set_mode([GameController.screen_width, GameController.screen_height])
+
         # Criando matriz ROWS+1 por COLUMNS+1
         # Neste caso, nao sera gerado IndexError quando elemento esta fora da matriz
         matrix = [[None for x in range(GameController.rows + 1)] for y in range(GameController.columns + 1)]
+        # grupo dos elementos para minas e todos os outros elementos
+        mines = pygame.sprite.Group()
+        all_sprites_list = pygame.sprite.Group()
         # Fila de elementos que precisam ser atualizados a cada clique
         blocks_to_reveal = []
 
@@ -217,12 +233,9 @@ def play_game():
         GameController.movs = 0
         GameController.markedBombs = 0
         GameController.revealedBlocks = 0
-
-        if GameController.player_ID == 0:
-            create_new_tabuleiro_on_server()
-            delete_match_score()
-
-        tabuleiro = get_tabuleiro_from_server().replace('\n', '')
+        # Inicializa valores default
+        GameController.bombs = GameController.columns * GameController.rows * GameController.bombs_percentage / 100
+        GameController.totalBlocks = GameController.rows * GameController.columns
 
         if not GameController.is_multiplayer:
             i = 0

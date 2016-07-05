@@ -178,14 +178,8 @@ class SettingsApp(App):
         else:
             GameController.match_ID = self.username[:12]
         GameController.bombs_percentage = self.bombs
-        GameController.bombs = max(5,self.columns*self.rows*self.bombs/100)
         GameController.rows = max(5,self.rows)
         GameController.columns = max(10,self.columns)
-        # Inicializa valores default
-        GameController.totalBlocks = GameController.rows * GameController.columns
-        GameController.screen_width = GameController.columns * BLOCK_SIZE + PADDING + 2*BLOCK_SIZE
-        GameController.screen_height = GameController.rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE + 2*BLOCK_SIZE
-        GameController.score = 0
         # Inicia o jogo
         play_game()
 

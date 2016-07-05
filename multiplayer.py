@@ -17,17 +17,7 @@ def get_tabuleiro_from_server():
     :param partida: ID da partida
     :return: string com a informação do tabuleiro
     """
-    ROUTE = ROUTE_TABULEIROS + '/' + str(GameController.match_ID)
-    # Envia a informação de linhas, colunas e porcentagem de bombas para criação ou verificação
-    data = {'rows':GameController.rows,'cols':GameController.columns,'bombs':GameController.bombs}
-    try:
-        requests.post(ROUTE,data)
-        result = requests.get(ROUTE).content
-        if result is not None and len(result) > 0:
-            result = literal_eval(result)
-            return result['tabuleiro']
-    except:
-        raise RuntimeError('Não foi possivel conectar no servidor')
+    return get_board(False)
 
 def create_new_tabuleiro_on_server():
     """
@@ -36,15 +26,20 @@ def create_new_tabuleiro_on_server():
     :return: nada
     """
 
-    # Servidor sempre muda o tabuleiro quando pelo menos uma das variaveis mudam
+    return get_board(True)
 
-    # Muda o número de bombas
-    GameController.bombs += 1
-    get_tabuleiro_from_server()
-    # Retorna o número de bombas
-    GameController.bombs -= 1
+def get_board(new=False):
+    ROUTE = ROUTE_TABULEIROS + '/' + str(GameController.match_ID)
+    # Envia a informação de linhas, colunas e porcentagem de bombas para criação ou verificação
+    data = {'rows':GameController.rows, 'cols':GameController.columns, 'bombs':GameController.bombs, 'new':new}
     try:
-        return get_tabuleiro_from_server()
+        if new:
+            requests.post(ROUTE, data)
+
+        result = requests.get(ROUTE).content
+        if result is not None and len(result) > 0:
+            result = literal_eval(result)
+            return result['tabuleiro'], result['rows'], result['cols']
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 

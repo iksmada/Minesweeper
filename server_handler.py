@@ -237,12 +237,20 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 rows = int(temp_dict['rows'])
                 cols = int(temp_dict['cols'])
                 bombs = int(temp_dict['bombs'])
+                new = bool(temp_dict['new'])
             except:
                 self.send_response(406)
                 self.end_headers()
                 self.wfile.write('Invalid parameters')
                 return
-            tabuleiro = ('0'*cols + '\n')*rows
+
+            if not new:
+                self.send_response(406)
+                self.end_headers()
+                self.wfile.write('Invalid parameters')
+                return
+
+            tabuleiro = ('0'*cols)*rows
             i = 0
             while i < bombs:
                 r = random.randrange(rows)
@@ -253,10 +261,13 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             if 'tabuleiro' not in ultimo_dict \
                     or ultimo_dict['soma'] != rows + cols + bombs\
                     or ultimo_dict['mult'] != rows * cols * bombs:
-                ultimo_dict['tabuleiro']=tabuleiro
+                ultimo_dict['tabuleiro'] = tabuleiro
                 # Usado para comparar a assinatura do tabuleiro atual com o antigo
                 ultimo_dict['soma'] = rows + cols + bombs
                 ultimo_dict['mult'] = rows * cols * bombs
+                ultimo_dict['rows'] = rows
+                ultimo_dict['cols'] = cols
+                ultimo_dict['bombs'] = bombs
         elif OPERATION == 3:
             ultimo_dict['conectando'] = True
         elif OPERATION == 4:

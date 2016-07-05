@@ -33,6 +33,9 @@ accepted_services = ['jogos','global']
 accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','score','segredo'],
                   'global':['score']}
 
+def compute_total(rows, cols, bombs, score, movs):
+    return (100*score*bombs/(cols*rows)) * ((cols*rows - movs)/ (cols*rows))
+
 class MineSweeperServer(BaseHTTPRequestHandler):
     """
         Servidor REST (HTTP) para partidas multiplayer
@@ -177,8 +180,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 score = int(temp_dict['score'])
                 movs = int(temp_dict['movs'])
                 username = temp_dict['username']
-                final = 100*score*bombs/(cols*rows)
-                tupla = (final, username, rows, cols, bombs, score, movs)
+                total = compute_total(rows, cols, bombs, score, movs)
+                tupla = (total, username, rows, cols, bombs, score, movs)
                 server_data['score'].append(tupla)
                 server_data['score'].sort(reverse=True)
                 if len (server_data['score']) > 5:
@@ -282,8 +285,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 score = int(temp_dict['score'])
                 movs = int(temp_dict['movs'])
                 username = temp_dict['username']
-                final = 100 * score * bombs / (cols * rows)
-                tupla = (final, username, rows, cols, bombs, score, movs)
+                total = compute_total(rows, cols, bombs, score, movs)
+                tupla = (total, username, rows, cols, bombs, score, movs)
                 ultimo_dict['score'].append(tupla)
                 ultimo_dict['score'].sort(reverse=True)
                 if len(ultimo_dict['score']) > 5:

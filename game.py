@@ -1,6 +1,7 @@
 from classes import *
 from utils import *
 from multiplayer import *
+from server_handler import compute_total
 
 import pygame
 import random
@@ -68,12 +69,10 @@ def show_global_score(screen):
     screen.blit(wait, ((GameController.screen_width - wait.get_width())/2 , height))
     pygame.display.flip()
 
-    final = 100 * GameController.score * GameController.bombs_percentage / \
-            (GameController.columns * GameController.rows)
     has_scored = False
     for score in scores:
         height += step
-        # score = (final, username, rows, cols, bombs, score, movs)
+        # score = (total, username, rows, cols, bombs, score, movs)
         if GameController.columns >= 20:
             message = '%-12s %5d %7d %7s %7d %5d %8d' % (score[1], score[2], score[3], str(score[4])+'%', score[5], score[6], score[0])
         elif GameController.columns >= 15:
@@ -93,7 +92,9 @@ def show_global_score(screen):
         pygame.time.wait(100)
         pygame.display.flip()
 
-    score = (final, GameController.username, GameController.rows,
+    total = compute_total(GameController.rows, GameController.columns, GameController.bombs_percentage,
+                          GameController.score, GameController.movs)
+    score = (total, GameController.username, GameController.rows,
              GameController.columns, GameController.bombs_percentage,
              GameController.score, GameController.movs)
 
@@ -109,7 +110,7 @@ def show_global_score(screen):
         pygame.time.wait(100)
         pygame.display.flip()
 
-    message = 'TOTAL = (100*SCORE*BOMBS)/(ROWS*COLUMNS)'
+    message = 'TOTAL = (100*SCORE*BOMBS_%)/(ROWS*COLUMNS) - MOVS%'
     font = pygame.font.Font('fonts/UbuntuMono.ttf', min(NORMAL_FONT_SIZE,get_recommended_font_size(screen,100,message)))
     wait = font.render(message, 1, COLOR_RESULT)
     screen.blit(wait, ((GameController.screen_width - wait.get_width()) / 2, height + 2*step))
@@ -141,12 +142,10 @@ def show_match_score(screen):
     wait = font.render(message, 1, COLOR_TITLE)
     screen.blit(wait, ((GameController.screen_width - wait.get_width())/2 , height))
 
-    final = 100 * GameController.score * GameController.bombs_percentage / \
-            (GameController.columns * GameController.rows)
     has_scored = False
     for score in scores:
         height += step
-        # score = (final, username, rows, cols, bombs, score, movs)
+        # score = (total, username, rows, cols, bombs, score, movs)
         if GameController.columns >= 20:
             message = '%-12s %5d %7d %7s %7d %5d %8s' % (score[1], score[2], score[3], str(score[4])+'%', score[5], score[6], score[0])
         elif GameController.columns >= 15:
@@ -164,9 +163,11 @@ def show_match_score(screen):
             wait = font.render(message, 1, COLOR_OTHER_SCORE)
         screen.blit(wait, ((GameController.screen_width - wait.get_width())/2, height))
 
-    score = (final, GameController.username, GameController.rows,
-             GameController.columns, GameController.bombs_percentage,
-             GameController.score, GameController.movs)
+        total = compute_total(GameController.rows, GameController.columns, GameController.bombs_percentage,
+                              GameController.score, GameController.movs)
+
+        score = (total, GameController.username, GameController.rows, GameController.columns, GameController.bombs_percentage,
+                 GameController.score, GameController.movs)
 
     if not has_scored:
         if GameController.columns >= 20:
@@ -180,7 +181,7 @@ def show_match_score(screen):
         pygame.time.wait(100)
         pygame.display.flip()
 
-    message = 'TOTAL = (100*SCORE*BOMBS)/(ROWS*COLUMNS)'
+    message = 'TOTAL = (100*SCORE*BOMBS_%)/(ROWS*COLUMNS) - MOVS%'
     font = pygame.font.Font('fonts/UbuntuMono.ttf', min(NORMAL_FONT_SIZE,get_recommended_font_size(screen,100,message)))
     wait = font.render(message, 1, COLOR_RESULT)
     screen.blit(wait, ((GameController.screen_width - wait.get_width()) / 2, height + 2*step))

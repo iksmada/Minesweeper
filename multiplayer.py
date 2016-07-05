@@ -11,13 +11,13 @@ from classes import GameController
     Arquivo que contém métodos auxiliares para partidas multiplayer
 """
 
-def get_tabuleiro_from_server(partida):
+def get_tabuleiro_from_server():
     """
         Método que obtém o tabuleiro de uma partida do servidor
     :param partida: ID da partida
     :return: string com a informação do tabuleiro
     """
-    ROUTE = ROUTE_TABULEIROS + '/' + str(partida)
+    ROUTE = ROUTE_TABULEIROS + '/' + str(GameController.match_ID)
     # Envia a informação de linhas, colunas e porcentagem de bombas para criação ou verificação
     data = {'rows':GameController.rows,'cols':GameController.columns,'bombs':GameController.bombs}
     try:
@@ -29,7 +29,7 @@ def get_tabuleiro_from_server(partida):
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def create_new_tabuleiro_on_server(partida):
+def create_new_tabuleiro_on_server():
     """
         Método que gera um novo tabuleiro no servidor
     :param partida: string com o criador da partida
@@ -40,23 +40,23 @@ def create_new_tabuleiro_on_server(partida):
 
     # Muda o número de bombas
     GameController.bombs += 1
-    get_tabuleiro_from_server(partida)
+    get_tabuleiro_from_server(GameController.match_ID)
     # Retorna o número de bombas
     GameController.bombs -= 1
     try:
-        return get_tabuleiro_from_server(partida)
+        return get_tabuleiro_from_server(GameController.match_ID)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def get_player_ID(player,partida):
+def get_player_ID():
     """
         Método que obtém o ID do jogador para uso interno (ex: 0, 1, 2, ...)
     :param player: string com o username do jogador
     :param partida: string com o nome da partida (username do criador da partida)
     :return: id do usuário para esta partida
     """
-    ROUTE = ROUTE_JOGADORES + '/' + str(partida)
-    dados = {'player':player}
+    ROUTE = ROUTE_JOGADORES + '/' + str(GameController.match_ID)
+    dados = {'player':GameController.username}
 
     try:
         ID = requests.post(ROUTE, dados).content
@@ -64,39 +64,39 @@ def get_player_ID(player,partida):
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def set_up_new_match(partida):
+def set_up_new_match():
     """
         Método que registra uma nova partida multiplayer no servidor
     :param partida: string com o nome da partida
     :return: nada
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
 
     try:
-        requests.post(ROUTE, partida)
+        requests.post(ROUTE, GameController.match_ID)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def start_match(partida):
+def start_match():
     """
         Método que registra o início de uma partida no servidor
     :param partida: string com o nome da partida
     :return: nada
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
 
     try:
         requests.delete(ROUTE)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def wait_match_to_begin(partida):
+def wait_match_to_begin():
     """
         Método que 'trava' o jogo até que o criador da partida inicie-a
     :param partida: string com o nome da partida
     :return: nada
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
 
     try:
         response = requests.get(ROUTE).content
@@ -108,13 +108,13 @@ def wait_match_to_begin(partida):
     time.sleep(0.1)
     return 0
 
-def check_match_has_begun(partida):
+def check_match_has_begun():
     """
         Método que verifica se uma partida já começou
     :param partida: string com o nome da partida
     :return: verdadeiro ou falso
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(partida)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
 
     try:
         response = requests.get(ROUTE).content

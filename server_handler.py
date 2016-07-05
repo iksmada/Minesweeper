@@ -100,8 +100,10 @@ class MineSweeperServer(BaseHTTPRequestHandler):
             OPERATION = 2
         elif path[0] == 'partidas':
             OPERATION = 3
-        elif path[0] == 'score':
+        elif path[0] == 'jogadores':
             OPERATION = 4
+        elif path[0] == 'score':
+            OPERATION = 5
         elif path[0] == 'segredo':
             self.send_response(200)
             self.end_headers()
@@ -130,6 +132,11 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         if OPERATION in {1, 2, 3}:
             response = str(ultimo_dict)
         elif OPERATION == 4:
+            try:
+                response = str(ultimo_dict.keys())
+            except:
+                response = str([])
+        elif OPERATION == 5:
             try:
                 response = str(ultimo_dict['score'])
             except:

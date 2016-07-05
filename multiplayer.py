@@ -209,9 +209,48 @@ def register_global_score():
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
+def get_match_score():
 
-if __name__ == '__main__':
-    thread_send_data(10, 10, 1, 'test3', 1)
-    thread_send_data(10, 11, 1, 'test3', 1)
-    thread_send_data(10, 12, 1, 'test3', 1)
-    thread_get_data(0, 'test3', [])
+    ROUTE = ROUTE_SCORE + '/' + str(GameController.match_ID)
+
+    try:
+        result = requests.get(ROUTE).content
+        if result is not None and len(result) > 0:
+            return literal_eval(result)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+
+def get_match_players():
+
+    ROUTE = ROUTE_JOGADORES + '/' + str(GameController.match_ID)
+
+    try:
+        result = requests.get(ROUTE).content
+        if result is not None and len(result) > 0:
+            return literal_eval(result)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+
+def delete_match_score():
+
+    ROUTE = ROUTE_SCORE + '/' + str(GameController.match_ID)
+
+    try:
+        requests.delete(ROUTE)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+
+def register_match_score():
+
+    ROUTE = ROUTE_SCORE + '/' + str(GameController.match_ID)
+    data = {'username':     GameController.username,
+            'rows':         GameController.rows,
+            'cols':         GameController.columns,
+            'bombs':        GameController.bombs_percentage,
+            'score':        GameController.score,
+            'movs':         GameController.movs}
+
+    try:
+        requests.post(ROUTE, data)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')

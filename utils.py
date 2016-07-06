@@ -127,10 +127,12 @@ def wait_for_space_key_message(screen):
                     GameController.round_is_finished = True
                     GameController.done = True
                     done = True
+                    delete_match()
             elif event.type == pygame.QUIT:
                 GameController.round_is_finished = True
                 GameController.done = True
                 done = True
+                delete_match()
 
 
 
@@ -158,6 +160,21 @@ def match_has_started_message(screen):
     wait = font.render(message, 1, BLACK)
     screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
                        (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
+    pygame.display.flip()
+
+    pygame.time.delay(3000)
+
+def match_has_finished_message(screen):
+    """
+        Método que exibe uma mensagem que a partida já terminou
+    :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
+    :return: nada
+    """
+    message = 'SORRY, MATCH WAS FINISHED BY HOST :('
+    font = pygame.font.Font(None, min(EXTRA_LARGE_FONT_SIZE,get_recommended_font_size(screen,95,message)))
+    wait = font.render(message, 1, BLACK)
+    screen.blit(wait, ((GameController.screen_width - wait.get_size()[0]) / 2,
+                       (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2 + 2*BLOCK_SIZE))
     pygame.display.flip()
 
     pygame.time.delay(3000)

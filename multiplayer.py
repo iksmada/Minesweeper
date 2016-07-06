@@ -69,9 +69,10 @@ def set_up_new_match():
     :return: nada
     """
     ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match)
+    dados = {'connect':True}
 
     try:
-        requests.post(ROUTE, GameController.match)
+        requests.post(ROUTE, dados)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
@@ -87,6 +88,19 @@ def start_match():
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
+def delete_match():
+    """
+        Método que registra uma nova partida multiplayer no servidor
+    :return: nada
+    """
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match)
+    dados = {'connect':False}
+
+    try:
+        requests.post(ROUTE, dados)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+
 def get_match_status():
     """
         Método que verifica se uma partida começou ou terminou (com delay)
@@ -98,11 +112,13 @@ def get_match_status():
         response = requests.get(ROUTE).content
         if len(response) == 2:
             return 1
+        else:
+            response = literal_eval(response)
+            if 'connect' in response and response['connect'] == 'False':
+                return -1
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-    # Checa a cada 100ms
-    time.sleep(0.1)
     return 0
 
 def check_match_has_begun():

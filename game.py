@@ -255,7 +255,8 @@ def play_game():
                 else:
                     if not check_match_has_begun():
                         utils.wait_for_match_message(screen)
-                        while not get_match_status() > 0 and not GameController.done:
+                        status = get_match_status()
+                        while not status > 0 and not GameController.done:
                             for event in pygame.event.get():
                                 if event.type == pygame.KEYDOWN:
                                     if event.key == pygame.K_ESCAPE:
@@ -264,6 +265,17 @@ def play_game():
                                 elif event.type == pygame.QUIT:
                                     GameController.round_is_finished = True
                                     GameController.done = True
+                            # Partida terminou devido o host
+                            if status < 0:
+                                GameController.round_is_finished = True
+                                GameController.done = True
+                                break
+
+                            pygame.time.wait(100)
+                            status = get_match_status()
+
+                        if status < 0:
+                            utils.match_has_finished_message(screen)
                     else:
                         # Partida não está conectável
                         utils.match_has_started_message(screen)

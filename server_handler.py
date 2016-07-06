@@ -300,8 +300,10 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 last_dict['cols'] = cols
                 last_dict['bombs'] = bombs
         elif OPERATION == 3:
-            # Registra que partida é conectável
-            last_dict['conectando'] = True
+            # Registra que partida é conectável ou não
+            for par in str(POST_data).split('&'):
+                par = str(par).split('=')
+                last_dict[str(par[0])] = str(par[1])
         elif OPERATION == 4:
             # Registra um novo jogador em uma partida
             for par in str(POST_data).split('&'):

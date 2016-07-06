@@ -247,13 +247,13 @@ def play_game():
 
             # Atualiza a tela
             pygame.display.flip()
+            if GameController.is_multiplayer:
+                status = get_match_status()
 
-            status = get_match_status()
-
-            if status < 0 and not new_game:
-                GameController.round_is_finished = True
-                GameController.done = True
-                utils.match_has_finished_message(screen)
+                if status < 0 and not new_game:
+                    GameController.round_is_finished = True
+                    GameController.done = True
+                    utils.match_has_finished_message(screen)
 
             # Se uma partida multiplayer está começando (verificado depois da primeira iteração)
             if GameController.is_multiplayer and new_game:
@@ -341,8 +341,6 @@ def play_game():
 
                 # Interpreta eventos recebidos
                 for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        clicked = True
                     if event.type == pygame.QUIT:
                         GameController.done = True
                     if event.type == pygame.KEYDOWN:
@@ -353,9 +351,10 @@ def play_game():
                         elif event.key == pygame.K_SPACE:
                             clicked = True
 
-                status = get_match_status()
-                if status != 0:
-                    clicked = True
+                if GameController.is_multiplayer:
+                    status = get_match_status()
+                    if status != 0:
+                        clicked = True
 
     # Insere um booleano na lista compartilhada para Thread terminar
     if GameController.is_multiplayer:

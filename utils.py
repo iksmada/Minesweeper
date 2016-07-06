@@ -31,10 +31,10 @@ def show_match_info(screen, text="MINESWEEPER", color=COLOR_TITLE):
     else:
         text = match
     # Se o tamanho máximo é maior que o desejado, escolha o desejado; se não, escolha o máximo
-    if get_recommended_font_size(screen,50,text) > NORMAL_FONT_SIZE:
+    if get_recommended_font_size(screen,45,text) > NORMAL_FONT_SIZE:
         font = pygame.font.Font('fonts/UbuntuMono.ttf', NORMAL_FONT_SIZE)
     else:
-        font = pygame.font.Font('fonts/UbuntuMono.ttf', get_recommended_font_size(screen,60,text))
+        font = pygame.font.Font('fonts/UbuntuMono.ttf', get_recommended_font_size(screen,45,text))
 
     # Exibe a quantidade de pontos obtidos na janela
     score_text = font.render("%5s %07d" % ('SCORE', GameController.score), 1, COLOR_MENU_POINTS)
@@ -102,6 +102,12 @@ def get_recommended_font_size(screen_object,screen_percentage,text):
     return TINY_FONT_SIZE
 
 def wait_for_space_key_message(screen):
+    """
+        Método que espera que a barra de espaço seja pressionada para uma partida começar
+        Exibe uma mensagem enquanto estiver sendo executado
+    :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
+    :return: nada
+    """
     message = 'PRESS SPACE TO START MATCH'
     font = pygame.font.Font(None, min(EXTRA_LARGE_FONT_SIZE,get_recommended_font_size(screen,95,message)))
     wait = font.render(message, 1, BLACK)
@@ -109,13 +115,14 @@ def wait_for_space_key_message(screen):
                 (GameController.screen_height + TITLE_AND_SCORE_SIZE - wait.get_size()[1]) / 2))
     pygame.display.flip()
 
-    set_up_new_match()
+    set_up_new_match() # Partida se torna conectável
     done = False
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     done = True
+                    start_match()
                 elif event.key == pygame.K_ESCAPE:
                     GameController.round_is_finished = True
                     GameController.done = True
@@ -125,9 +132,14 @@ def wait_for_space_key_message(screen):
                 GameController.done = True
                 done = True
 
-    start_match()
+
 
 def wait_for_match_message(screen):
+    """
+        Método que exibe uma mensagem para esperar a partid começar
+    :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
+    :return: nada
+    """
     message = 'WAIT FOR MATCH TO START'
     font = pygame.font.Font(None, min(EXTRA_LARGE_FONT_SIZE,get_recommended_font_size(screen,95,message)))
     wait = font.render(message, 1, BLACK)
@@ -136,6 +148,11 @@ def wait_for_match_message(screen):
     pygame.display.flip()
 
 def match_has_started_message(screen):
+    """
+        Método que exibe uma mensagem que a partida já terminou
+    :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
+    :return: nada
+    """
     message = 'SORRY, MATCH IS UNAVALAIBLE :('
     font = pygame.font.Font(None, min(EXTRA_LARGE_FONT_SIZE,get_recommended_font_size(screen,95,message)))
     wait = font.render(message, 1, BLACK)
@@ -146,12 +163,24 @@ def match_has_started_message(screen):
     pygame.time.delay(3000)
 
 def show_global_score(screen):
-    scores = get_global_score()
+    """
+        Método que exibe o score global para partidas single player
+        Mostra em branco scores de outros usuários
+        Mostra em azul scores do usuário atual
+        Mostra em verde o score da última partida
+        Exibe o score conseguido na posição exata dentre os 5 melhores ou após todos eles
 
+    :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
+    :return: nada
+    """
+    #Pega a lista com os resultados
+    scores = get_global_score()
+    # Altura inicial do primeiro score
     height = BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     step = BLOCK_SIZE*GameController.rows/float(7)
     font = pygame.font.Font('fonts/UbuntuMonoBold.ttf', SMALL_FONT_SIZE)
 
+    # Exibe a descrição da tabela de acordo com o tamanho da tela
     if GameController.columns >= 20:
         message = '%-12s %5s %7s %5s %7s %5s %8s' % tuple('USERNAME ROWS COLUMNS BOMBS SCORE MOVS TOTAL'.split())
     elif GameController.columns >= 15:
@@ -163,7 +192,7 @@ def show_global_score(screen):
     screen.blit(wait, ((GameController.screen_width - wait.get_width())/2 , height))
     pygame.display.flip()
 
-    has_scored = False
+    has_scored = False # Variável de controle para saber se usuário conseguiu um dos 5 melhores
     for score in scores:
         height += step
         # score = (total, username, rows, cols, bombs, score, movs)
@@ -177,6 +206,7 @@ def show_global_score(screen):
             and score[5] == GameController.score \
             and score[6] == GameController.movs:
             wait = font.render(message, 1, COLOR_THIS_SCORE)
+            # Score atual é o Score da última partida
             has_scored = True
         elif score[1] == GameController.username:
             wait = font.render(message, 1, COLOR_MY_SCORE)
@@ -186,13 +216,15 @@ def show_global_score(screen):
         pygame.time.wait(100)
         pygame.display.flip()
 
-    total = compute_total(GameController.rows, GameController.columns, GameController.bombs_percentage,
-                          GameController.score, GameController.movs)
-    score = (total, GameController.username, GameController.rows,
-             GameController.columns, GameController.bombs_percentage,
-             GameController.score, GameController.movs)
+
 
     if not has_scored:
+        # Calcula o score da última partida localmente
+        total = compute_total(GameController.rows, GameController.columns, GameController.bombs_percentage,
+                              GameController.score, GameController.movs)
+        score = (total, GameController.username, GameController.rows,
+                 GameController.columns, GameController.bombs_percentage,
+                 GameController.score, GameController.movs)
         if GameController.columns >= 20:
             message = '%-12s %5d %7d %5s %7d %5d %8d' % (score[1], score[2], score[3], str(score[4])+'%', score[5], score[6], score[0])
         elif GameController.columns >= 15:
@@ -204,6 +236,7 @@ def show_global_score(screen):
         pygame.time.wait(100)
         pygame.display.flip()
 
+    # Exibe mensagem do cálculo do score final
     message = 'TOTAL = SCORE + (ROWS*COLS/50)% - (MOVS-BOMBS)%'
     font = pygame.font.Font('fonts/UbuntuMono.ttf', min(NORMAL_FONT_SIZE,get_recommended_font_size(screen,100,message)))
     wait = font.render(message, 1, COLOR_RESULT)
@@ -212,8 +245,21 @@ def show_global_score(screen):
     pygame.display.flip()
 
 def show_match_score(screen):
+    """
+        Método que exibe o score de uma partida multiplayer
+        Mostra em branco scores de outros usuários
+        Mostra em azul scores do usuário atual
+        Mostra em verde o score da última partida
+        Exibe o score conseguido na posição exata dentre os 5 melhores ou após todos eles
+        Exibe um score temporário para usuários que ainda não terminaram a partida
+        Não tem delay entre scores
+
+    :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
+    :return: nada
+    """
     scores = get_match_score()
     all_players = get_match_players()
+    # Pega o nome de usuário de todos os usuários que já tem score registrado
     finished_players = [score[1] for score in scores]
 
     all_players.sort()
@@ -221,7 +267,7 @@ def show_match_score(screen):
         if player not in finished_players:
             scores.append(('?????', player, 0, 0, 0, 0, 0))
 
-
+    # Comportamento igual que show_global_score()
     height = BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
     step = BLOCK_SIZE*GameController.rows/float(7)
     font = pygame.font.Font('fonts/UbuntuMonoBold.ttf', SMALL_FONT_SIZE)

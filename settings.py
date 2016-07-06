@@ -7,7 +7,6 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.config import ConfigParser
 
-from constants import *
 from random import randint
 from classes import GameController
 from game import play_game

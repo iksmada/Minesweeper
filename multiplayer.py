@@ -8,7 +8,7 @@ from constants import *
 from classes import GameController
 
 """
-    Arquivo que contém métodos auxiliares para partidas multiplayer
+    Script que contém métodos auxiliares para partidas multiplayer
 """
 
 def get_tabuleiro_from_server():

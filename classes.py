@@ -15,16 +15,20 @@ class GameController:
     columns =               None # número de colunas do tabuleiro
     bombs =                 None # número de bombas de uma partida
     bombs_percentage =      None # porcentagem de bombas de uma partida
+
     screen_width =          None # tamanho de comprimento da tela
     screen_height =         None # tamanho de largura da tela
     is_multiplayer =        None # booleano para controle se é uma partida multiplayer
+
     done =                  None # booleano para controle se o jogo acabou
     round_is_finished =     None # booleano para controle se uma partida acabou
+
     score =                 None # contador de pontos de uma partida
     movs =                  None # contador de cliques de uma partida
     markedBombs =           None # contador de bombas marcadas
     revealedBlocks =        None # contador de blocos revelados (foram clicados ou vizinhos de clicados)
     totalBlocks =           None # contador de blocos totais no tabuleiro
+
     username =              None # nome do usuário
     player_ID =             None # identificador local de um usuário usado nas partidas multiplayer
     match =                 None # nome do usuário que criou a sala

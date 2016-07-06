@@ -34,7 +34,7 @@ def get_board(new=False):
 
     ROUTE = ROUTE_TABULEIROS + '/' + str(GameController.match)
     # Envia a informação de linhas, colunas e porcentagem de bombas para criação ou verificação
-    data = {'rows':GameController.rows, 'cols':GameController.columns, 'bombs':GameController.bombs, 'new':new}
+    data = {'rows':GameController.rows, 'cols':GameController.columns, 'bombs':GameController.bombs_percentage, 'new':new}
     try:
         # Se um novo tabuleiro precisa ser criado
         if new:

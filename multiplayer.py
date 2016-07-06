@@ -45,7 +45,7 @@ def get_board(new=False):
             # Converte string para dicionário
             result = literal_eval(result)
             # Retorna o tabuleiro e suas dimensões
-            return result['tabuleiro'], result['rows'], result['cols']
+            return result['tabuleiro'], result['rows'], result['cols'], result['bombs']
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 

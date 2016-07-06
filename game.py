@@ -42,7 +42,7 @@ def play_game():
                 result = get_tabuleiro_from_server()
 
             # Inicializa o tabuleiro e as dimensões do tabuleiro
-            tabuleiro, GameController.rows, GameController.columns = result
+            tabuleiro, GameController.rows, GameController.columns, GameController.bombs_percentage = result
 
         # Inicializa a tela a ser exibida
         GameController.screen_width = GameController.columns * BLOCK_SIZE + PADDING + 2 * BLOCK_SIZE

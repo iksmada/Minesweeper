@@ -1,118 +1,81 @@
 # -*- coding: utf-8
 import pygame
-
-from utils import *
+from constants import *
 
 class GameController:
     """
         Classe estática que faz o controle das variáveis do jogo.
-        Todo o acesso é por meio de variáveis estáticas da classe
+        Todo o acesso é feito por meio de variáveis estáticas da classe
 
         A classe não pode ser instanciada
     """
 
-    # Atributos estaticos da classe
-    is_multiplayer = False
-    rows = 10
-    columns = 20
-    bombs = 10  # numero de bombas
-    bombs_percentage = 5 # porcentagem de bombas
-    screen_width = columns * BLOCK_SIZE + PADDING
-    screen_height = rows * BLOCK_SIZE + PADDING + TITLE_AND_SCORE_SIZE
-    done = False
-    round_is_finished = False
-    score = 0
-    movs = None
-    markedBombs = None
-    revealedBlocks = None
-    totalBlocks = rows*columns
-    username = ''
-    player_ID = -1
-    match_ID = ''
-    player_color = None
+    # Atributos estáticos da classe
+    rows =                  None # número de linhas do tabuleiro
+    columns =               None # número de colunas do tabuleiro
+    bombs =                 None # número de bombas de uma partida
+    bombs_percentage =      None # porcentagem de bombas de uma partida
+    screen_width =          None # tamanho de comprimento da tela
+    screen_height =         None # tamanho de largura da tela
+    is_multiplayer =        None # booleano para controle se é uma partida multiplayer
+    done =                  None # booleano para controle se o jogo acabou
+    round_is_finished =     None # booleano para controle se uma partida acabou
+    score =                 None # contador de pontos de uma partida
+    movs =                  None # contador de cliques de uma partida
+    markedBombs =           None # contador de bombas marcadas
+    revealedBlocks =        None # contador de blocos revelados (foram clicados ou vizinhos de clicados)
+    totalBlocks =           None # contador de blocos totais no tabuleiro
+    username =              None # nome do usuário
+    player_ID =             None # identificador local de um usuário usado nas partidas multiplayer
+    match =                 None # nome do usuário que criou a sala
+    player_color =          None # cor de bandeira selecionada pelo usuário
 
     def __init__(self):
-        raise AssertionError('Classe GameController não é instanciavel.')
-
-    @staticmethod
-    def draw(screen,top="MINESWEEPER",color=COLOR_TITLE):
-        """
-            Método que insere as informações da partida na janela d jogo
-        :param screen: objeto que representa a tela/janela onde outros objetos são desenhados
-        :param top: texto a ser exibido no menu
-        :param color: cor do texto
-        :return:
-        """
-
-        font = pygame.font.Font('fonts/UbuntuMonoBold.ttf', get_recommended_font_size(screen,100,top))
-        title = font.render(top, 1, color)
-        screen.blit(title, (GameController.screen_width / 2 - (PADDING + title.get_size()[0]) / 2, PADDING))
-
-        username = "USERNAME: %s" % GameController.username
-        match = "MATCH: %s" % GameController.match_ID
-        if len(username) >= len(match):
-            text = username
-        else:
-            text = match
-
-        if get_recommended_font_size(screen,60,text) > NORMAL_FONT_SIZE:
-            font = pygame.font.Font('fonts/UbuntuMono.ttf', NORMAL_FONT_SIZE)
-        else:
-            font = pygame.font.Font('fonts/UbuntuMono.ttf', get_recommended_font_size(screen,60,text))
-
-        score_text = font.render("%5s %07d" % ('SCORE', GameController.score), 1, COLOR_MENU_POINTS)
-        screen.blit(score_text, (PADDING, PADDING + 2*BLOCK_SIZE))
-
-        movs = font.render("%-9s %03d " % ('MOVS',GameController.movs), 1, COLOR_MENU_POINTS)
-        screen.blit(movs, (PADDING, PADDING + 3*BLOCK_SIZE))
-
-        username = font.render(username, 1, COLOR_MENU_POINTS)
-        screen.blit(username, (GameController.screen_width-(PADDING + username.get_size()[0]),PADDING + 2*BLOCK_SIZE))
-
-        if GameController.is_multiplayer:
-            match = font.render(match, 1, COLOR_MENU_POINTS)
-            screen.blit(match, (GameController.screen_width-(PADDING + match.get_size()[0]), PADDING + 3*BLOCK_SIZE))
-
+        raise AssertionError('Classe GameController não é instanciável.')
 
 class Block(pygame.sprite.Sprite):
     """
         Classe Bloco:
-            representa uma caixa que contem os elementos do jogo:
-            minas (subclasse), avisos de minas ou vazio
+        Representa um container para os elementos do jogo:
+        Blocos (vazios ou com vizinhos) ou Minas (subclasse)
     """
 
-    # Atributos estaticos atualizados no main()
-    matrix = None
-    blocks_to_reveal = None
-    all_sprites_list = None
-    screen = None
+    # Atributos estáticos da classe (e compartilhados com game.py)
+    matrix =            None
+    blocks_to_reveal =  None
+    all_sprites_list =  None
+    screen =            None
 
     def __init__(self, posX, posY, neighbors=0):
+        """
+            Construtor da classe
+        :param posX: inteiro da posição x de 0 a rows-1 do Bloco no tabuleiro
+        :param posY: inteiro da posição y de 0 a colums-1 do Bloco no tabuleiro
+        :param neighbors: número de minas vizinhas desse Bloco
+        """
         # Chama o construtor do Pai
         super(Block,self).__init__()
-        # image representa o elemento interno da caixa
-        self.image = pygame.Surface([MINA_SIZE, MINA_SIZE])
+
+        self.image = pygame.Surface([MINA_SIZE, MINA_SIZE]) # Conteúdo do bloco
         self.image.fill(COLOR_UNCLICKED_BLOCK)
-        # next_image representa o image depois que uma atualizacao acontece
-        self.next_image = None
-        # posX e posY sao as posicoes do elemento na matriz. Utilizados para encontrar os vizinhos
-        self.posX=posX
+        self.next_image = None         # Representa o image depois que uma atualizacao acontece
+
+        self.posX=posX                 # Posições do elemento na matriz do tabuleiro
         self.posY=posY
-        # objeto retangulo que contem o bloco
+
         self.rect = self.image.get_rect()
         self.rect.x = BLOCK_SIZE * posX + PADDING + BLOCK_SIZE
         self.rect.y = BLOCK_SIZE * posY + PADDING + TITLE_AND_SCORE_SIZE + BLOCK_SIZE
-        # neighbors e o numero de minas vizinhas desse bloco
-        self.neighbors = neighbors
-        # revealed representa se este bloco ja foi revelado pelo/ao usuario
-        self.revealed=False
-        # marked representa se o usuario marcou este bloco com uma bandeira
-        self.marked = False
+
+        self.neighbors = neighbors      # Número de minas vizinhas desse bloco
+
+        self.revealed = False           # Representa se este bloco já foi revelado pelo/ao usuário
+        self.marked = False             # Representa se o usuario marcou este bloco com uma bandeira
 
     def __repr__(self):
         """
-            Cria uma string com posicao, vizinhos, se ja foi revelado ou marcado
-            :return: string com informacao
+            Cria uma represetação de um bloco com posição, vizinhos, se já foi revelado ou marcado
+            :return: string criada
         """
 
         posicao = '(%d,%d)' % (self.posX, self.posY)
@@ -124,27 +87,28 @@ class Block(pygame.sprite.Sprite):
 
     def reveal(self):
         """
-            Revela um bloco e adiciona seus vizinhos na lista de blocos para serem revelados
+            Revela o conteúdo de um bloco e adiciona seus vizinhos na lista de blocos para serem revelados
             :return: nada
         """
 
         if self.revealed:
             return
 
+        # Revela e adiciona contador de blocos revelados
         self.revealed = True
-        #GameController.score += self.neighbors
         GameController.revealedBlocks += 1
 
-        if self.neighbors>0:
-            # Atualiza numero de bombas no tabuleiro
+        if self.neighbors > 0:
+            # Atualiza imagem do número de bombas no tabuleiro
             self.next_image = pygame.image.load("images/number_"+str(self.neighbors)+".png").convert_alpha()
         else:
-            # Adiciona vizinhos na lista de blocos para serem revelados
+            # Muda de cor e adiciona vizinhos na lista de blocos para serem revelados
+            # PS: se já estiver na lista, não insere de novo
             self.next_image = ACTION_FILL_CLICKED
 
             bloco = self.matrix[self.posX + 1][self.posY]
             if type(bloco) is Block and not bloco.revealed \
-                    and self.blocks_to_reveal.count(bloco)==0: #se ja estiver na lista nao coloca denovo
+                    and self.blocks_to_reveal.count(bloco) == 0:
                 self.blocks_to_reveal.append(bloco)
 
             bloco = self.matrix[self.posX][self.posY + 1]
@@ -182,6 +146,7 @@ class Block(pygame.sprite.Sprite):
                     and self.blocks_to_reveal.count(bloco) == 0:
                 self.blocks_to_reveal.append(bloco)
 
+        # Atualiza gráficos de todos os blocos alterados
         self.update_image()
         self.all_sprites_list.draw(self.screen)
         pygame.display.flip()
@@ -189,13 +154,14 @@ class Block(pygame.sprite.Sprite):
 
     def update_image(self):
         """
-            Atualiza image para a imagem previamente carregada em next_image
+            Atualiza imagem do bloco para a imagem previamente carregada em next_image
             :return: nada
         """
 
         if self.next_image is not None:
             if self.next_image == ACTION_FILL_CLICKED:
-                self.image.fill(GRAYDARK)
+                # Objeto imagem é preenchido completamente com uma única cor
+                self.image.fill(COLOR_CLICKED_BLOCK)
             else:
                 self.image = pygame.transform.scale(self.next_image,[MINA_SIZE,MINA_SIZE])
 
@@ -203,12 +169,12 @@ class Block(pygame.sprite.Sprite):
 
     def mark(self, color):
         """
-            Marca um bloco se ele nao foi revelado ou marcado
+            Marca um bloco se ele não foi revelado ou marcado
             :return: nada
         """
+        # Se o bloco ainda não foi revelado ou marcado
         if not self.revealed and not self.marked:
-            #conta movimentos, ja faz a checagem pra nao checar mais de uma vez
-            #muda imagem para marcacao
+            # Altera para o gráfico de um bloco marcado
             self.next_image = pygame.image.load("images/mark_" + str(color) + ".png").convert_alpha()
             self.marked=True
             self.update_image()
@@ -217,8 +183,16 @@ class Block(pygame.sprite.Sprite):
 
 
 class Mine(Block):
+    """
+        Classe Mina (filha de Bloco):
+        Representa uma mina/bomba no jogo. Sobrescreve alguns métodos de Bloco
+    """
 
     def reveal(self):
+        """
+            Revela o conteúdo de uma Mina que explodiu
+        :return: nada
+        """
 
         if not self.revealed: #and not self.marked:
             self.next_image = pygame.image.load("images/mine_exploded.png").convert_alpha()
@@ -229,7 +203,10 @@ class Mine(Block):
         pygame.display.flip()
 
     def reveal_unrevealed(self):
-
+        """
+            Revela o conteúdo de uma Mina que não explodiu
+        :return:
+        """
         if not self.revealed and not self.marked:
             self.next_image = pygame.image.load("images/mine.png").convert_alpha()
             self.revealed = True
@@ -238,6 +215,9 @@ class Mine(Block):
         self.all_sprites_list.draw(self.screen)
         pygame.display.flip()
 
-
     def __repr__(self):
+        """
+            Cria uma representação literal de uma mina
+        :return: string criada
+        """
         return "Mine " + super(Mine,self).__repr__()

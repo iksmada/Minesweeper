@@ -14,7 +14,6 @@ from classes import GameController
 def get_tabuleiro_from_server():
     """
         Método que obtém o tabuleiro de uma partida do servidor
-    :param partida: ID da partida
     :return: string com a informação do tabuleiro
     """
     return get_board(False)
@@ -22,23 +21,30 @@ def get_tabuleiro_from_server():
 def create_new_tabuleiro_on_server():
     """
         Método que gera um novo tabuleiro no servidor
-    :param partida: string com o criador da partida
     :return: nada
     """
-
     return get_board(True)
 
 def get_board(new=False):
-    ROUTE = ROUTE_TABULEIROS + '/' + str(GameController.match_ID)
+    """
+        Método auxiliar para criar ou pegar um tabuleiro do servidor
+    :param new: indica se uma novo tabuleiro deve ser criado
+    :return: tabuleiro criado ou pegado do servidor
+    """
+
+    ROUTE = ROUTE_TABULEIROS + '/' + str(GameController.match)
     # Envia a informação de linhas, colunas e porcentagem de bombas para criação ou verificação
     data = {'rows':GameController.rows, 'cols':GameController.columns, 'bombs':GameController.bombs, 'new':new}
     try:
+        # Se um novo tabuleiro precisa ser criado
         if new:
             requests.post(ROUTE, data)
 
         result = requests.get(ROUTE).content
         if result is not None and len(result) > 0:
+            # Converte string para dicionário
             result = literal_eval(result)
+            # Retorna o tabuleiro e suas dimensões
             return result['tabuleiro'], result['rows'], result['cols']
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
@@ -46,11 +52,9 @@ def get_board(new=False):
 def get_player_ID():
     """
         Método que obtém o ID do jogador para uso interno (ex: 0, 1, 2, ...)
-    :param player: string com o username do jogador
-    :param partida: string com o nome da partida (username do criador da partida)
     :return: id do usuário para esta partida
     """
-    ROUTE = ROUTE_JOGADORES + '/' + str(GameController.match_ID)
+    ROUTE = ROUTE_JOGADORES + '/' + str(GameController.match)
     dados = {'player':GameController.username}
 
     try:
@@ -62,36 +66,33 @@ def get_player_ID():
 def set_up_new_match():
     """
         Método que registra uma nova partida multiplayer no servidor
-    :param partida: string com o nome da partida
     :return: nada
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match)
 
     try:
-        requests.post(ROUTE, GameController.match_ID)
+        requests.post(ROUTE, GameController.match)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
 def start_match():
     """
         Método que registra o início de uma partida no servidor
-    :param partida: string com o nome da partida
     :return: nada
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match)
 
     try:
         requests.delete(ROUTE)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def wait_match_to_begin():
+def get_match_status():
     """
-        Método que 'trava' o jogo até que o criador da partida inicie-a
-    :param partida: string com o nome da partida
-    :return: nada
+        Método que verifica se uma partida começou ou terminou (com delay)
+    :return: 0 se não começou, 1 se começou ou -1 se terminou
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match)
 
     try:
         response = requests.get(ROUTE).content
@@ -99,17 +100,17 @@ def wait_match_to_begin():
             return 1
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
+
     # Checa a cada 100ms
     time.sleep(0.1)
     return 0
 
 def check_match_has_begun():
     """
-        Método que verifica se uma partida já começou
-    :param partida: string com o nome da partida
+        Método que verifica se uma partida já começou (sem delay)
     :return: verdadeiro ou falso
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match_ID)
+    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match)
 
     try:
         response = requests.get(ROUTE).content
@@ -150,7 +151,7 @@ def thread_get_data(player,partida,lista):
                 requests.delete(ROUTE)
                 if str(params['player']) != str(player):
                     print params
-                    # Adiciona na lista compartilhada
+                    # Adiciona clique na lista compartilhada
                     lista.append((params['x'], params['y'], params['color'], params['action']))
         except:
             raise RuntimeError('Não foi possivel conectar no servidor')
@@ -161,12 +162,12 @@ def thread_get_data(player,partida,lista):
 def thread_send_data(x,y,player,partida,color,action):
     """
         Thread que envia a informação de um clique ao servidor
-    :param x: coordenada x do tabuleiro
-    :param y: coordenada y do tabuleiro
-    :param player: ID interno do jogador que clicou
+    :param x:       coordenada x do tabuleiro
+    :param y:       coordenada y do tabuleiro
+    :param player:  ID interno do jogador que clicou
     :param partida: nome da partida
-    :param color: cor da bandeira do jogador
-    :param action: ID da ação (revelar, marcar com bandeira, ...)
+    :param color:   cor da bandeira do jogador
+    :param action:  ID da ação (revelar, marcar com bandeira, ...)
     :return: nada
     """
     ROUTE = ROUTE_JOGADAS + '/' + str(partida)
@@ -180,6 +181,10 @@ def thread_send_data(x,y,player,partida,color,action):
 
 def get_global_score():
 
+    """
+        Método que obtém o score de partidas single player
+    :return: retorna uma lista ordenada dos cinco melhores scores registrados no servidor
+    """
     ROUTE = ROUTE_GLOBAL_SCORE
 
     try:
@@ -190,7 +195,10 @@ def get_global_score():
         raise RuntimeError('Não foi possivel conectar no servidor')
 
 def register_global_score():
-
+    """
+        Método que registra um novo score no servidor
+    :return: nada
+    """
     ROUTE = ROUTE_GLOBAL_SCORE
     data = {'username':     GameController.username,
             'rows':         GameController.rows,
@@ -205,8 +213,11 @@ def register_global_score():
         raise RuntimeError('Não foi possivel conectar no servidor')
 
 def get_match_score():
-
-    ROUTE = ROUTE_SCORE + '/' + str(GameController.match_ID)
+    """
+        Método que obtém o score de uma partida multiplayer
+    :return: retorna uma lista ordenada dos scores registrados no servidor
+    """
+    ROUTE = ROUTE_SCORE + '/' + str(GameController.match)
 
     try:
         result = requests.get(ROUTE).content
@@ -216,8 +227,11 @@ def get_match_score():
         raise RuntimeError('Não foi possivel conectar no servidor')
 
 def get_match_players():
-
-    ROUTE = ROUTE_JOGADORES + '/' + str(GameController.match_ID)
+    """
+        Método que obtém todos os nomes de usuários de uma partida multiplayer
+    :return: lista com todos os usernames
+    """
+    ROUTE = ROUTE_JOGADORES + '/' + str(GameController.match)
 
     try:
         result = requests.get(ROUTE).content
@@ -226,18 +240,12 @@ def get_match_players():
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def delete_match_score():
-
-    ROUTE = ROUTE_SCORE + '/' + str(GameController.match_ID)
-
-    try:
-        requests.delete(ROUTE)
-    except:
-        raise RuntimeError('Não foi possivel conectar no servidor')
-
 def register_match_score():
-
-    ROUTE = ROUTE_SCORE + '/' + str(GameController.match_ID)
+    """
+        Método que registra um novo score de uma partida multiplayer no servidor
+    :return: nada
+    """
+    ROUTE = ROUTE_SCORE + '/' + str(GameController.match)
     data = {'username':     GameController.username,
             'rows':         GameController.rows,
             'cols':         GameController.columns,
@@ -247,5 +255,17 @@ def register_match_score():
 
     try:
         requests.post(ROUTE, data)
+    except:
+        raise RuntimeError('Não foi possivel conectar no servidor')
+
+def delete_match_score():
+    """
+        Método que remove a informação de score de uma partida multiplayer do servidor
+    :return: nada
+    """
+    ROUTE = ROUTE_SCORE + '/' + str(GameController.match)
+
+    try:
+        requests.delete(ROUTE)
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')

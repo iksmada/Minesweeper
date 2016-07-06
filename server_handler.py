@@ -27,41 +27,56 @@ def clean_path(path):
     path = [x for x in path if x]
     return path
 
+def compute_total(rows, cols, bombs, score, movs):
+    """
+        Método que calcula o score final de uma partida single player oy multiplayer
+    :param rows:    número de linhas
+    :param cols:    número de colunas
+    :param bombs:   porcentagem (de 0 à 100) de bombas
+    :param score:   score da partida
+    :param movs:    número de movimentos da partida
+    :return: score final calculado
+    """
+    bonus = min(10, rows * cols / 50 - 1)
+    return score * (100 + bonus - max(0, movs - bombs)) / 100
+
 # Rotas acessíveis
 accepted_services = ['jogos','global']
 # Sub-rotas acessíveis
 accepted_route = {'jogos':['jogadas','partidas', 'tabuleiros', 'jogadores','score','segredo'],
                   'global':['score']}
 
-def compute_total(rows, cols, bombs, score, movs):
-    bonus = rows * cols / 50 - 1
-    return score * (100 + bonus - max(0, movs - bombs)) / 100
 
 class MineSweeperServer(BaseHTTPRequestHandler):
     """
         Servidor REST (HTTP) para partidas multiplayer
     """
-    __version__ = '3.2'
+    __version__ = '3.14'
     server_version = "MineSweeperHTTP/" + __version__
 
-    # Remova esse metodo para ver todas as requests chegando
+    # Remova esse método para ver todas as requests HTTP chegando
     def log_message(self, f, *args):
         pass
 
     def check_path(self,path):
-
+        """
+            Método que verifica se caminho desejado no servidor é válido
+        :param path: lista com o caminho a ser percorrido
+        :return: verdadeiro ou falso
+        """
+        # Verifica se tamanho é válido. Caso contrário, retorna o status do servidor
         if len(path) < 2:
             self.send_response(200)
             self.end_headers()
             self.wfile.write('Running :)')
             return False
-
+        # Verifica se é um serviço válido no servidor
         if path[0] not in accepted_services:
             self.send_response(503)
             self.end_headers()
             self.wfile.write('Unknown service')
             return False
-
+        # Verifica se é um sub-serviço válido no servidor
         if len(path) >= 2 and path[1] not in accepted_route[path[0]]:
             self.send_response(503)
             self.end_headers()
@@ -116,36 +131,42 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         else:
             OPERATION = 0
 
-        ultimo_dict = server_data['jogos']
+        # Percorre informações no servidor (por meio de dicionários)
+        last_dict = server_data['jogos']
         while len(path) > 0:
-            if path[0] in ultimo_dict:
-                ultimo_dict = ultimo_dict[path[0]]
+            if path[0] in last_dict:
+                last_dict = last_dict[path[0]]
             else:
-                ultimo_dict[path[0]] = {}
-                ultimo_dict = ultimo_dict[path[0]]
+                last_dict[path[0]] = {}
+                last_dict = last_dict[path[0]]
 
             path = path[1:]
 
         response = ''
         if OPERATION == 1:
+            # Retorna a informação do clique mais antigo ao usuário
             try:
-                chave_mais_antiga = sorted(ultimo_dict.keys())[0]
-                ultimo_dict = ultimo_dict[chave_mais_antiga]
+                chave_mais_antiga = sorted(last_dict.keys())[0]
+                last_dict = last_dict[chave_mais_antiga]
             except:
-                ultimo_dict = {} # Dict está vazio
+                last_dict = {} # Dict está vazio
+        # Retorna uma representação literal do último dicionário
         if OPERATION in {1, 2, 3}:
-            response = str(ultimo_dict)
+            response = str(last_dict)
+        # Retorna uma representação literal da lista de usuários
         elif OPERATION == 4:
             try:
-                response = str(ultimo_dict.keys())
+                response = str(last_dict.keys())
             except:
                 response = str([])
+        # Retorna uma representação literal da lista de scores registrada
         elif OPERATION == 5:
             try:
-                response = str(ultimo_dict['score'])
+                response = str(last_dict['score'])
             except:
                 response = str([])
 
+        # Termina request
         self.send_response(200)
         self.end_headers()
         self.wfile.write(response)
@@ -165,9 +186,11 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         if not self.check_path(path):
             return
 
+        # Obtém a informação que chegaram por meio da requisição
         content_length = int(self.headers.getheader('content-length', 0))
         POST_data = self.rfile.read(content_length)
 
+        # Registra um novo score global no servidor
         if len(path) >= 2 and path[0] == 'global' and path[1] == 'score':
             temp_dict = {}
             for par in str(POST_data).split('&'):
@@ -183,6 +206,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 username = temp_dict['username']
                 total = compute_total(rows, cols, bombs, score, movs)
                 tupla = (total, username, rows, cols, bombs, score, movs)
+
+                # Adiciona novo score à lista, ordena novamente e pega os cinco melhores resultados
                 server_data['score'].append(tupla)
                 server_data['score'].sort(reverse=True)
                 if len (server_data['score']) > 5:
@@ -210,30 +235,34 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         else:
             OPERATION = 0
 
-        ultimo_dict = server_data['jogos']
+        # Percorre servidor até o último dicionário
+        last_dict = server_data['jogos']
         while len(path) > 0:
-            if path[0] in ultimo_dict:
-                ultimo_dict = ultimo_dict[path[0]]
+            if path[0] in last_dict:
+                last_dict = last_dict[path[0]]
             else:
-                ultimo_dict[path[0]] = {}
-                ultimo_dict = ultimo_dict[path[0]]
+                last_dict[path[0]] = {}
+                last_dict = last_dict[path[0]]
 
             path = path[1:]
 
         if OPERATION == 1:
+            # Registra um novo clique no servidor
             instante = datetime.datetime.now()
             chave_instante = str(instante).replace('.', ':')
-            ultimo_dict[chave_instante] = {}
-            ultimo_dict = ultimo_dict[chave_instante]
+            last_dict[chave_instante] = {}
+            last_dict = last_dict[chave_instante]
 
             for par in str(POST_data).split('&'):
                 par = str(par).split('=')
-                ultimo_dict[str(par[0])] = str(par[1])
+                last_dict[str(par[0])] = str(par[1])
         elif OPERATION == 2:
+            # Registra um novo tabuleiro (se configurado corretamente)
             temp_dict = {}
             for par in str(POST_data).split('&'):
                 par = str(par).split('=')
                 temp_dict[str(par[0])] = str(par[1])
+
             try:
                 rows = int(temp_dict['rows'])
                 cols = int(temp_dict['cols'])
@@ -259,31 +288,35 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 if tabuleiro[r*cols + c] == '0':
                     tabuleiro = tabuleiro[:r*cols + c] + '1' + tabuleiro[r*cols + c + 1:]
                     i += 1
-            if 'tabuleiro' not in ultimo_dict \
-                    or ultimo_dict['soma'] != rows + cols + bombs\
-                    or ultimo_dict['mult'] != rows * cols * bombs:
-                ultimo_dict['tabuleiro'] = tabuleiro
-                # Usado para comparar a assinatura do tabuleiro atual com o antigo
-                ultimo_dict['soma'] = rows + cols + bombs
-                ultimo_dict['mult'] = rows * cols * bombs
-                ultimo_dict['rows'] = rows
-                ultimo_dict['cols'] = cols
-                ultimo_dict['bombs'] = bombs
+
+            if 'tabuleiro' not in last_dict \
+                    or last_dict['soma'] != rows + cols + bombs\
+                    or last_dict['mult'] != rows * cols * bombs:
+                last_dict['tabuleiro'] = tabuleiro
+                # Assinatura do tabuleiro para verificação de mudança
+                last_dict['soma'] = rows + cols + bombs
+                last_dict['mult'] = rows * cols * bombs
+                last_dict['rows'] = rows
+                last_dict['cols'] = cols
+                last_dict['bombs'] = bombs
         elif OPERATION == 3:
-            ultimo_dict['conectando'] = True
+            # Registra que partida é conectável
+            last_dict['conectando'] = True
         elif OPERATION == 4:
+            # Registra um novo jogador em uma partida
             for par in str(POST_data).split('&'):
                 par = str(par).split('=')
                 if par[0] == 'player':
-                    if len(ultimo_dict) == 0:
-                        ultimo_dict[par[1]] = 0
-                    elif par[1] not in ultimo_dict.keys():
-                        ultimo_dict[par[1]] = max(ultimo_dict.values()) + 1
+                    if len(last_dict) == 0:
+                        last_dict[par[1]] = 0
+                    elif par[1] not in last_dict.keys():
+                        last_dict[par[1]] = max(last_dict.values()) + 1
 
-                    response = ultimo_dict[par[1]]
+                    response = last_dict[par[1]]
         elif OPERATION == 5:
-            if 'score' not in ultimo_dict:
-                ultimo_dict['score'] = []
+            # Registra um novo score em uma partida
+            if 'score' not in last_dict:
+                last_dict['score'] = []
 
             temp_dict = {}
             for par in str(POST_data).split('&'):
@@ -299,10 +332,12 @@ class MineSweeperServer(BaseHTTPRequestHandler):
                 username = temp_dict['username']
                 total = compute_total(rows, cols, bombs, score, movs)
                 tupla = (total, username, rows, cols, bombs, score, movs)
-                ultimo_dict['score'].append(tupla)
-                ultimo_dict['score'].sort(reverse=True)
-                if len(ultimo_dict['score']) > 5:
-                    ultimo_dict['score'] = ultimo_dict['score'][:5]
+
+                # Adiciona novo score à lista, ordena novamente e pega os cinco melhores resultados
+                last_dict['score'].append(tupla)
+                last_dict['score'].sort(reverse=True)
+                if len(last_dict['score']) > 5:
+                    last_dict['score'] = last_dict['score'][:5]
             except:
                 self.send_response(406)
                 self.end_headers()
@@ -311,6 +346,8 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.end_headers()
+
+        # Retorna 'Done!' para requests que funcionaram corretamente ou o identificador do usuário
         if OPERATION != 4:
             self.wfile.write('Done!')
         else:
@@ -340,6 +377,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
         else:
             LOOP = len(path)
 
+        # Percorre até o LOOP-ésimo último dicionário
         ultimo_dict = server_data['jogos']
         while len(path) > LOOP:
             if path[0] in ultimo_dict:
@@ -350,12 +388,14 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
             path = path[1:]
 
+        # Remove do servidor apenas a primeira sub-chave do dicionário
         if LOOP == 0:
             try:
                 chave_mais_antiga = sorted(ultimo_dict.keys())[0]
                 del ultimo_dict[chave_mais_antiga]
             except:
-                pass # Dict esta vazio
+                pass # Dict está vazio
+        # Remove do servidor o último dicionário por completo
         elif LOOP == 1:
             try:
                 del ultimo_dict[path[0]]
@@ -369,7 +409,7 @@ class MineSweeperServer(BaseHTTPRequestHandler):
 
 def garbage_collector():
     """
-        Thread que limpa as informações do servidor a cada 15 minutos
+        Thread que limpa as informações do servidor uma vez por mês
     :return: nada
     """
     # Atualiza primeiro acesso
@@ -380,10 +420,11 @@ def garbage_collector():
         # Horário do último acesso
         d = datetime.datetime.fromtimestamp(last_timestamp)
         # Horário do último acesso + 1 mês
-        d = datetime.datetime(d.year, d.month, d.day, d.hour, d.minute, d.second, d.microsecond)
+        d = datetime.datetime(d.year, min(11, d.month + 1), d.day, d.hour, d.minute, d.second, d.microsecond)
 
-        # Se passou 15 minutos
+        # Se passou tempo esperado desde o último acesso
         if d < datetime.datetime.now():
+            # Remove apenas dicionário jogos, preservando score global
             if 'jogos' in server_data:
                 server_data['jogos'].clear()
             print "Server has been cleaned at %s" % str(datetime.datetime.now())

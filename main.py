@@ -4,8 +4,8 @@ from settings import *
 
 def play():
     """
-        Carrega o menu com configurações ou o jogo
-    :return:
+        Carrega o menu de configurações
+    :return: nada
     """
     SettingsApp().run()
 

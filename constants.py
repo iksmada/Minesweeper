@@ -1,14 +1,12 @@
 # -*- coding: utf-8
 
-MINA_SIZE   = 20 # tamanho de uma mina
-BLOCK_SIZE  = 24 # tamanho de um bloco que contem uma mina
+MINA_SIZE   = 20                        # Tamanho de uma mina
+BLOCK_SIZE  = 25                        # Tamanho de um bloco que contém uma mina
 
-# Espaço entre tabuleiro e minas
-PADDING = (BLOCK_SIZE - MINA_SIZE)
-# Espaço para informações da partida
-TITLE_AND_SCORE_SIZE = 4 * BLOCK_SIZE
+PADDING = (BLOCK_SIZE - MINA_SIZE)      # Espaço entre tabuleiro e minas
+TITLE_AND_SCORE_SIZE = 4 * BLOCK_SIZE   # Espaço para informações da partida
 
-# Tamanho de fonte padrão
+# Tamanhos de fonte padrão
 TINY_FONT_SIZE =            int(BLOCK_SIZE*0.25)
 EXTRA_SMALL_FONT_SIZE =     int(BLOCK_SIZE*0.5)
 SMALL_FONT_SIZE =           int(BLOCK_SIZE*0.75)
@@ -51,6 +49,7 @@ ACTION_REGISTER_CLICK = 1
 ACTION_REGISTER_MARK = 2
 
 # Variáveis para partidas multiplayer
+
 # Troque as próximas linhas para partidas localhost
 #SERVER_NAME = 'http://127.0.0.1'
 SERVER_NAME = 'http://ec2-52-67-17-125.sa-east-1.compute.amazonaws.com'

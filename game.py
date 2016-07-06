@@ -255,7 +255,7 @@ def play_game():
                 else:
                     if not check_match_has_begun():
                         utils.wait_for_match_message(screen)
-                        while not get_match_status() > 0:
+                        while not get_match_status() > 0 and not GameController.done:
                             for event in pygame.event.get():
                                 if event.type == pygame.KEYDOWN:
                                     if event.key == pygame.K_ESCAPE:

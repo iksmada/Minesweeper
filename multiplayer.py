@@ -76,7 +76,7 @@ def set_up_new_match():
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def start_match():
+def delete_match():
     """
         Método que registra o início de uma partida no servidor
     :return: nada
@@ -88,7 +88,7 @@ def start_match():
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-def delete_match():
+def start_match():
     """
         Método que registra uma nova partida multiplayer no servidor
     :return: nada
@@ -111,31 +111,28 @@ def get_match_status():
     try:
         response = requests.get(ROUTE).content
         if len(response) == 2:
-            return 1
+            return -1
         else:
-            response = literal_eval(response)
-            if 'connect' in response and response['connect'] == 'False':
-                return -1
+            try:
+                response = literal_eval(response)
+                if 'connect' in response:
+                    if response['connect'] == 'True':
+                        return 1
+                    elif response['connect'] == 'False':
+                        return 0
+            except:
+                pass
     except:
         raise RuntimeError('Não foi possivel conectar no servidor')
 
-    return 0
+    return -1
 
 def check_match_has_begun():
     """
         Método que verifica se uma partida já começou (sem delay)
     :return: verdadeiro ou falso
     """
-    ROUTE = ROUTE_PARTIDAS + '/' + str(GameController.match)
-
-    try:
-        response = requests.get(ROUTE).content
-        if len(response) == 2:
-            return True
-        else:
-            return False
-    except:
-        raise RuntimeError('Não foi possivel conectar no servidor')
+    return get_match_status() <= 0
 
 def thread_get_data(player,partida,lista):
     """
@@ -166,7 +163,6 @@ def thread_get_data(player,partida,lista):
                 # Remove último clique da lista
                 requests.delete(ROUTE)
                 if str(params['player']) != str(player):
-                    print params
                     # Adiciona clique na lista compartilhada
                     lista.append((params['x'], params['y'], params['color'], params['action']))
         except:

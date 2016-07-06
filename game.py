@@ -36,6 +36,7 @@ def play_game():
 
             if GameController.player_ID == 0:
                 result = create_new_tabuleiro_on_server()
+                delete_match()
                 delete_match_score()
             else:
                 result = get_tabuleiro_from_server()
@@ -160,6 +161,7 @@ def play_game():
                         pass #TODO O que fazer quando seu parceiro clica na mina?
                     elif action == ACTION_REGISTER_MARK:
                         bloco.mark(color)
+                        GameController.markedBombs += 1
 
             # Para eventos recebidos pelo pygame
             for event in pygame.event.get():
@@ -246,6 +248,13 @@ def play_game():
             # Atualiza a tela
             pygame.display.flip()
 
+            status = get_match_status()
+
+            if status < 0 and not new_game:
+                GameController.round_is_finished = True
+                GameController.done = True
+                utils.match_has_finished_message(screen)
+
             # Se uma partida multiplayer está começando (verificado depois da primeira iteração)
             if GameController.is_multiplayer and new_game:
                 # Se é o criador da partida
@@ -254,9 +263,9 @@ def play_game():
                     utils.wait_for_space_key_message(screen)
                 else:
                     if not check_match_has_begun():
-                        utils.wait_for_match_message(screen)
                         status = get_match_status()
-                        while not status > 0 and not GameController.done:
+                        utils.wait_for_match_message(screen)
+                        while status > 0 and not GameController.done:
                             for event in pygame.event.get():
                                 if event.type == pygame.KEYDOWN:
                                     if event.key == pygame.K_ESCAPE:
@@ -267,15 +276,14 @@ def play_game():
                                     GameController.done = True
                             # Partida terminou devido o host
                             if status < 0:
-                                GameController.round_is_finished = True
-                                GameController.done = True
                                 break
 
                             pygame.time.wait(100)
                             status = get_match_status()
 
                         if status < 0:
-                            utils.match_has_finished_message(screen)
+                            GameController.round_is_finished = True
+                            GameController.done = True
                     else:
                         # Partida não está conectável
                         utils.match_has_started_message(screen)
@@ -345,8 +353,15 @@ def play_game():
                         elif event.key == pygame.K_SPACE:
                             clicked = True
 
+                status = get_match_status()
+                if status != 0:
+                    clicked = True
+
     # Insere um booleano na lista compartilhada para Thread terminar
     if GameController.is_multiplayer:
         shared_click_list.insert(0,True)
+
+        if GameController.player_ID == 0:
+            delete_match()
 
     pygame.quit()
